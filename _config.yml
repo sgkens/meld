@@ -1,0 +1,20 @@
+# ----------------------------------------------------------------------
+# GLOBAL SETUP
+# ----------------------------------------------------------------------
+remote_theme: just-the-docs/just-the-docs
+
+# Site Metadata
+title: Meld.js Documentation
+description: The 2kb Micro-Frontend Engine documentation.
+favicon_ico: "/assets/favicon.ico" # Use the icon generated from the logo
+
+# ----------------------------------------------------------------------
+# AESTHETICS & NAVIGATION
+# ----------------------------------------------------------------------
+color_scheme: custom # Use our defined color variables (see below)
+search_enabled: true
+footer_content: "Copyright &copy; 2024 Meld.js Contributors. Released under the MIT License."
+
+# Navigation Settings
+aux_links:
+  "GitHub Repo": "https://github.com/your-org/meld.js"

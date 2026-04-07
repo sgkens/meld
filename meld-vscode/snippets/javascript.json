@@ -1,0 +1,20 @@
+{
+  "Meld Component": {
+    "prefix": "meld-comp",
+    "body": [
+      "defineMeld('${1:tag-name}', (el, { emit }) => {",
+      "\tconst state = meldState({ ${2:count: 0} });",
+      "",
+      "\treturn meldHtml`",
+      "\t\t<style>",
+      "\t\t\t:host { display: block; }",
+      "\t\t</style>",
+      "\t\t<div>",
+      "\t\t\t${3:Hello Meld}",
+      "\t\t</div>",
+      "\t`;",
+      "});"
+    ],
+    "description": "Scaffold a new Meld component"
+  }
+}

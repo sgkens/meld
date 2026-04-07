@@ -1,0 +1,17 @@
+{
+  "name": "meldjs",
+  "version": "1.4.0",
+  "description": "The 2kb Micro-Frontend Engine",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/meldjs/dist/meld.core.js",
+  "module": "dist/meldjs/dist/meld.core.esm.js",
+  "exports": {
+    ".": "./dist/meldjs/dist/meld.core.esm.js",
+    "./plugins/*": "./src/plugins/*",
+    "./bin/*": "./bin/*"
+  },
+  "bin": {
+    "meld-artisan": "./bin/meld-artisan.js"
+  }
+}

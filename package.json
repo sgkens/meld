@@ -1,0 +1,37 @@
+{
+  "name": "meldjs",
+  "version": "1.4.0",
+  "description": "The 2kb Micro-Frontend Engine",
+  "license": "MIT",
+  "type": "module",
+  "main": "dist/meldjs/dist/meld.core.js",
+  "module": "dist/meldjs/dist/meld.core.esm.js",
+  "exports": {
+    ".": "./dist/meldjs/dist/meld.core.esm.js",
+    "./plugins/*": "./src/plugins/*",
+    "./bin/*": "./bin/*"
+  },
+  "bin": {
+    "meld-artisan": "./bin/meld-artisan.js"
+  },
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "lint": "eslint src/**/*.js",
+    "lint:fix": "eslint src/**/*.js --fix",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "serve": "node bin/meld-artisan.js serve",
+    "build:docs": "node bin/meld-artisan.js build:static docs/static"
+  },
+  "devDependencies": {
+    "@rollup/plugin-terser": "^0.4.4",
+    "eslint": "^9.17.0",
+    "eslint-config-prettier": "^10.1.8",
+    "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "marked": "^12.0.0",
+    "puppeteer": "^22.0.0",
+    "rollup-plugin-copy": "^3.5.0",
+    "vite": "^5.0.0"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "scopeName": "meld.injection",
+  "injectionSelector": "L:source.js -comment -string, L:source.jsx -comment -string, L:source.ts -comment -string, L:source.tsx -comment -string",
+  "patterns": [
+    {
+      "name": "meta.embedded.block.html",
+      "begin": "(meldHtml|html)\\s*(`)",
+      "beginCaptures": {
+        "1": { "name": "entity.name.function.js" },
+        "2": { "name": "punctuation.definition.string.template.begin.js" }
+      },
+      "end": "(`)",
+      "endCaptures": {
+        "1": { "name": "punctuation.definition.string.template.end.js" }
+      },
+      "patterns": [
+        { "include": "text.html.derivative" }
+      ]
+    }
+  ]
+}

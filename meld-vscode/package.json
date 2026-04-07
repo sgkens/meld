@@ -1,0 +1,30 @@
+{
+  "name": "meld-vscode",
+  "displayName": "Meld.js Support",
+  "description": "Syntax highlighting and snippets for Meld.js",
+  "version": "1.0.0",
+  "publisher": "meld-js",
+  "engines": {
+    "vscode": "^1.70.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets"
+  ],
+  "contributes": {
+    "grammars": [
+      {
+        "scopeName": "meld.injection",
+        "path": "./syntaxes/meld-injection.json",
+        "injectTo": ["source.js", "source.jsx", "source.ts", "source.tsx"],
+        "embeddedLanguages": { "meta.embedded.block.html": "html" }
+      }
+    ],
+    "snippets": [
+      { "language": "javascript", "path": "./snippets/javascript.json" }
+    ],
+    "typescriptServerPlugins": [
+      { "name": "meld-lsp", "enableForWorkspaceTypeScriptVersions": true }
+    ]
+  }
+}
