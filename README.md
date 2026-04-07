@@ -54,24 +54,37 @@ defineMeld('hello-meld', (el) => {
 
 ---
 
+## 🎨 **Meld UI: The Premium Catalog**
+
+Meld comes with a rich, pre-built component suite built entirely without external dependencies like Tailwind. Everything runs natively using our Design Token system.
+
+### **Included Components**
+*   **Inputs & Actions:** `<m-button>`, `<m-input>`, `<m-switch>`, `<m-select>`
+*   **Layout:** `<m-stack>`, `<m-group>`, `<m-card>`, `<m-divider>`
+*   **Data Display:** `<m-table>` (sortable), `<m-badge>`, `<m-avatar>`, `<m-alert>`
+*   **Navigation:** `<m-tabs>`, `<m-breadcrumb>`, `<m-dropdown>`
+*   **Overlays:** `<m-modal>`, `<m-toast>` (with robust toast service)
+
+---
+
 ## 🛠️ **Artisan CLI v2.2**
 
 The Artisan tool provides a robust TUI (Terminal User Interface) for managing your development cycle.
 
 *   **🟦 Dashboard:** Interactive TUI with `npx meld-artisan dashboard`.
 *   **🟩 Scaffolding:** `init`, `init:stack`, and `make:component`.
-*   **💠 Type Safety:** `types` command generates `meld-env.d.ts` recursively.
+*   **💠 Type Safety:** `types` command generates `meld-env.d.ts` recursively for full IDE IntelliSense.
 *   **🔄 Production:** `build:static` for SSG with Declarative Shadow DOM.
 
 ---
 
-## 🧩 **Ecosystem**
+## 🧩 **Ecosystem & Plugins**
 
 Meld ships with 22 official plugins covering every enterprise need:
 
-*   **Infrastructure:** Router (with View Transitions), Store, Persist, Head.
+*   **Infrastructure:** Router (with View Transitions), Store, Persist, Head, I18n.
 *   **Async:** Query, Quiver, gRPC, Streaming AI Hook.
-*   **UX:** Portal, Lazy, A11y, Skeleton, Markdown, Terminal.
+*   **UX:** Portal, Lazy, A11y, Skeleton, Markdown, Terminal, Motion.
 *   **Native Power:** Federation, WASM, Broadcast.
 
 ---
@@ -80,17 +93,24 @@ Meld ships with 22 official plugins covering every enterprise need:
 
 The full documentation is built with Meld.js and hosted at `/docs`.
 
-*   **H2** **Core API Reference**
-*   **H2** **Plugin Guide**
-*   **H2** **KMEL Stack Architecture**
-*   **H2** **Bootcamp: 30-Min Task Manager**
+*   [**Core API Reference**](/docs/core-api.md)
+*   [**Plugin Guide**](/docs/plugins.md)
+*   [**KMEL Stack Architecture**](/docs/advanced-architecture.md)
+*   [**Bootcamp: 30-Min Task Manager**](/docs/bootcamp.md)
+*   [**Performance Benchmarks**](/docs/performance.md)
 
 ---
 
-## 🔄 **Release Candidate Status**
+## 🤝 **Contributing**
 
-**Version:** `v1.4.0-rc2`
-**Status:** Feature Complete. Production Ready.
+Contributions are welcome! Please ensure you adhere to the `build: patch|minor|major` semantic versioning convention when submitting pull requests.
+
+---
+
+## 🔄 **Release Status**
+
+**Version:** `v1.0.0` (Stable)
+**Status:** Battle-Tested. Production Ready.
 
 ---
 
