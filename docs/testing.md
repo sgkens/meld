@@ -7,7 +7,7 @@ nav_order: 12
 
 Testing components with Shadow DOM can be tricky. Meld provides `meld-test-utils` to make it easy using Jest, Vitest, or Playwright.
 
-## 1. Unit Testing (Vitest/Jest)
+## **1. Unit Testing (Vitest/Jest)**
 
 Use the `render` helper to mount components into the document.
 
@@ -25,7 +25,7 @@ test('increments on click', async () => {
 });
 ```
 
-## 2. E2E Testing (Playwright)
+## **2. E2E Testing (Playwright)**
 
 Since Meld components are standard Web Components, Playwright can find them easily using the `>>` shadow-piercing selector.
 

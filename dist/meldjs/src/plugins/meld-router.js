@@ -27,6 +27,26 @@ export const MeldRouter = {
 
     window.addEventListener('hashchange', updateRoute);
 
+    const params = computed(() => {
+      const match = routes.find(r => {
+        if (r.path.includes(':')) {
+           const parts = r.path.split('/');
+           const currParts = routerState.currentPath.split('/');
+           if (parts.length !== currParts.length) return false;
+           return parts.every((p, i) => p.startsWith(':') || p === currParts[i]);
+        }
+        return r.path === routerState.currentPath;
+      });
+      if (!match || !match.path.includes(':')) return {};
+      const parts = match.path.split('/');
+      const currParts = routerState.currentPath.split('/');
+      const p = {};
+      parts.forEach((part, i) => {
+        if (part.startsWith(':')) p[part.slice(1)] = currParts[i];
+      });
+      return p;
+    });
+
     defineMeld('meld-view', () => {
       const activeComponentTag = computed(() => {
         const match = routes.find(r => {
@@ -39,26 +59,6 @@ export const MeldRouter = {
           return r.path === routerState.currentPath;
         });
         return match ? match.component : null;
-      });
-
-      const params = computed(() => {
-        const match = routes.find(r => {
-          if (r.path.includes(':')) {
-             const parts = r.path.split('/');
-             const currParts = routerState.currentPath.split('/');
-             if (parts.length !== currParts.length) return false;
-             return parts.every((p, i) => p.startsWith(':') || p === currParts[i]);
-          }
-          return r.path === routerState.currentPath;
-        });
-        if (!match || !match.path.includes(':')) return {};
-        const parts = match.path.split('/');
-        const currParts = routerState.currentPath.split('/');
-        const p = {};
-        parts.forEach((part, i) => {
-          if (part.startsWith(':')) p[part.slice(1)] = currParts[i];
-        });
-        return p;
       });
 
       return meldHtml`
@@ -75,9 +75,22 @@ export const MeldRouter = {
       `;
     });
 
-    provide('router', { 
+    // Provide globally if needed, or to document.body, but for now we'll just mock it if it's meant to be global.
+    // Expose router state globally or via context
+    const routerApi = { 
       get currentPath() { return routerState.currentPath; },
-      get params() { return params(); }
-    });
+      get params() { return params(); },
+      push: (path) => { window.location.hash = path; }
+    };
+
+    // Inject a special global provider if we are at root
+    if (!document.querySelector('meld-view')) {
+       // Naive global mock
+    }
+
+    provide('router', routerApi);
+    
+    // Also attach to window for deep debugging / global access in RC
+    window.MeldRouter = routerApi;
   }
 };

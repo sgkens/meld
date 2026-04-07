@@ -1,12 +1,14 @@
-/**
- * @fileoverview Meld.js Core Engine - v1.4 (Platform Release)
- * Includes Hydration support for SSG and Keyed List Reconciliation.
- */
+// --------------------------------------------------------
+// 🔗 MELD CORE (v1.4.0-rc1)
+// --------------------------------------------------------
+
+export const VERSION = '1.4.0-rc1';
 
 let activeEffect = null;
 let currentComponent = null;
 let globalStyles = []; // Store for adopted stylesheets
 const installedPlugins = new Set();
+const extensionContext = {};
 
 // 1. REACTIVITY ENGINE
 // --------------------------------------------------------
@@ -99,10 +101,14 @@ export const meld = {
 // --------------------------------------------------------
 export function use(plugin, options = {}) {
   if (installedPlugins.has(plugin)) return;
-  plugin.install({ 
+  const api = { 
     defineMeld, meldState, meldHtml, computed, 
     provide, inject, onMount, onDestroy, meld 
-  }, options);
+  };
+  plugin.install(api, options);
+  if (plugin.setupHelpers) {
+    Object.assign(extensionContext, plugin.setupHelpers(api, options));
+  }
   installedPlugins.add(plugin);
 }
 
@@ -241,7 +247,7 @@ export function defineMeld(tagName, setupFn) {
         this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
       };
 
-      const template = setupFn(this, { emit });
+      const template = setupFn(this, { emit, ...extensionContext });
       if (template) {
         if (this._isHydrating) {
           this.shadowRoot.innerHTML = ''; 

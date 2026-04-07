@@ -1,5 +1,5 @@
 export const MeldDiagnostics = {
-  install(api) {
+  install(_api) {
     console.log("Meld Diagnostics Engine initialized");
   }
 };

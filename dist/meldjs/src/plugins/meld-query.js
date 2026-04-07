@@ -16,5 +16,8 @@ export const MeldQuery = {
       query.refetch = execute;
       return query;
     };
+  },
+  setupHelpers(api) {
+    return { useQuery: api.useQuery };
   }
 };

@@ -21,5 +21,8 @@ export const MeldA11y = {
         }
       });
     };
+  },
+  setupHelpers(api) {
+    return { announce: api.announce, trapFocus: api.trapFocus };
   }
 };

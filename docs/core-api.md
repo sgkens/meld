@@ -9,9 +9,9 @@ The primary functions exported from `meld.core.js`.
 
 ---
 
-## 1. Component Definition & State
+## **1. Component Definition & State**
 
-### `defineMeld(tagName, setupFn)`
+### **`defineMeld(tagName, setupFn)`**
 Registers a new Custom Element, which forms the isolated boundary of your component.
 
 ```javascript
@@ -32,10 +32,10 @@ defineMeld('user-profile', (el, { emit }) => {
 });
 ```
 
-### `meldState(initialObject)`
+### **`meldState(initialObject)`**
 Creates a deep reactive proxy. Changes to properties automatically trigger updates in the UI where the property is accessed.
 
-### `computed(getterFn)`
+### **`computed(getterFn)`**
 Creates a derived, cached, read-only state. Useful for calculations based on `meldState`.
 
 ```javascript
@@ -49,9 +49,9 @@ const fullName = computed(() => {
 // Usage in template: <h1>\${fullName}</h1>
 ```
 
-## 2. Rendering & Templating
+## **2. Rendering & Templating**
 
-### `meldHtml(strings, ...values)`
+### **`meldHtml(strings, ...values)`**
 The core template function. It parses HTML strings and establishes reactive bindings.
 
 #### A. Binding Types (The `$` in `\${...}`)
@@ -85,9 +85,9 @@ return meldHtml`
 `;
 ```
 
-## 3. Styling & Utilities
+## **3. Styling & Utilities**
 
-### `meld.theme(cssString)`
+### **`meld.theme(cssString)`**
 Global Styling Solution. Use this once in your main entry file to load styles (like Tailwind or a global reset) that should be available inside all Shadow DOM components.
 
 ```javascript
@@ -101,7 +101,7 @@ meld.theme(`
 `);
 ```
 
-### `meld.css(object)` & `meld.raw(htmlString)`
+### **`meld.css(object)` & `meld.raw(htmlString)`**
 Helpers for conditional styling and injecting content.
 
 ```javascript

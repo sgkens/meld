@@ -13,7 +13,7 @@ nav_order: 1
 
 **Meld** is a razor-thin JavaScript framework designed for building high-performance, isolated UI widgets and micro-frontends. It combines the fine-grained reactivity of **SolidJS** with the native interoperability of **Web Components**.
 
-### Why Choose Meld?
+### **Why Choose Meld?**
 
 | Feature | Description |
 | :--- | :--- |
@@ -22,7 +22,7 @@ nav_order: 1
 | **🛡️ True Isolation** | Components are Native Custom Elements with **Shadow DOM** for guaranteed style encapsulation. |
 | **🔗 Native Integration** | Works seamlessly inside any existing application (React, Vue, legacy jQuery) because it relies on web standards. |
 
-### Quick Start: The "No-Build" Way
+### **Quick Start: The "No-Build" Way**
 
 To start, you only need `index.html` and the `meld.core.js` file.
 

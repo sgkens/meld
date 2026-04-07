@@ -80,6 +80,8 @@ export const MeldWasm: object;
 export const MeldBroadcast: object;
 export const MeldForms: object;
 export const MeldTime: object;
+export const MeldI18n: object;
+export const MeldMotion: object;
 export const MeldMarkdown: object;
 export const MeldUpload: object;
 export const MeldTerminal: object;

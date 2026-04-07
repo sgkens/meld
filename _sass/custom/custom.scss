@@ -1,5 +1,15 @@
+// --------------------------------------------------------
+// 🎨 MELD.JS Custom Theme
+// Mirroring Artisan TUI Palette
+// --------------------------------------------------------
+
 $body-background-color: #F9F9FB;
-$text-color: #2C3E50;
-$brand-color: #00BCD4;
-$code-color: #FF6600;
+$text-color: #1A1A1A;
+$brand-color: #D64045; // MELD PRIMARY RED
+$code-color: #D64045;
 $sidebar-color: #FFFFFF;
+$nav-child-link-color: #D64045;
+$link-color: #D64045;
+
+@import "support/support";
+@import "custom/setup";

@@ -43,7 +43,7 @@ defineMeld('m-modal', (el, { emit }) => {
 
     <meld-portal>
       <div class="backdrop" ?active="${() => state.isOpen}" onclick="${(e) => e.target === e.currentTarget && close()}">
-        <div class="content">
+        <div class="content" ref="${trapFocus}">
           <div class="header">
             <slot name="title"><strong>Modal Title</strong></slot>
             <button class="close-btn" onclick="${close}">&times;</button>

@@ -1,0 +1,50 @@
+stages:
+  - lint
+  - test
+  - build
+  - deploy
+
+variables:
+  npm_config_cache: "$CI_PROJECT_DIR/.npm"
+
+cache:
+  paths:
+    - .npm/
+    - node_modules/
+
+lint:
+  stage: lint
+  image: node:20
+  script:
+    - npm install
+    - npm run lint
+
+test:
+  stage: test
+  image: node:20
+  script:
+    - npm install
+    - npm run test
+
+build:
+  stage: build
+  image: node:20
+  script:
+    - npm install
+    - npm run build
+  artifacts:
+    paths:
+      - dist/
+
+pages:
+  stage: deploy
+  image: node:20
+  script:
+    - npm install
+    - npm run build:docs
+    - mv docs/static public
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

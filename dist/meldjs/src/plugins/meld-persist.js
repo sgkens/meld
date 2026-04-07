@@ -13,5 +13,8 @@ export const MeldPersist = {
       });
       return state;
     };
+  },
+  setupHelpers(api) {
+    return { persist: api.persist };
   }
 };

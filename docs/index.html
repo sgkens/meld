@@ -64,19 +64,28 @@
         { path: '/cli', component: 'doc-cli' },
         { path: '/caveats', component: 'doc-caveats' },
         { path: '/advanced', component: 'doc-advanced' },
-        { path: '/bootcamp', component: 'doc-bootcamp' }
-      ]
-    });
+        { path: '/bootcamp', component: 'doc-bootcamp' },
+        { path: '/roadmap', component: 'doc-roadmap' },
+        { path: '/plugin-development', component: 'doc-plugin-dev' },
+        { path: '/faq', component: 'doc-faq' },
+        { path: '/performance', component: 'doc-perf' },
+        { path: '/architecture', component: 'doc-arch' }
+        ]
+        });
 
-    defineMeld('doc-home', () => meldHtml\`<doc-page file="./index.md"></doc-page>\`);
-    defineMeld('doc-install', () => meldHtml\`<doc-page file="./installation.md"></doc-page>\`);
-    defineMeld('doc-core', () => meldHtml\`<doc-page file="./core-api.md"></doc-page>\`);
-    defineMeld('doc-plugins', () => meldHtml\`<doc-page file="./plugins.md"></doc-page>\`);
-    defineMeld('doc-cli', () => meldHtml\`<doc-page file="./cli.md"></doc-page>\`);
-    defineMeld('doc-caveats', () => meldHtml\`<doc-page file="./caveats.md"></doc-page>\`);
-    defineMeld('doc-advanced', () => meldHtml\`<doc-page file="./advanced-architecture.md"></doc-page>\`);
-    defineMeld('doc-bootcamp', () => meldHtml\`<doc-page file="./bootcamp.md"></doc-page>\`);
-
+        defineMeld('doc-home', () => meldHtml`<doc-page file="./index.md"></doc-page>`);
+        defineMeld('doc-install', () => meldHtml`<doc-page file="./installation.md"></doc-page>`);
+        defineMeld('doc-core', () => meldHtml`<doc-page file="./core-api.md"></doc-page>`);
+        defineMeld('doc-plugins', () => meldHtml`<doc-page file="./plugins.md"></doc-page>`);
+        defineMeld('doc-cli', () => meldHtml`<doc-page file="./cli.md"></doc-page>`);
+        defineMeld('doc-caveats', () => meldHtml`<doc-page file="./caveats.md"></doc-page>`);
+        defineMeld('doc-advanced', () => meldHtml`<doc-page file="./advanced-architecture.md"></doc-page>`);
+        defineMeld('doc-bootcamp', () => meldHtml`<doc-page file="./bootcamp.md"></doc-page>`);
+        defineMeld('doc-roadmap', () => meldHtml`<doc-page file="./roadmap.md"></doc-page>`);
+        defineMeld('doc-plugin-dev', () => meldHtml`<doc-page file="./plugin-development.md"></doc-page>`);
+        defineMeld('doc-faq', () => meldHtml`<doc-page file="./faq.md"></doc-page>`);
+        defineMeld('doc-perf', () => meldHtml`<doc-page file="./performance.md"></doc-page>`);
+        defineMeld('doc-arch', () => meldHtml`<doc-page file="./architecture-deep-dive.md"></doc-page>`);
     defineMeld('meld-app', (el, { inject }) => {
       const router = inject('router');
       const linkClass = (path) => router && router.currentPath === path ? 'active' : '';
@@ -90,9 +99,14 @@
           <a href="#/plugins" class="\${() => linkClass('/plugins')}">Plugins</a>
           <a href="#/cli" class="\${() => linkClass('/cli')}">Artisan CLI</a>
           <a href="#/caveats" class="\${() => linkClass('/caveats')}">Known Limitations</a>
-          <a href="#/advanced" class="\${() => linkClass('/advanced')}">KMEL Architecture</a>
-          <a href="#/bootcamp" class="\${() => linkClass('/bootcamp')}">30-Min Bootcamp</a>
-        </nav>
+          <a href="#/advanced" class="${() => linkClass('/advanced')}">KMEL Architecture</a>
+          <a href="#/bootcamp" class="${() => linkClass('/bootcamp')}">30-Min Bootcamp</a>
+          <a href="#/performance" class="${() => linkClass('/performance')}">Benchmarks</a>
+          <a href="#/architecture" class="${() => linkClass('/architecture')}">Deep Dive</a>
+          <a href="#/roadmap" class="${() => linkClass('/roadmap')}">Roadmap</a>
+          <a href="#/plugin-development" class="${() => linkClass('/plugin-development')}">Building Plugins</a>
+          <a href="#/faq" class="${() => linkClass('/faq')}">FAQ</a>
+          </nav>
         <main>
           <meld-view></meld-view>
         </main>

@@ -7,7 +7,7 @@ nav_order: 11
 
 Meld components use **Shadow DOM**, which provides perfect style isolation. This means your component's CSS will never leak out or be affected by outside styles.
 
-## 1. Local Scoped Styles
+## **1. Local Scoped Styles**
 
 Place your styles directly inside the `meldHtml` template.
 
@@ -23,7 +23,7 @@ defineMeld('red-box', () => {
 });
 ```
 
-## 2. Global Theming (`meld.theme`)
+## **2. Global Theming (`meld.theme`)**
 
 If you want shared variables (like brand colors) or base styles (like Tailwind) to work inside all components, use `meld.theme()`.
 
@@ -36,7 +36,7 @@ meld.theme(`
 `);
 ```
 
-## 3. Dynamic Styling (`meld.css` & `meld.style`)
+## **3. Dynamic Styling (`meld.css` & `meld.style`)**
 
 Helpers for conditional classes and inline styles.
 

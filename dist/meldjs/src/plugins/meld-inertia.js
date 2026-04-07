@@ -1,13 +1,13 @@
 export const MeldInertia = {
-  install(api, options) {
+  install(api, _options) {
     const { defineMeld, meldHtml, meldState, onMount } = api;
-    defineMeld('inertia-root', (el) => {
+    defineMeld('inertia-root', (_el) => {
       const state = meldState({ componentTag: null, props: {} });
       onMount(async () => {
         const { createInertiaApp } = await import('https://esm.sh/@inertiajs/core@1.0.14');
         createInertiaApp({
           resolve: name => import(`./Pages/${name}.js`),
-          setup({ el: rootEl, App, props }) {
+          setup({ el: _rootEl, App, props }) {
             state.componentTag = App.default; 
             state.props = props;
           },

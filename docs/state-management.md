@@ -7,7 +7,7 @@ nav_order: 10
 
 Meld uses a "Reactivity First" approach. You don't need a heavy external library; everything is built on standard JavaScript Proxies.
 
-## 1. Local State (`meldState`)
+## **1. Local State (`meldState`)**
 
 Each component usually manages its own local state.
 
@@ -18,11 +18,11 @@ defineMeld('my-counter', () => {
 });
 ```
 
-## 2. Shared Global State (`meld-store`)
+## **2. Shared Global State (`meld-store`)**
 
 For app-wide data (like User sessions), use the `meld-store` plugin.
 
-### Setup
+### **Setup**
 ```javascript
 // store.js
 import { meldState } from './src/meld.core.js';
@@ -35,7 +35,7 @@ defineMeld('user-profile', () => {
 });
 ```
 
-## 3. Persistent State (`meld-persist`)
+## **3. Persistent State (`meld-persist`)**
 
 Automatically sync your state to LocalStorage.
 
@@ -49,7 +49,7 @@ defineMeld('settings', (el, { persist }) => {
 });
 ```
 
-## 4. Cross-Tab Sync (`meld-broadcast`)
+## **4. Cross-Tab Sync (`meld-broadcast`)**
 
 Keep state in sync across multiple browser tabs using the `meld-broadcast` plugin.
 

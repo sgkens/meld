@@ -7,10 +7,10 @@ nav_order: 4
 
 Meld's core is tiny. Plugins add features like routing, global state, and persistence.
 
-## 1. Meld Router (`meld-router`)
+## **1. Meld Router (`meld-router`)**
 Enables client-side SPA routing using URL hashes.
 
-### Example
+### **Example**
 ```javascript
 import { MeldRouter } from './plugins/meld-router.js';
 // Define your components (home-page, about-page) before this block
@@ -26,10 +26,10 @@ use(MeldRouter, {
 // <meld-view></meld-view>
 ```
 
-## 2. Meld Query (`meld-query`)
+## **2. Meld Query (`meld-query`)**
 Reactive wrapper for asynchronous data fetching. Solves the boilerplate of managing loading and error states.
 
-### Example
+### **Example**
 ```javascript
 import { MeldQuery } from './plugins/meld-query.js';
 use(MeldQuery);
@@ -53,10 +53,10 @@ defineMeld('fetch-data', (el, { useQuery }) => {
 });
 ```
 
-## 3. Meld Portal (`meld-portal`)
+## **3. Meld Portal (`meld-portal`)**
 Teleports content (e.g., modals, tooltips) from inside the Shadow DOM to the main `document.body` to avoid z-index/clipping issues.
 
-### Example
+### **Example**
 ```javascript
 // Must be defined globally:
 import { MeldPortal } from './plugins/meld-portal.js';
@@ -82,10 +82,10 @@ defineMeld('app-modal', () => {
 });
 ```
 
-## 4. Meld A11y (`meld-a11y`)
+## **4. Meld A11y (`meld-a11y`)**
 Adds crucial utilities for accessibility compliance.
 
-### Example
+### **Example**
 ```javascript
 import { MeldA11y } from './plugins/meld-a11y.js';
 use(MeldA11y);
