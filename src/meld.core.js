@@ -1,7 +1,8 @@
-/**
- * @fileoverview Meld.js Core Engine - v1.4 (Platform Release)
- * Includes Hydration support for SSG and Keyed List Reconciliation.
- */
+// --------------------------------------------------------
+// 🔗 MELD CORE (v1.4.0-rc1)
+// --------------------------------------------------------
+
+export const VERSION = '1.4.0-rc1';
 
 let activeEffect = null;
 let currentComponent = null;
