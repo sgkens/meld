@@ -1,5 +1,5 @@
 export const MeldMotion = {
-  install(api) {
+  install(_api) {
     // Basic implementation blueprint from PDR
     // Logic to handle enter/exit classes on mount/unmount
     // This requires core support for deferred removal, 
