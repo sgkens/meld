@@ -1,0 +1,5 @@
+docs/skipped/**
+docs/**/skipped/**
+node_modules/**
+dist/**
+coverage/**

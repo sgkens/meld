@@ -1,117 +1,309 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
-  <title>Meld.js Documentation</title>
-  <style>
-    body { font-family: 'Inter', sans-serif; background: #F9F9FB; margin: 0; display: flex; height: 100vh; overflow: hidden; }
-    nav { width: 250px; background: #fff; border-right: 1px solid #eaeaea; padding: 20px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; }
-    nav a { text-decoration: none; color: #2C3E50; padding: 8px 12px; border-radius: 6px; font-weight: 500; transition: background 0.2s; }
-    nav a:hover, nav a.active { background: #f4f4f5; color: #D64045; }
-    main { flex: 1; padding: 40px; overflow-y: auto; line-height: 1.6; }
-    .markdown-body { max-width: 800px; margin: 0 auto; }
-    pre { background: #f6f8fa; padding: 16px; border-radius: 6px; overflow-x: auto; }
-    code { font-family: monospace; background: #f6f8fa; padding: 2px 4px; border-radius: 3px; }
-    pre code { padding: 0; background: transparent; }
-    h1, h2, h3 { color: #1a1a1a; margin-top: 2em; }
-    h1 { border-bottom: 1px solid #eaeaea; padding-bottom: 10px; margin-top: 0; }
-    a { color: #D64045; }
-    table { width: 100%; border-collapse: collapse; margin-bottom: 1em; }
-    th, td { border: 1px solid #eaeaea; padding: 8px; text-align: left; }
-    th { background: #f9f9fb; }
-    blockquote { border-left: 4px solid #D64045; margin: 0; padding-left: 1em; color: #666; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meld Documentation</title>
+  <meta name="description" content="Documentation for Meld, a small JavaScript framework for reactive Web Components and plugin-based micro-frontends.">
+  <link rel="icon" href="../logo.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./assets/meld-docs.css">
 </head>
 <body>
-  <meld-app></meld-app>
+  <header class="site-header">
+    <a class="brand" href="#top" aria-label="Meld documentation home">
+      <img src="../logo.svg" alt="" width="34" height="34">
+      <span>Meld</span>
+    </a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav">Menu</button>
+    <nav id="site-nav" class="site-nav" aria-label="Primary navigation">
+      <a href="#install">Install</a>
+      <a href="#core">Core API</a>
+      <a href="#plugins">Plugins</a>
+      <a href="#tooling">Tooling</a>
+      <a href="#release">Release</a>
+    </nav>
+    <button class="theme-toggle" type="button" aria-label="Toggle color theme">Theme</button>
+  </header>
 
-  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script type="module">
-    import { defineMeld, meldHtml, meldState, use, inject, onMount, meld } from '../src/meld.core.js';
-    import { MeldRouter } from '../src/plugins/meld-router.js';
-
-    // A component to fetch and render markdown
-    defineMeld('doc-page', (el) => {
-      const state = meldState({ content: 'Loading...', loading: true });
-      
-      onMount(async () => {
-        try {
-          const file = el.getAttribute('file');
-          const res = await fetch(file);
-          if (!res.ok) throw new Error('Not found');
-          const text = await res.text();
-          state.content = marked.parse(text);
-        } catch (e) {
-          state.content = '<h1>404 - Page Not Found</h1>';
-        } finally {
-          state.loading = false;
-        }
-      });
-
-      return meldHtml`
-        <div class="markdown-body">
-          \${() => state.loading ? 'Loading...' : meld.raw(state.content)}
+  <main id="top">
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="eyebrow">Meld v1 documentation</p>
+        <h1 id="hero-title">Reactive Web Components with a small core and plugin surface.</h1>
+        <p class="lede">Meld provides component registration, proxy state, tagged-template rendering, lifecycle hooks, context, and optional plugins for routing, data, portals, persistence, accessibility, and tooling.</p>
+        <div class="hero-actions">
+          <a class="button primary" href="#install">Install Meld</a>
+          <a class="button secondary" href="#core">Read API</a>
         </div>
-      `;
-    });
+      </div>
+      <div class="hero-panel" aria-label="Install command">
+        <span class="panel-label">Package</span>
+        <code>npm install @meldjs/meld</code>
+        <span class="panel-label">Core import</span>
+        <code>import { defineMeld, meldHtml, meldState } from '@meldjs/meld';</code>
+        <span class="panel-label">Plugin import</span>
+        <code>import { MeldRouter } from '@meldjs/meld/plugins/router';</code>
+      </div>
+    </section>
 
-    use(MeldRouter, {
-      routes: [
-        { path: '/', component: 'doc-home' },
-        { path: '/installation', component: 'doc-install' },
-        { path: '/core-api', component: 'doc-core' },
-        { path: '/plugins', component: 'doc-plugins' },
-        { path: '/cli', component: 'doc-cli' },
-        { path: '/caveats', component: 'doc-caveats' },
-        { path: '/advanced', component: 'doc-advanced' },
-        { path: '/bootcamp', component: 'doc-bootcamp' },
-        { path: '/roadmap', component: 'doc-roadmap' },
-        { path: '/plugin-development', component: 'doc-plugin-dev' },
-        { path: '/faq', component: 'doc-faq' },
-        { path: '/performance', component: 'doc-perf' },
-        { path: '/architecture', component: 'doc-arch' }
-        ]
-        });
+    <section class="release-strip" aria-label="Release summary">
+      <div>
+        <strong>Package</strong>
+        <span>@meldjs/meld</span>
+      </div>
+      <div>
+        <strong>Runtime</strong>
+        <span>Browser ESM and CDN UMD</span>
+      </div>
+      <div>
+        <strong>Domain</strong>
+        <span>meldjs.dev</span>
+      </div>
+      <div>
+        <strong>Output</strong>
+        <span>dist/meld.core.*</span>
+      </div>
+    </section>
 
-        defineMeld('doc-home', () => meldHtml`<doc-page file="./index.md"></doc-page>`);
-        defineMeld('doc-install', () => meldHtml`<doc-page file="./installation.md"></doc-page>`);
-        defineMeld('doc-core', () => meldHtml`<doc-page file="./core-api.md"></doc-page>`);
-        defineMeld('doc-plugins', () => meldHtml`<doc-page file="./plugins.md"></doc-page>`);
-        defineMeld('doc-cli', () => meldHtml`<doc-page file="./cli.md"></doc-page>`);
-        defineMeld('doc-caveats', () => meldHtml`<doc-page file="./caveats.md"></doc-page>`);
-        defineMeld('doc-advanced', () => meldHtml`<doc-page file="./advanced-architecture.md"></doc-page>`);
-        defineMeld('doc-bootcamp', () => meldHtml`<doc-page file="./bootcamp.md"></doc-page>`);
-        defineMeld('doc-roadmap', () => meldHtml`<doc-page file="./roadmap.md"></doc-page>`);
-        defineMeld('doc-plugin-dev', () => meldHtml`<doc-page file="./plugin-development.md"></doc-page>`);
-        defineMeld('doc-faq', () => meldHtml`<doc-page file="./faq.md"></doc-page>`);
-        defineMeld('doc-perf', () => meldHtml`<doc-page file="./performance.md"></doc-page>`);
-        defineMeld('doc-arch', () => meldHtml`<doc-page file="./architecture-deep-dive.md"></doc-page>`);
-    defineMeld('meld-app', (el, { inject }) => {
-      const router = inject('router');
-      const linkClass = (path) => router && router.currentPath === path ? 'active' : '';
+    <div class="docs-shell">
+      <aside class="toc" aria-label="On this page">
+        <a href="#overview">Overview</a>
+        <a href="#install">Install</a>
+        <a href="#quickstart">Quick Start</a>
+        <a href="#core">Core API</a>
+        <a href="#plugins">Plugins</a>
+        <a href="#tooling">Tooling</a>
+        <a href="#deployment">Deployment</a>
+        <a href="#release">Release Checklist</a>
+      </aside>
 
-      return meldHtml`
-        <nav>
-          <div style="font-weight: bold; font-size: 1.2rem; padding: 10px; color: #D64045;">🔗 Meld.js Docs</div>
-          <a href="#/" class="\${() => linkClass('/')}">Introduction</a>
-          <a href="#/installation" class="\${() => linkClass('/installation')}">Installation</a>
-          <a href="#/core-api" class="\${() => linkClass('/core-api')}">Core API</a>
-          <a href="#/plugins" class="\${() => linkClass('/plugins')}">Plugins</a>
-          <a href="#/cli" class="\${() => linkClass('/cli')}">Artisan CLI</a>
-          <a href="#/caveats" class="\${() => linkClass('/caveats')}">Known Limitations</a>
-          <a href="#/advanced" class="${() => linkClass('/advanced')}">KMEL Architecture</a>
-          <a href="#/bootcamp" class="${() => linkClass('/bootcamp')}">30-Min Bootcamp</a>
-          <a href="#/performance" class="${() => linkClass('/performance')}">Benchmarks</a>
-          <a href="#/architecture" class="${() => linkClass('/architecture')}">Deep Dive</a>
-          <a href="#/roadmap" class="${() => linkClass('/roadmap')}">Roadmap</a>
-          <a href="#/plugin-development" class="${() => linkClass('/plugin-development')}">Building Plugins</a>
-          <a href="#/faq" class="${() => linkClass('/faq')}">FAQ</a>
-          </nav>
-        <main>
-          <meld-view></meld-view>
-        </main>
-      `;
-    });
-  </script>
+      <article class="docs-content">
+        <section id="overview" class="doc-section">
+          <p class="section-label">Overview</p>
+          <h2>What Meld includes</h2>
+          <p>Meld is built around platform APIs: Custom Elements, Shadow DOM, template literals, JavaScript proxies, DOM events, and ES modules. The core package exposes the primitives. Plugins extend the component context without increasing the default runtime surface.</p>
+          <div class="feature-grid">
+            <article>
+              <h3>Component Boundary</h3>
+              <p><code>defineMeld</code> registers a custom element and gives each component a Shadow DOM root.</p>
+            </article>
+            <article>
+              <h3>Reactive State</h3>
+              <p><code>meldState</code> tracks property access and reruns only the effects that depend on changed state.</p>
+            </article>
+            <article>
+              <h3>Template Rendering</h3>
+              <p><code>meldHtml</code> binds functions to text, attributes, events, refs, raw HTML, and Node output.</p>
+            </article>
+            <article>
+              <h3>Plugin Surface</h3>
+              <p><code>use</code> installs plugins and exposes helpers such as router, query, portal, a11y, and persist.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="install" class="doc-section">
+          <p class="section-label">Install</p>
+          <h2>Package and CDN usage</h2>
+          <p>Use the scoped package name for npm and JSR. Legacy unscoped examples are not valid for the first public release.</p>
+          <div class="code-tabs" data-tabs>
+            <div class="tab-list" role="tablist" aria-label="Install methods">
+              <button type="button" role="tab" aria-selected="true" data-tab="npm">npm</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="pnpm">pnpm</button>
+              <button type="button" role="tab" aria-selected="false" data-tab="cdn">CDN</button>
+            </div>
+            <pre data-panel="npm"><code>npm install @meldjs/meld</code></pre>
+            <pre data-panel="pnpm" hidden><code>pnpm add @meldjs/meld</code></pre>
+            <pre data-panel="cdn" hidden><code>&lt;script type="module"&gt;
+  import { defineMeld, meldHtml, meldState } from 'https://cdn.jsdelivr.net/npm/@meldjs/meld/dist/meld.core.esm.js';
+&lt;/script&gt;</code></pre>
+          </div>
+        </section>
+
+        <section id="quickstart" class="doc-section">
+          <p class="section-label">Quick Start</p>
+          <h2>Define a component</h2>
+          <p>The setup function returns a <code>DocumentFragment</code>. Reactive template functions update when accessed state changes.</p>
+          <pre><code>import { defineMeld, meldHtml, meldState } from '@meldjs/meld';
+
+defineMeld('hello-meld', () => {
+  const state = meldState({ count: 0 });
+
+  return meldHtml`
+    &lt;button onclick="${() => state.count++}"&gt;
+      Count: ${() => state.count}
+    &lt;/button&gt;
+  `;
+});</code></pre>
+        </section>
+
+        <section id="core" class="doc-section">
+          <p class="section-label">Core API</p>
+          <h2>Core reference</h2>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Export</th>
+                  <th>Type</th>
+                  <th>Purpose</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>defineMeld(tag, setup)</code></td>
+                  <td>Function</td>
+                  <td>Registers a custom element and runs the setup function when connected.</td>
+                </tr>
+                <tr>
+                  <td><code>meldState(object)</code></td>
+                  <td>Function</td>
+                  <td>Creates a proxy state object with dependency tracking.</td>
+                </tr>
+                <tr>
+                  <td><code>computed(getter)</code></td>
+                  <td>Function</td>
+                  <td>Creates a derived getter that updates when dependencies change.</td>
+                </tr>
+                <tr>
+                  <td><code>meldHtml</code></td>
+                  <td>Tagged template</td>
+                  <td>Creates DOM fragments with reactive text, attribute, event, Node, and raw HTML support.</td>
+                </tr>
+                <tr>
+                  <td><code>onMount(fn)</code> / <code>onDestroy(fn)</code></td>
+                  <td>Lifecycle</td>
+                  <td>Registers callbacks during component setup.</td>
+                </tr>
+                <tr>
+                  <td><code>provide(key, value)</code> / <code>inject(key, fallback)</code></td>
+                  <td>Context</td>
+                  <td>Shares values through component ancestry using DOM events.</td>
+                </tr>
+                <tr>
+                  <td><code>use(plugin, options)</code></td>
+                  <td>Plugin</td>
+                  <td>Installs plugin helpers and component definitions.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="plugins" class="doc-section">
+          <div class="section-heading">
+            <div>
+              <p class="section-label">Plugins</p>
+              <h2>Plugin index</h2>
+            </div>
+            <label class="search-box">
+              <span>Filter</span>
+              <input type="search" id="plugin-filter" placeholder="router, query, portal">
+            </label>
+          </div>
+          <div class="plugin-grid" id="plugin-grid">
+            <article data-plugin="router routes navigation">
+              <h3>Router</h3>
+              <code>@meldjs/meld/plugins/router</code>
+              <p>Hash-based client routing and <code>&lt;meld-view&gt;</code>.</p>
+            </article>
+            <article data-plugin="query fetch data loading error">
+              <h3>Query</h3>
+              <code>@meldjs/meld/plugins/query</code>
+              <p>Reactive fetch state for data, loading, error, and refetch.</p>
+            </article>
+            <article data-plugin="portal modal body teleport">
+              <h3>Portal</h3>
+              <code>@meldjs/meld/plugins/portal</code>
+              <p>Moves modal and overlay content to <code>document.body</code>.</p>
+            </article>
+            <article data-plugin="a11y accessibility focus announce">
+              <h3>A11y</h3>
+              <code>@meldjs/meld/plugins/a11y</code>
+              <p>Live announcements and focus trapping helpers.</p>
+            </article>
+            <article data-plugin="persist localstorage storage">
+              <h3>Persist</h3>
+              <code>@meldjs/meld/plugins/persist</code>
+              <p>Synchronizes state into browser storage.</p>
+            </article>
+            <article data-plugin="forms validation fields">
+              <h3>Forms</h3>
+              <code>@meldjs/meld/plugins/forms</code>
+              <p>Form state and validation helper surface.</p>
+            </article>
+          </div>
+        </section>
+
+        <section id="tooling" class="doc-section">
+          <p class="section-label">Tooling</p>
+          <h2>CLI and editor support</h2>
+          <p><code>meld-artisan</code> provides scaffolding, local serving, component generation, and type generation. VS Code and LSP work remains tracked separately before marketplace release.</p>
+          <pre><code>npx meld-artisan init my-app
+npx meld-artisan make:component user-card
+npx meld-artisan serve
+npx meld-artisan types</code></pre>
+        </section>
+
+        <section id="deployment" class="doc-section">
+          <p class="section-label">Deployment</p>
+          <h2>Release artifacts</h2>
+          <p>The production package publishes ESM, UMD, minified files, source maps, source modules, plugin modules, and generated type definitions.</p>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Artifact</th>
+                  <th>Path</th>
+                  <th>Use</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>ESM</td>
+                  <td><code>dist/meld.core.esm.js</code></td>
+                  <td>Modern bundlers and browser module imports.</td>
+                </tr>
+                <tr>
+                  <td>ESM minified</td>
+                  <td><code>dist/meld.core.esm.min.js</code></td>
+                  <td>CDN module imports.</td>
+                </tr>
+                <tr>
+                  <td>UMD</td>
+                  <td><code>dist/meld.core.js</code></td>
+                  <td>Browser global usage through <code>window.Meld</code>.</td>
+                </tr>
+                <tr>
+                  <td>Types</td>
+                  <td><code>src/meld.d.ts</code></td>
+                  <td>TypeScript and editor tooling.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+
+        <section id="release" class="doc-section">
+          <p class="section-label">Release</p>
+          <h2>First release checklist</h2>
+          <ul class="checklist">
+            <li>Package name is <code>@meldjs/meld</code>.</li>
+            <li>Docs examples use current package and plugin import paths.</li>
+            <li>Legacy docs are preserved in <code>docs/skipped/legacy</code> and ignored by Eleventy.</li>
+            <li>Core tests, lint, and build pass before tagging.</li>
+            <li>NPM, JSR, Generic Package Registry, and CDN links resolve after publish.</li>
+          </ul>
+        </section>
+      </article>
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <span>Meld documentation for the first public release.</span>
+    <a href="./meld-11ty-nunchucks-theme-sot.html">Theme SOT</a>
+  </footer>
+
+  <script src="./assets/meld-docs.js" type="module"></script>
 </body>
 </html>
