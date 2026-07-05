@@ -1,0 +1,57 @@
+{
+  "$schema": "https://jsr.io/schema/config-file.v1.json",
+  "name": "@meldjs/meld",
+  "version": "1.4.0",
+  "exports": {
+    ".": "./dist/meld.core.esm.js",
+    "./core": "./dist/meld.core.esm.js",
+    "./plugins/a11y": "./src/plugins/meld-a11y.js",
+    "./plugins/ai": "./src/plugins/meld-ai.js",
+    "./plugins/broadcast": "./src/plugins/meld-broadcast.js",
+    "./plugins/cookie": "./src/plugins/meld-cookie.js",
+    "./plugins/devtools": "./src/plugins/meld-devtools.js",
+    "./plugins/diagnostics": "./src/plugins/meld-diagnostics.js",
+    "./plugins/download": "./src/plugins/meld-download.js",
+    "./plugins/federation": "./src/plugins/meld-federation.js",
+    "./plugins/forms": "./src/plugins/meld-forms.js",
+    "./plugins/grpc": "./src/plugins/meld-grpc.js",
+    "./plugins/head": "./src/plugins/meld-head.js",
+    "./plugins/i18n": "./src/plugins/meld-i18n.js",
+    "./plugins/inertia": "./src/plugins/meld-inertia.js",
+    "./plugins/lazy": "./src/plugins/meld-lazy.js",
+    "./plugins/logger": "./src/plugins/meld-logger.js",
+    "./plugins/markdown": "./src/plugins/meld-markdown.js",
+    "./plugins/microbus": "./src/plugins/meld-microbus.js",
+    "./plugins/motion": "./src/plugins/meld-motion.js",
+    "./plugins/persist": "./src/plugins/meld-persist.js",
+    "./plugins/portal": "./src/plugins/meld-portal.js",
+    "./plugins/query": "./src/plugins/meld-query.js",
+    "./plugins/quiver": "./src/plugins/meld-quiver.js",
+    "./plugins/router": "./src/plugins/meld-router.js",
+    "./plugins/skeleton": "./src/plugins/meld-skeleton.js",
+    "./plugins/socket": "./src/plugins/meld-socket.js",
+    "./plugins/store": "./src/plugins/meld-store.js",
+    "./plugins/terminal": "./src/plugins/meld-terminal.js",
+    "./plugins/test-utils": "./src/plugins/meld-test-utils.js",
+    "./plugins/time": "./src/plugins/meld-time.js",
+    "./plugins/upload": "./src/plugins/meld-upload.js",
+    "./plugins/versioning": "./src/plugins/meld-versioning.js",
+    "./plugins/wasm": "./src/plugins/meld-wasm.js"
+  },
+  "publish": {
+    "include": [
+      "dist/**",
+      "src/**",
+      "bin/**",
+      "README.md",
+      "package.json",
+      "meld-env.d.ts"
+    ],
+    "exclude": [
+      "tests/**",
+      "docs/**",
+      "node_modules/**",
+      "coverage/**"
+    ]
+  }
+}
