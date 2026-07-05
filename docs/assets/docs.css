@@ -1915,11 +1915,145 @@ kbd {
 }
 
 /* --------------------------------------------------------------------------
-   27. Ctrl+K Search Modal
+   27. Benchmark Harness UI
+   -------------------------------------------------------------------------- */
+.bench-ui {
+  margin-block: var(--space-xl) var(--space-lg);
+}
+
+.bench-run-btn {
+  margin-block-end: var(--space-md);
+}
+
+.bench-progress {
+  margin-block: var(--space-sm);
+}
+
+.bench-progress-bar {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--bg-panel);
+  overflow: hidden;
+  margin-block-end: var(--space-xs);
+}
+
+.bench-progress-fill {
+  height: 100%;
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--accent-brand), var(--accent-amber));
+  transition: width 0.3s var(--ease-smooth);
+  width: 0%;
+}
+
+.bench-progress span {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+.bench-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: var(--space-lg);
+  margin-block: var(--space-lg);
+}
+
+.bench-card {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--bg-panel);
+  padding: var(--space-lg);
+}
+
+.bench-card--race {
+  grid-column: 1 / -1;
+}
+
+.bench-card-title {
+  font-family: var(--font-heading);
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--accent-amber);
+  margin-block-end: var(--space-sm);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.bench-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+.bench-table th {
+  text-align: left;
+  padding: 0.3rem 0.5rem;
+  font-family: var(--font-mono);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.bench-table td {
+  padding: 0.35rem 0.5rem;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(148, 163, 184, 0.06);
+}
+
+.bench-table td strong {
+  color: var(--text-main);
+}
+
+.bench-winner td {
+  color: var(--accent-brand) !important;
+}
+
+.bench-winner td strong {
+  color: var(--accent-brand) !important;
+}
+
+.bench-chart {
+  margin-block-start: var(--space-lg);
+  max-height: 200px;
+}
+
+.bench-callout {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-md);
+  border: 1px solid var(--border-cyan);
+  border-radius: var(--radius-lg);
+  background: rgba(6, 182, 212, 0.06);
+  padding: var(--space-md) var(--space-lg);
+  margin-block: var(--space-lg);
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.bench-callout .lucide {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  margin-top: 2px;
+  color: var(--accent-cyan);
+}
+
+.bench-callout strong {
+  display: block;
+  color: var(--text-main);
+  margin-block-end: 0.25rem;
+}
+
+
+/* --------------------------------------------------------------------------
+   28. Ctrl+K Search Modal
    -------------------------------------------------------------------------- */
 
 /* Body lock when modal is open */
 body.search-open {
+
   overflow: hidden;
 }
 

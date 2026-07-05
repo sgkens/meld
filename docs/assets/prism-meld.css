@@ -1,0 +1,254 @@
+/* ==========================================================================
+   Meld.js — Custom Prism Syntax Theme
+   "Meld Ember" — red/orange pastel palette, easy on the eyes,
+   aligned with --accent-brand (#ef4444) and --accent-amber (#f59e0b).
+   Applied server-side by eleventy-plugin-syntaxhighlight (Prism).
+   ========================================================================== */
+
+/* ── Base code block container ───────────────────────────────────────────── */
+code[class*="language-"],
+pre[class*="language-"] {
+  color: #e8cbb0;            /* warm cream — readable base text */
+  background: #0d1018;
+  font-family: "JetBrains Mono", Menlo, Consolas, "Courier New", monospace;
+  font-size: 0.875em;
+  line-height: 1.7;
+  tab-size: 2;
+  hyphens: none;
+  text-align: left;
+  white-space: pre;
+  word-spacing: normal;
+  word-break: normal;
+  word-wrap: normal;
+  -moz-tab-size: 2;
+  -o-tab-size: 2;
+}
+
+pre[class*="language-"] {
+  overflow: auto;
+  padding: 1.4rem 1.5rem;
+  margin: 0;
+  border-radius: 0.625rem;
+  border: 1px solid rgba(239, 68, 68, 0.15);
+  background: #0d1018;
+  position: relative;
+}
+
+/* Inline code */
+:not(pre) > code[class*="language-"] {
+  padding: 0.15em 0.45em;
+  border-radius: 0.3em;
+  background: rgba(239, 68, 68, 0.1);
+  color: #f4b47a;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  white-space: normal;
+}
+
+/* ── Meld keyword palette ────────────────────────────────────────────────── */
+
+/* Core Meld API identifiers: defineMeld, meldState, meldHtml, computed, use,
+   onMount, onDestroy, provide, inject — rendered in Meld's brand red-orange */
+.token.function {
+  color: #f4834f;            /* meld-orange — warm, pastel, on-brand */
+  font-weight: 600;
+}
+
+/* Keywords: const, let, var, return, export, import, class, extends, etc. */
+.token.keyword {
+  color: #e85d5d;            /* brand red — slightly desaturated for eye comfort */
+  font-style: italic;
+  font-weight: 500;
+}
+
+/* String literals */
+.token.string,
+.token.template-string,
+.token.attr-value {
+  color: #c8a97a;            /* warm amber-cream */
+}
+
+/* Template literal backticks & interpolation punctuation */
+.token.template-punctuation {
+  color: #f59e0b;            /* amber accent */
+}
+
+/* Numbers & boolean */
+.token.number,
+.token.boolean {
+  color: #f9b972;            /* soft amber-gold */
+}
+
+/* Null, undefined */
+.token.null,
+.token.undefined {
+  color: #c87a6a;
+  font-style: italic;
+}
+
+/* Comments */
+.token.comment,
+.token.prolog,
+.token.doctype,
+.token.cdata {
+  color: #5e6b5a;            /* desaturated olive-grey — recedes naturally */
+  font-style: italic;
+}
+
+/* Punctuation: brackets, semicolons, commas */
+.token.punctuation {
+  color: #8b7e72;            /* muted warm-grey */
+}
+
+/* Operators: =, =>, +, -, &&, ||, etc. */
+.token.operator {
+  color: #e87d5d;            /* light meld-orange */
+}
+
+/* Class names, constructor names */
+.token.class-name,
+.token.maybe-class-name {
+  color: #f4c06a;            /* amber-yellow — distinct from functions */
+  font-weight: 600;
+}
+
+/* Properties & object keys */
+.token.property {
+  color: #dfa07a;            /* warm peach */
+}
+
+/* HTML/JSX tag names */
+.token.tag {
+  color: #e06060;            /* soft brand red */
+}
+
+/* HTML/JSX attribute names */
+.token.attr-name {
+  color: #c8a97a;
+  font-style: italic;
+}
+
+/* Regex */
+.token.regex {
+  color: #f59e0b;
+}
+
+/* Built-in globals: console, document, window, customElements */
+.token.builtin {
+  color: #c8a97a;
+}
+
+/* Import/export module specifiers */
+.token.imports,
+.token.exports {
+  color: #e85d5d;
+  font-style: italic;
+}
+
+/* Arrow function (=> part) */
+.token.arrow {
+  color: #e87d5d;
+}
+
+/* CSS selectors */
+.token.selector {
+  color: #f4834f;
+}
+
+/* CSS property names */
+.token.property.css {
+  color: #dfa07a;
+}
+
+/* CSS values */
+.token.value.css {
+  color: #c8a97a;
+}
+
+/* Diff added/removed */
+.token.inserted {
+  background: rgba(16, 185, 129, 0.12);
+  color: #6ee7b7;
+  display: block;
+}
+
+.token.deleted {
+  background: rgba(239, 68, 68, 0.12);
+  color: #fca5a5;
+  display: block;
+}
+
+/* Line highlight (line-highlight plugin) */
+.line-highlight {
+  background: rgba(239, 68, 68, 0.08);
+  border-left: 3px solid #ef4444;
+}
+
+/* Line numbers */
+.line-numbers .line-numbers-rows {
+  border-right: 1px solid rgba(239, 68, 68, 0.2);
+}
+
+.line-numbers-rows > span::before {
+  color: #3d3028;
+}
+
+/* ── Language label badge ────────────────────────────────────────────────── */
+pre[class*="language-"]::before {
+  content: attr(data-lang);
+  position: absolute;
+  top: 0.6rem;
+  right: 3rem;          /* leaves room for copy button */
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.6rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(239, 68, 68, 0.5);
+  pointer-events: none;
+}
+
+/* Specific language badge labels */
+pre.language-javascript::before { content: "JS"; }
+pre.language-js::before         { content: "JS"; }
+pre.language-typescript::before { content: "TS"; }
+pre.language-ts::before         { content: "TS"; }
+pre.language-html::before       { content: "HTML"; }
+pre.language-css::before        { content: "CSS"; }
+pre.language-bash::before,
+pre.language-shell::before      { content: "Shell"; }
+pre.language-json::before       { content: "JSON"; }
+pre.language-mermaid::before    { content: ""; }
+
+/* ── Selection ───────────────────────────────────────────────────────────── */
+code[class*="language-"]::selection,
+code[class*="language-"] *::selection,
+pre[class*="language-"]::selection,
+pre[class*="language-"] *::selection {
+  background: rgba(239, 68, 68, 0.22);
+  color: inherit;
+}
+
+/* ── Light theme overrides ───────────────────────────────────────────────── */
+:root[data-theme="light"] code[class*="language-"],
+:root[data-theme="light"] pre[class*="language-"] {
+  color: #3d2218;
+  background: #fdf6f0;
+}
+
+:root[data-theme="light"] pre[class*="language-"] {
+  background: #fdf6f0;
+  border-color: rgba(239, 68, 68, 0.18);
+}
+
+:root[data-theme="light"] .token.comment  { color: #a08070; }
+:root[data-theme="light"] .token.keyword  { color: #c0392b; }
+:root[data-theme="light"] .token.function { color: #d45e18; }
+:root[data-theme="light"] .token.string   { color: #a06030; }
+:root[data-theme="light"] .token.number   { color: #c07020; }
+:root[data-theme="light"] .token.operator { color: #c05020; }
+:root[data-theme="light"] .token.class-name { color: #a05010; }
+:root[data-theme="light"] .token.property  { color: #805030; }
+:root[data-theme="light"] .token.tag       { color: #b03030; }
+:root[data-theme="light"] .token.attr-name { color: #906040; }
+:root[data-theme="light"] .token.punctuation { color: #806050; }
+:root[data-theme="light"] pre[class*="language-"]::before { color: rgba(192, 57, 43, 0.5); }
