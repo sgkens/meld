@@ -1,62 +1,45 @@
 ---
 title: State Management
-nav_order: 10
+nav_order: 5
 ---
 
-# 🧠 State Management in Meld
+# State Management
 
-Meld uses a "Reactivity First" approach. You don't need a heavy external library; everything is built on standard JavaScript Proxies.
+Meld offers a tiered approach to state, from local component state to global application stores.
 
-## **1. Local State (`meldState`)**
-
-Each component usually manages its own local state.
+## Local State (`meldState`)
+Used for data specific to a single component instance.
 
 ```javascript
-defineMeld('my-counter', () => {
-  const state = meldState({ count: 0 });
-  return meldHtml`<button onclick="\${() => state.count++}">\${() => state.count}</button>`;
+defineMeld('toggle-btn', () => {
+  const state = meldState({ on: false });
+  // 'state' is isolated to this specific <toggle-btn>
 });
 ```
 
-## **2. Shared Global State (`meld-store`)**
+## Derived State (computed)
 
-For app-wide data (like User sessions), use the `meld-store` plugin.
+Used when one value depends on others. Cached automatically.
 
-### **Setup**
+
 ```javascript
-// store.js
-import { meldState } from './src/meld.core.js';
-export const store = meldState({ user: null, theme: 'light' });
+const cart = meldState({ items: [], tax: 0.1 });
 
-// app.js
-import { store } from './store.js';
-defineMeld('user-profile', () => {
-  return meldHtml`<div>User: \${() => store.user?.name}</div>`;
+const total = computed(() => {
+  const sub = cart.items.reduce((a, b) => a + b.price, 0);
+  return sub + (sub * cart.tax);
 });
 ```
 
-## **3. Persistent State (`meld-persist`)**
+## Dependency Injection (provide / inject)
 
-Automatically sync your state to LocalStorage.
-
-```javascript
-import { MeldPersist } from './src/plugins/meld-persist.js';
-use(MeldPersist);
-
-defineMeld('settings', (el, { persist }) => {
-  const settings = persist(meldState({ darkMode: false }), 'my-settings');
-  // ...
-});
-```
-
-## **4. Cross-Tab Sync (`meld-broadcast`)**
-
-Keep state in sync across multiple browser tabs using the `meld-broadcast` plugin.
+Used to share state down the tree without prop-drilling.
 
 ```javascript
-import { MeldBroadcast } from './src/plugins/meld-broadcast.js';
-use(MeldBroadcast);
+// Ancestor
+const theme = meldState({ color: 'dark' });
+provide('theme', theme);
 
-// Inside setup:
-useBroadcast('my-app', store, ['user', 'theme']);
+// Descendant (Any depth)
+const theme = inject('theme');
 ```

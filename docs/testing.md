@@ -1,36 +1,38 @@
 ---
-title: Testing Guide
-nav_order: 12
+title: Testing & Quality
+nav_order: 7
 ---
 
-# 🧪 Testing Meld Components
+# Testing & Quality Assurance
 
-Testing components with Shadow DOM can be tricky. Meld provides `meld-test-utils` to make it easy using Jest, Vitest, or Playwright.
+Meld v1.3 introduces a complete testing layer to ensure your micro-frontends are stable.
 
-## **1. Unit Testing (Vitest/Jest)**
+## 1. Testing Components
+We use `meld-test-utils` to handle Shadow DOM complexity.
 
-Use the `render` helper to mount components into the document.
+**Example Test (Jest/Vitest):** ```javascript
+import { MeldTestUtils } from '../src/plugins/meld-test-utils.js';
 
-```javascript
-import { MeldTestUtils } from './src/plugins/meld-test-utils.js';
-import './components/my-button.js';
-
-test('increments on click', async () => {
-  const { element, shadowQuery } = MeldTestUtils.render('my-button');
+test('User Card renders name', () => {
+  // Render component into a clean DOM
+  const { shadowQuery, unmount } = MeldTestUtils.render('user-card', { name: 'Alice' });
   
-  const btn = shadowQuery('button');
-  btn.click();
+  // Query inside Shadow DOM
+  const h1 = shadowQuery('h1');
   
-  expect(btn.textContent).toBe('1');
+  expect(h1.textContent).toBe('Alice');
+  
+  unmount();
 });
-```
+````
 
-## **2. E2E Testing (Playwright)**
+## 2\. Debugging
 
-Since Meld components are standard Web Components, Playwright can find them easily using the `>>` shadow-piercing selector.
+Use the `meld-devtools` plugin during development to visualize updates.
 
-```javascript
-await page.goto('http://localhost:3000');
-await page.click('my-button >> button');
-await expect(page.locator('my-button >> span')).toHaveText('1');
-```
+  * **Visual Flash:** Components flash when updated.
+  *  **Console:** Run `MeldDiagnostics.getComponentMap()` to see all active instances.
+
+## 3\. Style Guide
+
+Because Meld uses raw JavaScript, we recommend **ESLint**+ **Prettier** with standard JS rules. No special plugins required.

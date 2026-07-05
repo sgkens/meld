@@ -3,7 +3,7 @@ title: Artisan CLI
 nav_order: 6
 ---
 
-# 🛠️ Meld Artisan CLI
+# Meld Artisan CLI
 
 Artisan is your command-line companion, automating setup and component generation.
 

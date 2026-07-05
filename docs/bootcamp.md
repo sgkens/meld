@@ -3,7 +3,7 @@ title: The 30-Minute Bootcamp
 nav_order: 20
 ---
 
-# 🎓 Meld Bootcamp
+# Meld Bootcamp
 
 Learn the entire framework by building a "Real-time Task Manager."
 

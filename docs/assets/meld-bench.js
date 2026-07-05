@@ -6,7 +6,7 @@
    1. Component Mount Storm    — rapid mount/unmount of N custom elements
    2. Reactive State Churn     — high-frequency state updates, DOM reads verified
    3. Pixel-Heavy Render Loop  — large list re-renders with keyed diffing
-   4. Simulated Framework Race — Meld vs. plain DOM vs. innerHTML baseline
+   4. Framework Race — Meld vs. Vue vs. React vs. HTMX
    ========================================================================== */
 
 'use strict';
@@ -27,6 +27,32 @@ const p95 = (arr) => {
 const fps = (ms) => (1000 / ms).toFixed(1);
 
 const perf = performance;
+const CDN = {
+  react: 'https://esm.sh/react@18.3.1?dev',
+  reactDom: 'https://esm.sh/react-dom@18.3.1/client?dev',
+  vue: 'https://esm.sh/vue@3.5.17?dev',
+  htmx: 'https://unpkg.com/htmx.org@2.0.4',
+};
+
+const loadScriptOnce = (src, globalName) =>
+  new Promise((resolve, reject) => {
+    if (globalName && window[globalName]) {
+      resolve(window[globalName]);
+      return;
+    }
+    const existing = document.querySelector(`script[src="${src}"]`);
+    if (existing) {
+      existing.addEventListener('load', () => resolve(globalName ? window[globalName] : true), { once: true });
+      existing.addEventListener('error', reject, { once: true });
+      return;
+    }
+    const script = document.createElement('script');
+    script.src = src;
+    script.async = true;
+    script.onload = () => resolve(globalName ? window[globalName] : true);
+    script.onerror = reject;
+    document.head.append(script);
+  });
 
 /* --------------------------------------------------------------------------
    Results Store
@@ -215,8 +241,9 @@ async function benchPixelRender(listSize = 500, cycles = 30) {
 }
 
 /* --------------------------------------------------------------------------
-   4. Framework Race — Meld vs. plain DOM vs. innerHTML
-   All three render N rows and update them M times. Normalised to ms/1000-ops.
+   4. Framework Race — Meld vs. Vue vs. React vs. HTMX
+   Each framework renders N rows and updates them M times. Normalised to
+   ms/1000 row updates. React, Vue, and HTMX are loaded from public CDN URLs.
    -------------------------------------------------------------------------- */
 async function benchFrameworkRace(rows = 200, updates = 50) {
   const { defineMeld, meldState, meldHtml, meld } =
@@ -228,40 +255,8 @@ async function benchFrameworkRace(rows = 200, updates = 50) {
   document.body.append(container);
 
   const makeData = (n) => Array.from({ length: n }, (_, i) => ({ id: i, v: Math.random() }));
+  const contestants = {};
 
-  /* ── Contestant A: plain innerHTML ──────────────────────────── */
-  const innerHtmlDiv = document.createElement('div');
-  container.append(innerHtmlDiv);
-
-  const t_ih0 = perf.now();
-  for (let u = 0; u < updates; u++) {
-    innerHtmlDiv.innerHTML = makeData(rows)
-      .map((d) => `<div style="color:hsl(${d.v * 360},60%,60%)">${d.id}:${d.v.toFixed(4)}</div>`)
-      .join('');
-    await new Promise((r) => requestAnimationFrame(r));
-  }
-  const innerHtmlTime = perf.now() - t_ih0;
-
-  /* ── Contestant B: Manual DOM (createElement loop) ──────────── */
-  const domDiv = document.createElement('div');
-  container.append(domDiv);
-
-  const t_dom0 = perf.now();
-  for (let u = 0; u < updates; u++) {
-    domDiv.textContent = '';
-    const frag = document.createDocumentFragment();
-    makeData(rows).forEach((d) => {
-      const div = document.createElement('div');
-      div.style.color = `hsl(${d.v * 360},60%,60%)`;
-      div.textContent = `${d.id}:${d.v.toFixed(4)}`;
-      frag.append(div);
-    });
-    domDiv.append(frag);
-    await new Promise((r) => requestAnimationFrame(r));
-  }
-  const domTime = perf.now() - t_dom0;
-
-  /* ── Contestant C: Meld reactive list ───────────────────────── */
   const RACE_TAG = 'meld-bench-race';
   if (!customElements.get(RACE_TAG)) {
     defineMeld(RACE_TAG, () => {
@@ -297,20 +292,99 @@ async function benchFrameworkRace(rows = 200, updates = 50) {
     await new Promise((r) => requestAnimationFrame(r));
   }
   const meldTime = perf.now() - t_meld0;
-
-  container.remove();
+  raceEl.remove();
   delete window.__meldRaceState;
 
-  // Normalise: ms per 1000 operations
-  const norm = (t) => ((t / (rows * updates)) * 1000).toFixed(3);
+  try {
+    const { createApp, h, ref, nextTick } = await import(CDN.vue);
+    const vueMount = document.createElement('div');
+    container.append(vueMount);
+    const vueItems = ref(makeData(rows));
+    const app = createApp({
+      setup() {
+        return () => h('div', vueItems.value.map((item) =>
+          h('div', { key: item.id, style: { color: `hsl(${item.v * 360},60%,60%)` } }, `${item.id}:${item.v.toFixed(4)}`)
+        ));
+      },
+    });
+    app.mount(vueMount);
+    await nextTick();
+    const t_vue0 = perf.now();
+    for (let u = 0; u < updates; u++) {
+      vueItems.value = makeData(rows);
+      await nextTick();
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+    contestants['Vue 3'] = { total: (perf.now() - t_vue0).toFixed(1), status: 'ok' };
+    app.unmount();
+    vueMount.remove();
+  } catch (err) {
+    contestants['Vue 3'] = { total: null, status: `skipped: ${err.message}` };
+  }
+
+  try {
+    const React = await import(CDN.react);
+    const ReactDOM = await import(CDN.reactDom);
+    const reactMount = document.createElement('div');
+    container.append(reactMount);
+    const root = ReactDOM.createRoot(reactMount);
+    const renderRows = (items) => React.createElement(
+      'div',
+      null,
+      items.map((item) => React.createElement(
+        'div',
+        { key: item.id, style: { color: `hsl(${item.v * 360},60%,60%)` } },
+        `${item.id}:${item.v.toFixed(4)}`
+      ))
+    );
+    root.render(renderRows(makeData(rows)));
+    await new Promise((r) => requestAnimationFrame(r));
+    const t_react0 = perf.now();
+    for (let u = 0; u < updates; u++) {
+      root.render(renderRows(makeData(rows)));
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+    contestants['React 18'] = { total: (perf.now() - t_react0).toFixed(1), status: 'ok' };
+    root.unmount();
+    reactMount.remove();
+  } catch (err) {
+    contestants['React 18'] = { total: null, status: `skipped: ${err.message}` };
+  }
+
+  try {
+    const htmx = await loadScriptOnce(CDN.htmx, 'htmx');
+    const htmxMount = document.createElement('div');
+    container.append(htmxMount);
+    const renderHtmxRows = (items) => {
+      htmxMount.innerHTML = items
+        .map((item) => `<div hx-preserve="true" id="htmx-row-${item.id}" style="color:hsl(${item.v * 360},60%,60%)">${item.id}:${item.v.toFixed(4)}</div>`)
+        .join('');
+      htmx.process(htmxMount);
+    };
+    renderHtmxRows(makeData(rows));
+    await new Promise((r) => requestAnimationFrame(r));
+    const t_htmx0 = perf.now();
+    for (let u = 0; u < updates; u++) {
+      renderHtmxRows(makeData(rows));
+      await new Promise((r) => requestAnimationFrame(r));
+    }
+    contestants['HTMX 2'] = { total: (perf.now() - t_htmx0).toFixed(1), status: 'ok' };
+    htmxMount.remove();
+  } catch (err) {
+    contestants['HTMX 2'] = { total: null, status: `skipped: ${err.message}` };
+  }
+
+  container.remove();
+
+  const norm = (t) => t === null ? null : ((Number(t) / (rows * updates)) * 1000).toFixed(3);
+  contestants['Meld.js'] = { total: meldTime.toFixed(1), status: 'ok' };
+  Object.keys(contestants).forEach((name) => {
+    contestants[name].per1kOps = norm(contestants[name].total);
+  });
 
   return {
     label: 'Framework Race',
-    contestants: {
-      'innerHTML': { total: innerHtmlTime.toFixed(1), per1kOps: norm(innerHtmlTime) },
-      'Manual DOM': { total: domTime.toFixed(1), per1kOps: norm(domTime) },
-      'Meld.js': { total: meldTime.toFixed(1), per1kOps: norm(meldTime) },
-    },
+    contestants,
     rows,
     updates,
   };
@@ -359,6 +433,19 @@ if (document.currentScript?.dataset.benchAutorun !== undefined) {
     // Inject UI
     target.innerHTML = `
       <div class="bench-ui">
+        <div class="bench-config" aria-label="Benchmark configuration">
+          <label class="bench-field" for="bench-rows">
+            <span>Rows</span>
+            <input id="bench-rows" type="number" min="20" max="2000" step="20" value="200">
+          </label>
+          <label class="bench-field" for="bench-updates">
+            <span>Updates</span>
+            <input id="bench-updates" type="number" min="5" max="300" step="5" value="30">
+          </label>
+          <div class="bench-note">
+            Framework race loads Vue, React, and HTMX from public CDN URLs. Run locally or in Docker for consistent network and CPU conditions.
+          </div>
+        </div>
         <button class="bench-run-btn ui-button ui-button--primary" id="bench-run">
           <i data-lucide="zap"></i> Run Benchmarks
         </button>
@@ -378,6 +465,8 @@ if (document.currentScript?.dataset.benchAutorun !== undefined) {
       const fill = document.getElementById('bench-fill');
       const stageEl = document.getElementById('bench-stage');
       const resultsEl = document.getElementById('bench-results');
+      const raceRows = clampInt(document.getElementById('bench-rows')?.value, 20, 2000, 200);
+      const raceUpdates = clampInt(document.getElementById('bench-updates')?.value, 5, 300, 30);
 
       btn.disabled = true;
       progress.hidden = false;
@@ -388,11 +477,11 @@ if (document.currentScript?.dataset.benchAutorun !== undefined) {
         mount: 'Running mount storm…',
         state: 'Running state churn…',
         pixel: 'Running pixel render…',
-        race: 'Running framework race…',
+        race: 'Running Meld/Vue/React/HTMX race…',
         done: 'Complete!',
       };
 
-      const r = await runBenchmarks({}, ({ stage, pct }) => {
+      const r = await runBenchmarks({ raceRows, raceUpdates }, ({ stage, pct }) => {
         fill.style.width = `${pct}%`;
         stageEl.textContent = stageLabels[stage] ?? stage;
       });
@@ -408,6 +497,12 @@ if (document.currentScript?.dataset.benchAutorun !== undefined) {
       if (window.lucide) window.lucide.createIcons({ nodes: [resultsEl] });
     });
   });
+}
+
+function clampInt(value, min, max, fallback) {
+  const parsed = Number.parseInt(value, 10);
+  if (!Number.isFinite(parsed)) return fallback;
+  return Math.max(min, Math.min(max, parsed));
 }
 
 function renderResults(r) {
@@ -436,8 +531,8 @@ function renderResults(r) {
           ${Object.entries(res.contestants).map(([name, c]) => `
             <tr class="${name === 'Meld.js' ? 'bench-winner' : ''}">
               <td>${name}</td>
-              <td><strong>${c.total}</strong></td>
-              <td>${c.per1kOps}</td>
+              <td><strong>${c.total ?? 'n/a'}</strong></td>
+              <td>${c.per1kOps ?? c.status}</td>
             </tr>
           `).join('')}
         </tbody>
@@ -463,7 +558,7 @@ function drawCharts(r) {
   if (!raceCtx) return;
 
   const labels = Object.keys(r.frameworkRace.contestants);
-  const values = labels.map((k) => parseFloat(r.frameworkRace.contestants[k].total));
+  const values = labels.map((k) => parseFloat(r.frameworkRace.contestants[k].total || '0'));
   const colors = labels.map((k) =>
     k === 'Meld.js'
       ? 'rgba(239, 68, 68, 0.8)'

@@ -3,7 +3,7 @@ title: Styling Components
 nav_order: 11
 ---
 
-# 🎨 Styling & Theming
+# Styling & Theming
 
 Meld components use **Shadow DOM**, which provides perfect style isolation. This means your component's CSS will never leak out or be affected by outside styles.
 

@@ -37,17 +37,16 @@ nav_order: 1
       <span class="dot dot-g"></span>
       <span class="terminal-title">src/counter.js</span>
     </div>
-    <pre><code class="language-javascript">import { defineMeld, meldHtml, meldState }
-  from '@meldjs/meld';
+    <pre class="language-javascript"><code class="language-javascript">import { defineMeld, meldHtml, meldState } from '@meldjs/meld';
 
-defineMeld('task-counter', () => {
+defineMeld('task-counter', () =&gt; {
   const state = meldState({ count: 0 });
 
   return meldHtml`
     &lt;div class="counter"&gt;
-      &lt;button onclick="${() => state.count--}"&gt;−&lt;/button&gt;
-      &lt;span&gt;${() => state.count}&lt;/span&gt;
-      &lt;button onclick="${() => state.count++}"&gt;+&lt;/button&gt;
+      &lt;button onclick="${() =&gt; state.count--}"&gt;-&lt;/button&gt;
+      &lt;span&gt;${() =&gt; state.count}&lt;/span&gt;
+      &lt;button onclick="${() =&gt; state.count++}"&gt;+&lt;/button&gt;
     &lt;/div&gt;
   `;
 });</code></pre>
@@ -135,12 +134,12 @@ defineMeld('task-counter', () => {
     </div>
   </div>
   <div class="diagram-panel">
-    <pre><code class="language-mermaid">flowchart TD
+    {% highlight "mermaid" %}flowchart TD
   State["meldState()"] --> Bindings["Template Bindings"]
   Bindings --> DOM["Targeted DOM Update"]
   Plugins["Plugin Context"] --> Ctx["Component Context"]
   Ctx --> Bindings
-  CE["Custom Element\nlifecycle"] --> Ctx</code></pre>
+  CE["Custom Element\nlifecycle"] --> Ctx{% endhighlight %}
   </div>
 </section>
 

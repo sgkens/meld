@@ -1,7 +1,10 @@
 ---
 title: Performance & Benchmarks
-nav_order: 15
+nav_order: 3
+parent: Architecture
 description: Live in-browser benchmarks, framework comparison charts, and a deep-dive into how Meld.js achieves maximum rendering performance.
+tags: [performance, benchmarks, rendering]
+category: Architecture
 ---
 
 # Performance & Benchmarks
@@ -12,7 +15,7 @@ Meld.js achieves **maximum rendering performance** by eliminating every abstract
 
 ## Live Benchmark Harness
 
-Run the benchmark directly in your browser. The harness performs **four independent stress tests** and reports mean, median, and p95 timings.
+Run the benchmark directly in your browser. The harness performs **four independent stress tests** and reports mean, median, and p95 timings. The framework race includes configurable row/update counts for local and Docker runs.
 
 <div class="bench-callout">
   <i data-lucide="flask-conical"></i>
@@ -112,18 +115,19 @@ return meldHtml`
 
 ### 4 — Framework Race
 
-Compares Meld against two baselines across `200 rows × 30 update cycles`:
+Compares Meld against Vue, React, and HTMX across the row/update counts selected in the benchmark panel:
 
 | Contestant | Strategy |
 | :--- | :--- |
-| `innerHTML` | Serialise entire list to HTML string, replace `.innerHTML` |
-| Manual DOM | `createElement` loop into `DocumentFragment`, replace children |
 | **Meld.js** | `meld.list()` keyed reactive list, surgical node reuse |
+| Vue 3 | Reactive keyed render function mounted with `createApp()` |
+| React 18 | Keyed Fiber render through `createRoot()` |
+| HTMX 2 | HTML fragment replacement followed by `htmx.process()` |
 
 **What it measures:** Total time in milliseconds for all 30 update cycles, and normalised cost per 1,000 operations.
 
 > [!TIP]
-> `innerHTML` is often competitive for *initial* renders but degrades rapidly on updates because it destroys and recreates all child nodes unconditionally, losing event listeners and forcing full re-layout. Meld's keyed list avoids this at the cost of a Map lookup per item.
+> The comparison frameworks are loaded from public CDN URLs when the benchmark runs. For repeatable results, run the docs locally or in Docker with a warm cache and a stable CPU profile.
 
 ---
 
@@ -200,7 +204,7 @@ await browser.close();
 | Mount storm mean | < 25 ms / 200 els | > 60 ms |
 | State churn p95 | < 80 ms / 5k writes | > 200 ms |
 | Pixel render median | < 16 ms / cycle | > 33 ms (drops below 30 fps) |
-| Race: Meld vs DOM | Within 2× of manual DOM | > 3× slower |
+| Race: Meld vs Vue/React/HTMX | Same order of magnitude | Consistently slower by > 3× |
 
 > [!NOTE]
 > All timings are measured on the Chrome Stable engine. Firefox and Safari show different absolute numbers but the same relative ordering. Mobile devices will show roughly 3–5× higher latency; the relative advantage of Meld's keyed list grows on constrained hardware.

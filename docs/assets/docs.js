@@ -67,6 +67,9 @@ const escHtml = (str) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;');
 
+const getCssToken = (name) =>
+  getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+
 /* --------------------------------------------------------------------------
    1. Site Index  (used by search modal)
       Builds a flat list of all nav links from the left sidebar + their
@@ -161,23 +164,53 @@ const buildPageToc = () => {
 
   if (!toc || !content) return;
 
+  // Collect both standard headings and api-entry anchors
   const headings = $$('h2, h3', content).filter(
     (h) => h.textContent.trim().length > 0
   );
 
-  if (headings.length === 0) {
-    toc.closest('.page-toc')?.setAttribute('hidden', '');
-  } else {
-    headings.forEach((heading) => {
-      if (!heading.id) heading.id = slugify(heading.textContent.replace(/#$/, ''));
+  // Also collect api-entry sections as TOC items
+  const apiEntries = $$('.api-entry[id]', content);
 
-      const link = document.createElement('a');
-      link.href = `#${heading.id}`;
-      link.className = `toc-depth-${heading.tagName === 'H3' ? '3' : '2'}`;
-      link.textContent = heading.textContent.replace(/#$/, '').trim();
-      toc.append(link);
-    });
+  const hasAnchors = headings.length > 0 || apiEntries.length > 0;
+
+  if (!hasAnchors) {
+    toc.closest('.page-toc')?.setAttribute('hidden', '');
+    return;
   }
+
+  // Build standard heading anchors
+  headings.forEach((heading) => {
+    if (!heading.id) heading.id = slugify(heading.textContent.replace(/#$/, ''));
+
+    const link = document.createElement('a');
+    link.href = `#${heading.id}`;
+    link.className = `toc-depth-${heading.tagName === 'H3' ? '3' : '2'}`;
+    link.textContent = heading.textContent.replace(/#$/, '').trim();
+    toc.append(link);
+  });
+
+  // Build api-entry anchors into the TOC
+  if (apiEntries.length > 0 && headings.length === 0) {
+    const label = document.createElement('div');
+    label.className = 'toc-api-label';
+    label.textContent = 'Functions';
+    toc.append(label);
+  }
+  apiEntries.forEach((entry) => {
+    const fnName = entry.querySelector('.fn-name');
+    if (!fnName) return;
+    const link = document.createElement('a');
+    link.href = `#${entry.id}`;
+    link.className = 'toc-depth-3 toc-api-anchor';
+    link.textContent = fnName.textContent.trim();
+    link.dataset.apiEntry = entry.id;
+    // Style with category color
+    const cat = entry.dataset.category;
+    const catColorMap = { core: 'var(--c-core)', dom: 'var(--c-dom)', lifecycle: 'var(--c-lifecycle)', context: 'var(--c-context)' };
+    if (catColorMap[cat]) link.style.borderLeftColor = catColorMap[cat];
+    toc.append(link);
+  });
 
   // ── Append recently-viewed panel
   buildRecentlyViewedPanel();
@@ -632,6 +665,7 @@ const prepareMermaid = () => {
     const wrapper = document.createElement('div');
     wrapper.className = 'mermaid';
     wrapper.textContent = block.textContent;
+    wrapper.dataset.mermaidSource = block.textContent;
     block.closest('pre').replaceWith(wrapper);
   });
 
@@ -642,28 +676,41 @@ const prepareMermaid = () => {
   window.mermaid.initialize({
     startOnLoad: false,
     securityLevel: 'strict',
-    theme: isDark ? 'dark' : 'default',
+    theme: 'base',
     themeVariables: {
-      background: isDark ? '#04060b' : '#ffffff',
-      primaryColor: isDark ? '#0d1526' : '#f1f4f9',
-      primaryTextColor: isDark ? '#eef2f7' : '#111827',
-      primaryBorderColor: '#06b6d4',
-      lineColor: isDark ? '#59697e' : '#9ca3af',
-      secondaryColor: isDark ? '#152034' : '#e8ecf4',
-      tertiaryColor: isDark ? '#080d18' : '#f4f6fb',
+      background: getCssToken('--bg-main') || (isDark ? '#080d18' : '#ffffff'),
+      primaryColor: getCssToken('--bg-panel') || (isDark ? '#0d1526' : '#f1f4f9'),
+      primaryTextColor: getCssToken('--text-main') || (isDark ? '#eef2f7' : '#111827'),
+      primaryBorderColor: getCssToken('--accent-cyan') || '#06b6d4',
+      lineColor: getCssToken('--text-faint') || (isDark ? '#59697e' : '#6b7280'),
+      secondaryColor: getCssToken('--bg-hover') || (isDark ? '#152034' : '#e8ecf4'),
+      tertiaryColor: getCssToken('--bg-panel-soft') || (isDark ? '#0d1526' : '#f4f6fb'),
+      fontFamily: getCssToken('--font-body') || 'Inter, sans-serif',
+      nodeBorder: getCssToken('--border-cyan') || '#06b6d4',
+      clusterBkg: getCssToken('--bg-panel') || '#0d1526',
+      clusterBorder: getCssToken('--border-strong') || '#334155',
+      edgeLabelBackground: getCssToken('--bg-panel') || '#0d1526',
     },
   });
 
   window.mermaid.run({ querySelector: '.mermaid' });
 };
 
-/* --------------------------------------------------------------------------
-   11. Syntax highlighting
-   -------------------------------------------------------------------------- */
-const highlightCode = () => {
-  if (!window.hljs) return;
-  $$('pre code:not(.language-mermaid)').forEach((b) => window.hljs.highlightElement(b));
+const rerenderMermaid = () => {
+  if (!window.mermaid) return;
+  const diagrams = $$('.mermaid[data-processed="true"]');
+  diagrams.forEach((diagram) => {
+    const source = diagram.dataset.mermaidSource;
+    if (!source) return;
+    diagram.removeAttribute('data-processed');
+    diagram.textContent = source;
+  });
+  if (diagrams.length > 0) {
+    prepareMermaid();
+  }
 };
+
+
 
 /* --------------------------------------------------------------------------
    12. Theme toggle
@@ -683,12 +730,43 @@ const setTheme = (theme) => {
     document.documentElement.dataset.theme = theme;
     localStorage.setItem('meld-docs-theme', theme);
     applyThemeIcon();
+    rerenderMermaid();
   };
   if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
     document.startViewTransition(update);
   } else {
     update();
   }
+};
+
+/* --------------------------------------------------------------------------
+   12.5 Release banner
+   -------------------------------------------------------------------------- */
+const bindReleaseBanner = () => {
+  const banner = $('[data-release-banner]');
+  if (!banner) return;
+  const id = banner.dataset.releaseId || 'default';
+  const storageKey = `meld-docs-release-dismissed:${id}`;
+  const hideBanner = () => {
+    banner.hidden = true;
+    delete document.body.dataset.releaseBanner;
+  };
+
+  try {
+    if (localStorage.getItem(storageKey) === 'true') {
+      hideBanner();
+      return;
+    }
+  } catch { /* storage unavailable */ }
+
+  document.body.dataset.releaseBanner = 'visible';
+
+  $('[data-release-banner-dismiss]', banner)?.addEventListener('click', () => {
+    hideBanner();
+    try {
+      localStorage.setItem(storageKey, 'true');
+    } catch { /* storage unavailable */ }
+  });
 };
 
 const bindThemeToggle = () => {
@@ -757,9 +835,84 @@ const renderIcons = () => {
 };
 
 /* --------------------------------------------------------------------------
+   14.5. API Reference Filter Chips
+   -------------------------------------------------------------------------- */
+const initApiFilter = () => {
+  const chips = $$('.api-chip');
+  if (chips.length === 0) return;
+  const entries = $$('.api-entry');
+  const categoryColors = {
+    core: 'var(--c-core)',
+    dom: 'var(--c-dom)',
+    lifecycle: 'var(--c-lifecycle)',
+    context: 'var(--c-context)'
+  };
+
+  chips.forEach(chip => {
+    chip.addEventListener('click', () => {
+      const filter = chip.dataset.filter;
+      chips.forEach(c => {
+        c.classList.remove('is-active');
+        c.style.background = '';
+        c.style.borderColor = '';
+        c.style.color = '';
+      });
+      chip.classList.add('is-active');
+
+      if (filter === 'all') {
+        chip.style.background = 'var(--text-main)';
+        chip.style.borderColor = 'var(--text-main)';
+        chip.style.color = 'var(--bg-main)';
+      } else {
+        const color = categoryColors[filter];
+        chip.style.background = color;
+        chip.style.borderColor = color;
+        chip.style.color = 'var(--bg-main)';
+      }
+
+      entries.forEach(entry => {
+        const visible = filter === 'all' || entry.dataset.category === filter;
+        entry.style.display = visible ? '' : 'none';
+      });
+
+      // Sync TOC api anchors to match filter
+      $$('.toc-api-anchor', $('[data-page-toc]')).forEach(link => {
+        const entryId = link.dataset.apiEntry;
+        const entry = entryId ? document.getElementById(entryId) : null;
+        if (link) link.style.display = (entry && entry.style.display !== 'none') ? '' : 'none';
+      });
+    });
+  });
+};
+
+const enhanceApiTables = () => {
+  const content = $('.docs-content');
+  if (!content) return;
+
+  $$('table', content).forEach((table) => {
+    if (table.classList.contains('api-params')) return;
+    const headers = $$('th', table).map((th) => th.textContent.trim().toLowerCase());
+    const hasReferenceShape =
+      headers.includes('type') ||
+      headers.includes('default') ||
+      headers.includes('required') ||
+      headers.includes('description') ||
+      headers.includes('property') ||
+      headers.includes('option') ||
+      headers.includes('api');
+
+    if (hasReferenceShape) {
+      table.classList.add('api-reference-table');
+    }
+  });
+};
+
+/* --------------------------------------------------------------------------
    15. Init
    -------------------------------------------------------------------------- */
 window.addEventListener('DOMContentLoaded', () => {
+  bindReleaseBanner();
+
   // Record this page as visited
   recordPageView();
 
@@ -773,7 +926,8 @@ window.addEventListener('DOMContentLoaded', () => {
   bindSidebarToggle();
   bindDocsFilter();
   bindSearchModal();
-  highlightCode();
+  initApiFilter();
+  enhanceApiTables();
   prepareMermaid();
   bindCopyButtons();
   addHeadingAnchors();

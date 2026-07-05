@@ -1,30 +1,36 @@
+
 ---
-title: Deployment & SSG
-nav_order: 13
+title: Deployment & Versioning
+nav_order: 9
 ---
 
-# 🚀 Deployment
+# Deployment & Versioning
 
-Meld apps are just static files. You can host them anywhere (Vercel, Netlify, GitHub Pages, or a simple S3 bucket).
+## 1. Micro-Frontend Versioning
+When deploying widgets to a host app, you need to know which version is running.
 
-## **1. Static Hosting (SPA)**
+Enable the `meld-versioning` plugin. It automatically tags your components in the DOM:
+```html
+<user-card data-meld-version="1.2.0"></user-card>
+````
 
-Simply upload your `index.html`, `src/`, and `components/` folders.
+This allows your monitoring tools (Sentry/LogRocket) to track errors by component version.
 
-## **2. Static Site Generation (SSG)**
+## 2\. Static Hosting
 
-For better SEO and instant loading (FCP), use the Artisan CLI to pre-render your app.
+Since Meld is 100% static JavaScript:
 
-```bash
-# 1. Start your dev server
-npx meld-artisan serve
+1.  Upload your folder to AWS S3, Vercel, Netlify, or Nginx.
+2.  Ensure your server redirects all 404s to `index.html` (if using `meld-router`).
 
-# 2. In another terminal, generate the static site
-npx meld-artisan build:static dist
+## 3\. CI/CD Pipeline Example
+
+```yaml
+# .github/workflows/deploy.yml
+steps:
+  - uses: actions/checkout@v2
+  - name: Run Tests
+    run: npm test
+  - name: Deploy to S3
+    run: aws s3 sync ./public s3://my-bucket
 ```
-
-This creates a `dist/` folder where components are serialized using **Declarative Shadow DOM**.
-
-## **3. Hydration**
-
-When the browser loads the pre-rendered HTML, Meld v1.4+ automatically detects the existing Shadow Roots and "hydrates" them (attaching events and reactivity) without a layout shift.

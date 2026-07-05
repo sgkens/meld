@@ -13,7 +13,6 @@
     <script>document.documentElement.dataset.theme = localStorage.getItem('meld-docs-theme') || 'dark';</script>
     <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
-    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/lib/common.min.js" defer></script>
     <script src="/assets/docs.js" defer></script>
   </head>
   <body class="landing-page">
@@ -25,10 +24,36 @@
 
     <a class="skip-link" href="#content">Skip to content</a>
 
+    <aside
+      class="release-banner"
+      data-release-banner
+      data-release-id="{{ releaseBanner.id or 'meld-launch-2026-07' }}"
+      aria-label="Release notice"
+    >
+      <div class="release-banner__inner">
+        <span class="release-banner__eyebrow">{{ releaseBanner.eyebrow or 'Release' }}</span>
+        <p>{{ releaseBanner.message or 'Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.' }}</p>
+        <a href="{{ releaseBanner.href or '/releases/' }}">{{ releaseBanner.linkText or 'View details' }}</a>
+        <button type="button" class="release-banner__dismiss" data-release-banner-dismiss aria-label="Dismiss release notice">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+    </aside>
+
     {# ── Topbar ─────────────────────────────────────────────────── #}
     <header class="site-topbar site-topbar--landing">
       <a class="brand" href="/">
-        <img src="/assets/logo.svg" alt="" class="brand-mark" width="36" height="36">
+        <svg class="brand-mark" viewBox="0 0 120 120" width="36" height="36" xmlns="http://www.w3.org/2000/svg" aria-label="Meld.js logo" role="img">
+          <defs>
+            <mask id="seam-mask">
+              <rect x="0" y="0" width="120" height="120" fill="white" />
+              <line x1="60" y1="48" x2="60" y2="72" stroke="black" stroke-width="14" stroke-linecap="round"/>
+            </mask>
+          </defs>
+          <path d="M 22 92 L 22 28 L 60 60 L 98 28 L 98 92" fill="none" stroke="var(--logo-path-stroke)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" mask="url(#seam-mask)"/>
+          <circle cx="60" cy="48" r="5.5" fill="var(--logo-path-stroke)"/>
+          <circle cx="60" cy="72" r="5.5" fill="var(--logo-path-stroke)"/>
+        </svg>
         <span class="brand-copy">
           <span class="brand-name">Meld.js</span>
           <span class="brand-kicker">Micro-frontend engine</span>

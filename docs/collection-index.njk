@@ -1,0 +1,28 @@
+---
+pagination:
+  data: collections.docsCategoryIndexes
+  size: 1
+  alias: category
+permalink: "/{{ category.id }}/"
+eleventyExcludeFromCollections: true
+---
+
+<header class="collection-index-hero">
+  <p class="section-label">Documentation Collection</p>
+  <h1>{{ category.label }}</h1>
+  <p>Browse every page in the {{ category.label | lower }} collection.</p>
+</header>
+
+<div class="collection-index-grid">
+  {% for item in category.items %}
+    <a class="link-card" href="{{ item.url }}">
+      <i data-lucide="file-text"></i>
+      <strong>{{ item.data.title or item.fileSlug }}</strong>
+      {% if item.data.description %}
+        <span>{{ item.data.description }}</span>
+      {% else %}
+        <span>{{ item.inputPath | replace("./docs/", "") }}</span>
+      {% endif %}
+    </a>
+  {% endfor %}
+</div>

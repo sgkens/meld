@@ -1,60 +1,11 @@
-<svg viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Meld.js logo">
+<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Meld.js logo">
   <defs>
-    <!-- Outer radial glow -->
-    <radialGradient id="meld-glow" cx="50%" cy="50%" r="50%">
-      <stop offset="0%"   stop-color="#ef4444" stop-opacity="0.32"/>
-      <stop offset="60%"  stop-color="#dc2626" stop-opacity="0.12"/>
-      <stop offset="100%" stop-color="#7f1d1d" stop-opacity="0"/>
-    </radialGradient>
-    <!-- Star fill gradient -->
-    <linearGradient id="meld-star" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%"   stop-color="#fca5a5"/>
-      <stop offset="45%"  stop-color="#ef4444"/>
-      <stop offset="100%" stop-color="#b91c1c"/>
-    </linearGradient>
-    <!-- Ring gradient — outer -->
-    <linearGradient id="meld-ring-outer" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%"   stop-color="#7f1d1d" stop-opacity="0.5"/>
-      <stop offset="100%" stop-color="#ef4444" stop-opacity="0.65"/>
-    </linearGradient>
-    <!-- Ring gradient — inner -->
-    <linearGradient id="meld-ring-inner" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%"   stop-color="#ef4444" stop-opacity="0.72"/>
-      <stop offset="100%" stop-color="#fca5a5" stop-opacity="0.9"/>
-    </linearGradient>
+    <mask id="seam-mask">
+      <rect x="0" y="0" width="120" height="120" fill="white" />
+      <line x1="60" y1="48" x2="60" y2="72" stroke="black" stroke-width="14" stroke-linecap="round"/>
+    </mask>
   </defs>
-
-  <g transform="translate(200 200)">
-    <!-- Background glow blob -->
-    <circle cx="0" cy="0" r="120" fill="url(#meld-glow)"/>
-
-    <!-- Orbital rings — outermost to innermost -->
-    <ellipse cx="0" cy="0" rx="118" ry="102" fill="none"
-             stroke="url(#meld-ring-outer)" stroke-width="2.2" opacity="0.45"
-             transform="rotate(-12)"/>
-    <ellipse cx="0" cy="0" rx="98"  ry="84"  fill="none"
-             stroke="url(#meld-ring-outer)" stroke-width="2.5" opacity="0.55"
-             transform="rotate(8)"/>
-    <ellipse cx="0" cy="0" rx="78"  ry="66"  fill="none"
-             stroke="url(#meld-ring-inner)" stroke-width="2.8" opacity="0.65"
-             transform="rotate(-6)"/>
-    <ellipse cx="0" cy="0" rx="58"  ry="50"  fill="none"
-             stroke="url(#meld-ring-inner)" stroke-width="3.2" opacity="0.78"
-             transform="rotate(14)"/>
-    <ellipse cx="0" cy="0" rx="38"  ry="34"  fill="none"
-             stroke="#ef4444" stroke-width="3.5" opacity="0.88"
-             transform="rotate(-4)"/>
-
-    <!-- 5-point star core -->
-    <path d="M0,-22 L5.8,-7 L22,-7 L9.2,2.5 L14.2,19 L0,9.6 L-14.2,19 L-9.2,2.5 L-22,-7 L-5.8,-7 Z"
-          fill="url(#meld-star)"
-          stroke="rgba(252,165,165,0.7)"
-          stroke-width="1.8"
-          stroke-linejoin="round"/>
-    <!-- Star inner highlight -->
-    <path d="M0,-22 L5.8,-7 L22,-7 L9.2,2.5 L14.2,19 L0,9.6 L-14.2,19 L-9.2,2.5 L-22,-7 L-5.8,-7 Z"
-          fill="none"
-          stroke="rgba(255,255,255,0.2)"
-          stroke-width="0.8"/>
-  </g>
+  <path d="M 22 92 L 22 28 L 60 60 L 98 28 L 98 92" fill="none" stroke="#dc2626" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" mask="url(#seam-mask)"/>
+  <circle cx="60" cy="48" r="5.5" fill="#dc2626"/>
+  <circle cx="60" cy="72" r="5.5" fill="#dc2626"/>
 </svg>
