@@ -48,8 +48,11 @@ CONTEXT-SOURCE/
 automator-devops/
 
 #_concepts
-concepts/
+_concepts/
 
 # coverage
 
 coverage/
+
+# raw randome notes
+/**/raw*notes*.md
