@@ -14,11 +14,13 @@
   *Reactive State. Native Components. No Build Step.*
 
   <span>
-      <a href="https://meldjs.dev">🌐 <i>Meldjs.dev</i></a>
+      <code>
+      <a href="https://meldjs.dev">🌐 <i><b>Meldjs.dev</b></i></a>
       <a href="https://meldjs.dev/core-api">📒 <i>API Reference</i></a>
       <a href="https://www.npmjs.com/package/meldjs">📦 <i>NPM</i></a>
       <a href="https://jsr.io/@meldjs/meldjs">🧊 <i>JSR</i></a>
       <a href="https://github.com/meldjs/meldjs">⬛  <i>GitHub</i></a>
+      </code>
   </span>
   <br>
   <br>
