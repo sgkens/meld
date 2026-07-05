@@ -5,7 +5,12 @@ export const MeldWasm = {
       const load = async () => {
         try {
           const response = await fetch(url);
-          const { instance } = await WebAssembly.instantiateStreaming(response, importObject);
+          if (!response.ok) throw new Error(response.statusText || `HTTP ${response.status}`);
+          const canStream = typeof WebAssembly.instantiateStreaming === 'function';
+          const result = canStream
+            ? await WebAssembly.instantiateStreaming(response, importObject)
+            : await WebAssembly.instantiate(await response.arrayBuffer(), importObject);
+          const { instance } = result;
           state.instance = instance; state.exports = instance.exports;
         } catch (e) { state.error = e.message; } 
         finally { state.loading = false; }

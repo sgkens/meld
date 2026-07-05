@@ -1,10 +1,11 @@
 // --------------------------------------------------------
-// 🔗 MELD CORE (v1.4.0-rc1)
+//  MELD CORE (v1.4.0-rc1)
 // --------------------------------------------------------
 
 export const VERSION = '1.4.0-rc1';
 
 let activeEffect = null;
+const effectStack = [];
 let currentComponent = null;
 let globalStyles = []; // Store for adopted stylesheets
 const installedPlugins = new Set();
@@ -40,9 +41,14 @@ function createEffect(fn) {
   const effect = {
     run: () => {
       cleanupEffect(effect);
+      effectStack.push(effect);
       activeEffect = effect;
-      fn();
-      activeEffect = null;
+      try {
+        fn();
+      } finally {
+        effectStack.pop();
+        activeEffect = effectStack[effectStack.length - 1] || null;
+      }
     },
     deps: new Set()
   };
@@ -183,20 +189,33 @@ export function meldHtml(strings, ...values) {
       const parent = node.parentNode;
 
       if (typeof value === "function") {
-        const anchor = document.createTextNode("");
-        parent.replaceChild(anchor, node);
+        const start = document.createTextNode("");
+        const end = document.createTextNode("");
+        parent.replaceChild(end, node);
+        parent.insertBefore(start, end);
+
+        const clearDynamicNodes = () => {
+          let current = start.nextSibling;
+          while (current && current !== end) {
+            const next = current.nextSibling;
+            current.remove();
+            current = next;
+          }
+        };
+
         createEffect(() => {
           const res = value();
+          clearDynamicNodes();
           if (res && res.__raw) {
-             const tempDiv = document.createElement('div');
-             tempDiv.innerHTML = res.__raw;
-             parent.innerHTML = '';
-             while(tempDiv.firstChild) parent.appendChild(tempDiv.firstChild);
+             start.data = "";
+             const template = document.createElement('template');
+             template.innerHTML = res.__raw;
+             parent.insertBefore(template.content.cloneNode(true), end);
           } else if (res instanceof Node) {
-             if (parent.replaceChildren) parent.replaceChildren(res);
-             else { parent.innerHTML = ''; parent.appendChild(res); }
+             start.data = "";
+             parent.insertBefore(res, end);
           } else {
-             anchor.data = res;
+             start.data = res == null ? "" : String(res);
           }
         });
       } else {
@@ -205,8 +224,9 @@ export function meldHtml(strings, ...values) {
     }
     let child = node.firstChild;
     while (child) {
+      const next = child.nextSibling;
       walk(child);
-      child = child.nextSibling;
+      child = next;
     }
   };
   walk(fragment);
@@ -216,6 +236,7 @@ export function meldHtml(strings, ...values) {
 // 6. COMPONENT DEFINITION (Updated for v1.4 Hydration)
 // --------------------------------------------------------
 export function defineMeld(tagName, setupFn) {
+  if (customElements.get(tagName)) return;
   customElements.define(tagName, class extends HTMLElement {
     constructor() {
       super();
@@ -233,6 +254,7 @@ export function defineMeld(tagName, setupFn) {
 
     connectedCallback() {
       if (globalStyles.length > 0) this.shadowRoot.adoptedStyleSheets = [...globalStyles];
+      const previousComponent = currentComponent;
       currentComponent = this;
       
       this.addEventListener('meld-context-request', (e) => {
@@ -247,16 +269,19 @@ export function defineMeld(tagName, setupFn) {
         this.dispatchEvent(new CustomEvent(name, { detail, bubbles: true, composed: true }));
       };
 
-      const template = setupFn(this, { emit, ...extensionContext });
-      if (template) {
-        if (this._isHydrating) {
-          this.shadowRoot.innerHTML = ''; 
-          this._isHydrating = false;
+      try {
+        const template = setupFn(this, { emit, ...extensionContext });
+        if (template) {
+          if (this._isHydrating) {
+            this.shadowRoot.innerHTML = ''; 
+            this._isHydrating = false;
+          }
+          this.shadowRoot.appendChild(template);
         }
-        this.shadowRoot.appendChild(template);
+        this.mountHooks.forEach(fn => fn());
+      } finally {
+        currentComponent = previousComponent;
       }
-      this.mountHooks.forEach(fn => fn());
-      currentComponent = null;
     }
 
     disconnectedCallback() {

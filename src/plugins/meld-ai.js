@@ -10,6 +10,7 @@ export const MeldAI = {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ prompt: textPayload })
           });
+          if (!response.ok) throw new Error(response.statusText || `HTTP ${response.status}`);
           if (!response.body) throw new Error("ReadableStream not supported");
           const reader = response.body.getReader();
           const decoder = new TextDecoder();

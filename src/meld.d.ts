@@ -1,5 +1,5 @@
 // --------------------------------------------------------
-// 🔗 MELD TYPE DEFINITIONS (v1.4.0-rc1)
+//  MELD TYPE DEFINITIONS (v1.4.0-rc1)
 // --------------------------------------------------------
 
 export type MeldState<T> = T;
@@ -73,6 +73,7 @@ export const MeldStore: object;
 export const MeldQuery: object;
 export const MeldPersist: object;
 export const MeldPortal: object;
+export const MeldSocket: object;
 export const MeldA11y: object;
 export const MeldAI: object;
 export const MeldFederation: object;

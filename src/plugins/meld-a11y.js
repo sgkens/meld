@@ -11,15 +11,18 @@ export const MeldA11y = {
     };
 
     api.trapFocus = (el) => {
-      el.addEventListener('keydown', (e) => {
+      const handler = (e) => {
         if (e.key !== 'Tab') return;
         const focusable = el.querySelectorAll('button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])');
+        if (focusable.length === 0) return;
         if (e.shiftKey && document.activeElement === focusable[0]) {
           focusable[focusable.length - 1].focus(); e.preventDefault();
         } else if (!e.shiftKey && document.activeElement === focusable[focusable.length - 1]) {
           focusable[0].focus(); e.preventDefault();
         }
-      });
+      };
+      el.addEventListener('keydown', handler);
+      return () => el.removeEventListener('keydown', handler);
     };
   },
   setupHelpers(api) {

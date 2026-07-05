@@ -1,9 +1,19 @@
 export const MeldQuiver = {
   install(api, options = {}) {
     const baseURL = options.baseURL || '';
+    const request = async (url, requestOptions = {}) => {
+      const response = await fetch(baseURL + url, requestOptions);
+      if (!response.ok) throw new Error(response.statusText || `HTTP ${response.status}`);
+      return response.json();
+    };
+
     api.useQuiver = () => ({
-      get: (url) => fetch(baseURL + url).then(r => r.json()),
-      post: (url, body) => fetch(baseURL + url, { method: 'POST', body: JSON.stringify(body) }).then(r => r.json())
+      get: (url) => request(url),
+      post: (url, body) => request(url, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      })
     });
   }
 };
