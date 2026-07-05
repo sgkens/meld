@@ -154,9 +154,61 @@
           On This Page
         </div>
         <nav data-page-toc aria-label="Page sections"></nav>
+        {# Recently viewed + recently edited panels injected by docs.js #}
       </aside>
 
     </div>{# /docs-shell #}
+
+    {# ── Ctrl+K Search Modal ─────────────────────────────────────── #}
+    <div
+      id="search-modal"
+      class="search-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search documentation"
+      hidden
+    >
+      <div class="search-dialog" role="document">
+
+        {# Input row #}
+        <div class="search-input-row">
+          <span class="search-input-icon"><i data-lucide="search"></i></span>
+          <input
+            id="search-modal-input"
+            type="search"
+            placeholder="Search docs…"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Search documentation"
+          >
+          <span class="search-kbd">Esc</span>
+          <button class="search-close-btn" id="search-modal-close" type="button" aria-label="Close search">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        {# Three-column body: categories | results | preview #}
+        <div class="search-body">
+          <div class="search-col-categories" id="search-categories" aria-label="Categories"></div>
+          <div class="search-col-results"    id="search-results"    role="listbox" aria-label="Search results"></div>
+          <div class="search-col-preview"    id="search-preview"    aria-label="Result preview">
+            <div class="search-hint">
+              <i data-lucide="search"></i>
+              <span>Type to search across all docs, API references, and anchors</span>
+            </div>
+          </div>
+        </div>
+
+        {# Footer hints #}
+        <div class="search-footer" aria-hidden="true">
+          <span class="search-footer-hint"><span class="search-kbd">↑↓</span> Navigate</span>
+          <span class="search-footer-hint"><span class="search-kbd">↵</span> Go</span>
+          <span class="search-footer-hint"><span class="search-kbd">Esc</span> Close</span>
+          <span class="search-footer-hint"><span class="search-kbd">⌘K</span> Toggle</span>
+        </div>
+
+      </div>
+    </div>{# /search-modal #}
 
     {# ── Footer ──────────────────────────────────────────────────── #}
     <footer class="site-footer">

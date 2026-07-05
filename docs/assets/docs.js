@@ -1,12 +1,24 @@
 /* ==========================================================================
-   Meld.js Docs — Client JavaScript
+   Meld.js Docs — Client JavaScript  v2
+   Features:
+     • Ctrl+K / Cmd+K → full search modal (2-col: categories + fuzzy preview)
+     • Sidebar scroll-into-view for active item
+     • Heading anchor links (§ glyph on hover)
+     • Recently viewed  + Recently edited in right TOC
+     • Copy-to-clipboard on all code blocks
+     • Mermaid + highlight.js integration
+     • Mobile sidebar with backdrop dismiss + Escape
+     • Theme toggle with View Transitions API
    ========================================================================== */
 
 'use strict';
 
 /* --------------------------------------------------------------------------
-   Helpers
+   0. Helpers
    -------------------------------------------------------------------------- */
+const $ = (sel, ctx = document) => ctx.querySelector(sel);
+const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
+
 const slugify = (value) =>
   String(value)
     .toLowerCase()
@@ -15,116 +27,133 @@ const slugify = (value) =>
     .replace(/\s+/g, '-')
     .replace(/-+/g, '-');
 
-const $ = (sel, ctx = document) => ctx.querySelector(sel);
-const $$ = (sel, ctx = document) => Array.from(ctx.querySelectorAll(sel));
-
-/* --------------------------------------------------------------------------
-   Theme toggle
-   -------------------------------------------------------------------------- */
-const applyThemeIcon = () => {
-  const toggle = $('[data-theme-toggle]');
-  if (!toggle) return;
-
-  const isLight = document.documentElement.dataset.theme === 'light';
-  toggle.setAttribute('aria-pressed', String(isLight));
-  toggle.innerHTML = `<i data-lucide="${isLight ? 'moon' : 'sun'}"></i>`;
-  if (window.lucide) window.lucide.createIcons({ nodes: [toggle] });
+/** Fuzzy-match: returns true if every char in `needle` appears in order in `haystack` */
+const fuzzyMatch = (needle, haystack) => {
+  const n = needle.toLowerCase();
+  const h = haystack.toLowerCase();
+  let hi = 0;
+  for (let ni = 0; ni < n.length; ni++) {
+    const pos = h.indexOf(n[ni], hi);
+    if (pos === -1) return false;
+    hi = pos + 1;
+  }
+  return true;
 };
 
-const setTheme = (theme) => {
-  const update = () => {
-    document.documentElement.dataset.theme = theme;
-    localStorage.setItem('meld-docs-theme', theme);
-    applyThemeIcon();
-  };
+/** Highlight matched characters in a string (returns HTML) */
+const highlightMatch = (needle, text) => {
+  if (!needle) return escHtml(text);
+  const lc = text.toLowerCase();
+  const ln = needle.toLowerCase();
+  let result = '';
+  let ti = 0;
+  let ni = 0;
+  while (ti < text.length) {
+    if (ni < ln.length && lc[ti] === ln[ni]) {
+      result += `<mark>${escHtml(text[ti])}</mark>`;
+      ni++;
+    } else {
+      result += escHtml(text[ti]);
+    }
+    ti++;
+  }
+  return result;
+};
 
-  if (
-    document.startViewTransition &&
-    !window.matchMedia('(prefers-reduced-motion: reduce)').matches
-  ) {
-    document.startViewTransition(update);
-  } else {
-    update();
+const escHtml = (str) =>
+  String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+
+/* --------------------------------------------------------------------------
+   1. Site Index  (used by search modal)
+      Builds a flat list of all nav links from the left sidebar + their
+      category labels, plus any h2/h3 headings within the current page.
+   -------------------------------------------------------------------------- */
+const buildSiteIndex = () => {
+  const index = [];
+  const sidebar = $('#docs-nav');
+
+  if (sidebar) {
+    $$('.nav-category', sidebar).forEach((cat) => {
+      const categoryLabel = $('h2', cat)?.textContent?.trim() ?? 'Docs';
+      $$('a', cat).forEach((link) => {
+        index.push({
+          type: 'page',
+          category: categoryLabel,
+          title: link.querySelector('span')?.textContent?.trim() ?? link.textContent.trim(),
+          url: link.href,
+          excerpt: '',
+        });
+      });
+    });
+  }
+
+  // Also index headings on the current page as anchor entries
+  const content = $('.docs-content');
+  if (content) {
+    const pageTitle = $('h1', content)?.textContent?.trim() ?? document.title;
+    $$('h2[id], h3[id]', content).forEach((h) => {
+      index.push({
+        type: 'anchor',
+        category: pageTitle,
+        title: h.textContent.replace(/#$/, '').trim(),
+        url: `${window.location.pathname}#${h.id}`,
+        excerpt: h.nextElementSibling?.textContent?.slice(0, 120) ?? '',
+      });
+    });
+  }
+
+  return index;
+};
+
+/* --------------------------------------------------------------------------
+   2. Recently Viewed  (localStorage)
+   -------------------------------------------------------------------------- */
+const VIEWED_KEY = 'meld-docs-viewed';
+const EDITED_KEY = 'meld-docs-edited'; // static list baked at build time (simulated)
+const MAX_RECENT = 6;
+
+const getRecentlyViewed = () => {
+  try {
+    return JSON.parse(localStorage.getItem(VIEWED_KEY) ?? '[]');
+  } catch {
+    return [];
   }
 };
 
-const bindThemeToggle = () => {
-  const toggle = $('[data-theme-toggle]');
-  if (!toggle) return;
+const recordPageView = () => {
+  const { pathname, href } = window.location;
+  if (pathname === '/') return; // don't record landing
+  const title =
+    $('h1.docs-content h1')?.textContent?.trim() ||
+    $('.docs-content h1')?.textContent?.trim() ||
+    document.title.replace(' | Meld.js', '').trim();
 
-  applyThemeIcon();
-  toggle.addEventListener('click', () => {
-    const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
-    setTheme(next);
-  });
+  let views = getRecentlyViewed().filter((v) => v.url !== href);
+  views.unshift({ title, url: href, ts: Date.now() });
+  views = views.slice(0, MAX_RECENT);
+  try {
+    localStorage.setItem(VIEWED_KEY, JSON.stringify(views));
+  } catch { /* quota */ }
+};
+
+/** Simulated "recently edited" from a static list embedded in a data attribute */
+const getRecentlyEdited = () => {
+  // Pages known to have been recently touched — updated at build time via
+  // docs.11tydata.js or a similar global data file. For now we surface the
+  // most recently-nav-ordered pages as a proxy.
+  const links = $$('.nav-category a', $('#docs-nav'));
+  return links.slice(0, 4).map((l) => ({
+    title: l.querySelector('span')?.textContent?.trim() ?? l.textContent.trim(),
+    url: l.href,
+  }));
 };
 
 /* --------------------------------------------------------------------------
-   Mobile sidebar toggle
-   -------------------------------------------------------------------------- */
-const bindSidebarToggle = () => {
-  const toggle = $('[data-sidebar-toggle]');
-  if (!toggle) return;
-
-  const nav = $('#docs-nav');
-
-  const close = () => {
-    document.body.dataset.sidebarOpen = 'false';
-    toggle.setAttribute('aria-expanded', 'false');
-    toggle.innerHTML = '<i data-lucide="menu"></i>';
-    if (window.lucide) window.lucide.createIcons({ nodes: [toggle] });
-  };
-
-  const open = () => {
-    document.body.dataset.sidebarOpen = 'true';
-    toggle.setAttribute('aria-expanded', 'true');
-    toggle.innerHTML = '<i data-lucide="x"></i>';
-    if (window.lucide) window.lucide.createIcons({ nodes: [toggle] });
-    // Focus first nav link
-    if (nav) {
-      const firstLink = $('a', nav);
-      if (firstLink) firstLink.focus();
-    }
-  };
-
-  toggle.addEventListener('click', () => {
-    const isOpen = document.body.dataset.sidebarOpen === 'true';
-    isOpen ? close() : open();
-  });
-
-  // Close on nav link click (mobile)
-  if (nav) {
-    $$('a', nav).forEach((link) => link.addEventListener('click', close));
-  }
-
-  // Close on backdrop click (the ::before pseudo-element covers the page)
-  document.addEventListener('click', (e) => {
-    if (
-      document.body.dataset.sidebarOpen === 'true' &&
-      nav &&
-      !nav.contains(e.target) &&
-      !toggle.contains(e.target)
-    ) {
-      close();
-    }
-  });
-
-  // Close on Escape
-  document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && document.body.dataset.sidebarOpen === 'true') {
-      close();
-      toggle.focus();
-    }
-  });
-
-  // Close on resize to desktop
-  window.addEventListener('resize', () => {
-    if (window.matchMedia('(min-width: 769px)').matches) close();
-  });
-};
-
-/* --------------------------------------------------------------------------
-   Page TOC builder
+   3. Right TOC: On This Page + Recently Viewed + Recently Edited
    -------------------------------------------------------------------------- */
 const buildPageToc = () => {
   const toc = $('[data-page-toc]');
@@ -138,35 +167,90 @@ const buildPageToc = () => {
 
   if (headings.length === 0) {
     toc.closest('.page-toc')?.setAttribute('hidden', '');
-    return;
+  } else {
+    headings.forEach((heading) => {
+      if (!heading.id) heading.id = slugify(heading.textContent.replace(/#$/, ''));
+
+      const link = document.createElement('a');
+      link.href = `#${heading.id}`;
+      link.className = `toc-depth-${heading.tagName === 'H3' ? '3' : '2'}`;
+      link.textContent = heading.textContent.replace(/#$/, '').trim();
+      toc.append(link);
+    });
   }
 
-  headings.forEach((heading) => {
-    if (!heading.id) heading.id = slugify(heading.textContent);
+  // ── Append recently-viewed panel
+  buildRecentlyViewedPanel();
+};
 
-    const link = document.createElement('a');
-    link.href = `#${heading.id}`;
-    link.className = `toc-depth-${heading.tagName === 'H3' ? '3' : '2'}`;
-    link.textContent = heading.textContent.replace(/^#+\s*/, '');
-    toc.append(link);
-  });
+const buildRecentlyViewedPanel = () => {
+  const pageToc = $('.page-toc');
+  if (!pageToc) return;
+
+  // Existing panels? Remove and rebuild
+  $$('.toc-recent-panel', pageToc).forEach((el) => el.remove());
+
+  const views = getRecentlyViewed();
+  const edits = getRecentlyEdited();
+
+  if (views.length === 0 && edits.length === 0) return;
+
+  const buildPanel = (titleText, icon, items) => {
+    if (items.length === 0) return null;
+    const section = document.createElement('div');
+    section.className = 'toc-recent-panel';
+
+    const heading = document.createElement('div');
+    heading.className = 'toc-recent-title';
+    heading.innerHTML = `<i data-lucide="${icon}"></i>${escHtml(titleText)}`;
+    section.append(heading);
+
+    const list = document.createElement('nav');
+    list.className = 'toc-recent-list';
+    items.forEach((item) => {
+      const a = document.createElement('a');
+      a.href = item.url;
+      a.className = 'toc-recent-link';
+      a.title = item.title;
+      a.textContent = item.title;
+      list.append(a);
+    });
+    section.append(list);
+    return section;
+  };
+
+  const viewPanel = buildPanel('Recently Viewed', 'clock', views);
+  const editPanel = buildPanel('Recently Edited', 'file-pen', edits);
+
+  if (viewPanel) pageToc.append(viewPanel);
+  if (editPanel) pageToc.append(editPanel);
+
+  // Re-render icons for the new panel nodes
+  if (window.lucide) window.lucide.createIcons({ nodes: [pageToc] });
 };
 
 /* --------------------------------------------------------------------------
-   TOC scroll-spy
+   4. TOC Scroll-spy
    -------------------------------------------------------------------------- */
 const bindTocHighlight = () => {
   const links = $$('[data-page-toc] a');
   const headings = links
-    .map((l) => document.getElementById(l.hash.slice(1)))
+    .map((l) => {
+      try { return document.getElementById(new URL(l.href).hash.slice(1)); }
+      catch { return null; }
+    })
     .filter(Boolean);
 
   if (links.length === 0 || headings.length === 0 || !('IntersectionObserver' in window)) return;
 
   const activate = (id) => {
     links.forEach((l) => l.removeAttribute('aria-current'));
-    const active = $(`[data-page-toc] a[href="#${id}"]`);
-    if (active) active.setAttribute('aria-current', 'true');
+    const active = $(`[data-page-toc] a[href$="#${id}"]`);
+    if (active) {
+      active.setAttribute('aria-current', 'true');
+      // Scroll the TOC link into view inside the aside
+      active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
   };
 
   const observer = new IntersectionObserver(
@@ -176,64 +260,329 @@ const bindTocHighlight = () => {
         .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)[0];
       if (visible) activate(visible.target.id);
     },
-    { rootMargin: '-10% 0px -70% 0px' }
+    { rootMargin: '-8% 0px -68% 0px' }
   );
 
   headings.forEach((h) => observer.observe(h));
 };
 
 /* --------------------------------------------------------------------------
-   Sidebar search / filter
+   5. Sidebar: scroll active item into view
    -------------------------------------------------------------------------- */
-const bindDocsFilter = () => {
-  const input = $('[data-docs-filter]');
-  const nav = $('.category-nav');
+const scrollSidebarToActive = () => {
+  const sidebar = $('#docs-nav');
+  if (!sidebar) return;
+  const active = $('[aria-current="page"]', sidebar);
+  if (!active) return;
+  // Smooth scroll within the aside
+  active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+};
 
-  if (!input) return;
+/* --------------------------------------------------------------------------
+   6. Heading Anchor Links
+   -------------------------------------------------------------------------- */
+const addHeadingAnchors = () => {
+  const content = $('.docs-content');
+  if (!content) return;
 
-  if (!nav) {
-    // On landing page: pressing Enter navigates to installation
-    input.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && input.value.trim()) {
-        window.location.href = `/installation/?q=${encodeURIComponent(input.value.trim())}`;
-      }
-    });
-    return;
-  }
+  $$('h2, h3', content).forEach((heading) => {
+    // Ensure id
+    if (!heading.id) heading.id = slugify(heading.textContent.replace(/#$/, ''));
 
-  input.addEventListener('input', () => {
-    const q = input.value.trim().toLowerCase();
-
-    $$('.nav-category', nav).forEach((cat) => {
-      let visible = 0;
-      $$('a', cat).forEach((link) => {
-        const match = link.textContent.toLowerCase().includes(q);
-        link.hidden = !match;
-        if (match) visible++;
-      });
-      cat.hidden = visible === 0;
-    });
-  });
-
-  // Keyboard shortcut: / or Ctrl+K to focus search
-  document.addEventListener('keydown', (e) => {
-    const tag = document.activeElement.tagName;
-    if ((e.key === '/' || (e.key === 'k' && (e.ctrlKey || e.metaKey))) &&
-        tag !== 'INPUT' && tag !== 'TEXTAREA') {
-      e.preventDefault();
-      input.focus();
-      input.select();
-    }
-    if (e.key === 'Escape' && document.activeElement === input) {
-      input.blur();
-      input.value = '';
-      input.dispatchEvent(new Event('input'));
-    }
+    const anchor = document.createElement('a');
+    anchor.href = `#${heading.id}`;
+    anchor.className = 'heading-anchor';
+    anchor.setAttribute('aria-label', `Permalink to: ${heading.textContent.trim()}`);
+    anchor.textContent = '§';
+    heading.append(anchor);
   });
 };
 
 /* --------------------------------------------------------------------------
-   Copy-to-clipboard for code blocks
+   7. Ctrl+K Search Modal
+   -------------------------------------------------------------------------- */
+let searchIndex = [];
+let modalOpen = false;
+let selectedIdx = -1;
+
+const openSearchModal = () => {
+  const modal = $('#search-modal');
+  if (!modal) return;
+  modalOpen = true;
+  modal.removeAttribute('hidden');
+  modal.setAttribute('aria-hidden', 'false');
+  document.body.classList.add('search-open');
+
+  const input = $('#search-modal-input');
+  if (input) {
+    input.value = '';
+    input.focus();
+  }
+  selectedIdx = -1;
+
+  // Populate categories in left column on open
+  renderCategoryList('');
+  renderResults('');
+};
+
+const closeSearchModal = () => {
+  const modal = $('#search-modal');
+  if (!modal) return;
+  modalOpen = false;
+  modal.setAttribute('hidden', '');
+  modal.setAttribute('aria-hidden', 'true');
+  document.body.classList.remove('search-open');
+  selectedIdx = -1;
+};
+
+const renderCategoryList = (query) => {
+  const col = $('#search-categories');
+  if (!col) return;
+  col.innerHTML = '';
+
+  // Build category map
+  const cats = new Map();
+  searchIndex.forEach((item) => {
+    if (!cats.has(item.category)) cats.set(item.category, []);
+    const matches = !query || fuzzyMatch(query, item.title) || fuzzyMatch(query, item.category);
+    if (matches) cats.get(item.category).push(item);
+    else if (!cats.get(item.category)) cats.set(item.category, []);
+  });
+
+  const catColors = [
+    'var(--accent-brand)',
+    'var(--accent-cyan)',
+    'var(--accent-emerald)',
+    'var(--accent-indigo)',
+    'var(--accent-amber)',
+    'var(--accent-rose)',
+  ];
+  let colorIdx = 0;
+
+  cats.forEach((items, catName) => {
+    if (items.length === 0) return;
+    const section = document.createElement('div');
+    section.className = 'search-cat-section';
+
+    const label = document.createElement('div');
+    label.className = 'search-cat-label';
+    label.style.color = catColors[colorIdx % catColors.length];
+    label.textContent = catName;
+    colorIdx++;
+
+    const list = document.createElement('div');
+    list.className = 'search-cat-list';
+
+    items.forEach((item) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'search-cat-item';
+      btn.dataset.url = item.url;
+      btn.dataset.type = item.type;
+      btn.innerHTML = `
+        <span class="search-cat-icon">
+          <i data-lucide="${item.type === 'anchor' ? 'hash' : 'file-text'}"></i>
+        </span>
+        <span class="search-cat-title">${highlightMatch(query, item.title)}</span>
+      `;
+      btn.addEventListener('click', () => navigate(item.url));
+      btn.addEventListener('mouseenter', () => showPreview(item));
+      list.append(btn);
+    });
+    section.append(label, list);
+    col.append(section);
+  });
+
+  if (col.children.length === 0) {
+    col.innerHTML = '<div class="search-empty">No categories match</div>';
+  }
+
+  if (window.lucide) window.lucide.createIcons({ nodes: [col] });
+};
+
+const renderResults = (query) => {
+  const col = $('#search-results');
+  if (!col) return;
+  col.innerHTML = '';
+  selectedIdx = -1;
+
+  if (!query) {
+    // Show recently viewed as default results
+    const views = getRecentlyViewed();
+    if (views.length > 0) {
+      const label = document.createElement('div');
+      label.className = 'search-results-label';
+      label.textContent = 'Recently Viewed';
+      col.append(label);
+      views.forEach((v) => {
+        const item = { type: 'page', title: v.title, url: v.url, category: 'History', excerpt: '' };
+        col.append(makeResultItem(item, ''));
+      });
+    } else {
+      col.innerHTML = '<div class="search-hint"><i data-lucide="keyboard"></i><span>Start typing to search across all docs</span></div>';
+    }
+    if (window.lucide) window.lucide.createIcons({ nodes: [col] });
+    return;
+  }
+
+  const results = searchIndex.filter(
+    (item) => fuzzyMatch(query, item.title) || fuzzyMatch(query, item.category) || fuzzyMatch(query, item.excerpt)
+  ).slice(0, 20);
+
+  if (results.length === 0) {
+    col.innerHTML = `<div class="search-empty"><i data-lucide="search-x"></i><span>No results for "<strong>${escHtml(query)}</strong>"</span></div>`;
+    if (window.lucide) window.lucide.createIcons({ nodes: [col] });
+    return;
+  }
+
+  results.forEach((item) => col.append(makeResultItem(item, query)));
+  if (window.lucide) window.lucide.createIcons({ nodes: [col] });
+};
+
+const makeResultItem = (item, query) => {
+  const btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'search-result-item';
+  btn.dataset.url = item.url;
+
+  const icon = item.type === 'anchor' ? 'hash' : 'file-text';
+  const catBadge = item.category
+    ? `<span class="search-result-cat">${escHtml(item.category)}</span>`
+    : '';
+  const excerpt = item.excerpt
+    ? `<span class="search-result-excerpt">${escHtml(item.excerpt.slice(0, 100))}…</span>`
+    : '';
+
+  btn.innerHTML = `
+    <span class="search-result-icon"><i data-lucide="${icon}"></i></span>
+    <span class="search-result-body">
+      <span class="search-result-title">${highlightMatch(query, item.title)}</span>
+      ${catBadge}
+      ${excerpt}
+    </span>
+    <span class="search-result-enter"><i data-lucide="corner-down-left"></i></span>
+  `;
+
+  btn.addEventListener('click', () => navigate(item.url));
+  btn.addEventListener('mouseenter', () => {
+    $$('.search-result-item', $('#search-results')).forEach((b) => b.classList.remove('is-selected'));
+    btn.classList.add('is-selected');
+    showPreview(item);
+  });
+
+  return btn;
+};
+
+const showPreview = (item) => {
+  const preview = $('#search-preview');
+  if (!preview) return;
+
+  preview.innerHTML = `
+    <div class="search-preview-header">
+      <span class="search-preview-cat">${escHtml(item.category)}</span>
+      <a class="search-preview-url" href="${escHtml(item.url)}">${escHtml(item.url.replace(window.location.origin, ''))}</a>
+    </div>
+    <div class="search-preview-title">${escHtml(item.title)}</div>
+    ${item.excerpt ? `<p class="search-preview-excerpt">${escHtml(item.excerpt)}</p>` : ''}
+    <div class="search-preview-tip">
+      <i data-lucide="corner-down-left"></i>
+      Press Enter or click to navigate
+    </div>
+  `;
+  if (window.lucide) window.lucide.createIcons({ nodes: [preview] });
+};
+
+const navigate = (url) => {
+  closeSearchModal();
+  window.location.href = url;
+};
+
+/** Arrow-key navigation across result items */
+const navigateResults = (dir) => {
+  const items = $$('.search-result-item:not([hidden])', $('#search-results'));
+  if (items.length === 0) return;
+
+  items.forEach((b) => b.classList.remove('is-selected'));
+  selectedIdx = Math.max(0, Math.min(items.length - 1, selectedIdx + dir));
+  items[selectedIdx]?.classList.add('is-selected');
+  items[selectedIdx]?.scrollIntoView({ block: 'nearest' });
+
+  // Show preview for selected
+  const url = items[selectedIdx]?.dataset.url;
+  if (url) {
+    const found = searchIndex.find((i) => i.url === url);
+    if (found) showPreview(found);
+  }
+};
+
+const bindSearchModal = () => {
+  const modal = $('#search-modal');
+  if (!modal) return;
+
+  const input = $('#search-modal-input');
+
+  // Ctrl+K / Cmd+K / slash
+  document.addEventListener('keydown', (e) => {
+    const tag = document.activeElement.tagName;
+    const inField = tag === 'INPUT' || tag === 'TEXTAREA';
+
+    if ((e.key === 'k' && (e.ctrlKey || e.metaKey)) || (e.key === '/' && !inField)) {
+      e.preventDefault();
+      modalOpen ? closeSearchModal() : openSearchModal();
+      return;
+    }
+
+    if (!modalOpen) return;
+
+    if (e.key === 'Escape') { closeSearchModal(); return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); navigateResults(1); return; }
+    if (e.key === 'ArrowUp')   { e.preventDefault(); navigateResults(-1); return; }
+    if (e.key === 'Enter') {
+      const sel = $('.search-result-item.is-selected', $('#search-results'));
+      if (sel?.dataset.url) navigate(sel.dataset.url);
+    }
+  });
+
+  // Close on backdrop click
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) closeSearchModal();
+  });
+
+  // Close button
+  const closeBtn = $('#search-modal-close');
+  closeBtn?.addEventListener('click', closeSearchModal);
+
+  // Topbar search button opens modal
+  const topbarInput = $('[data-docs-filter]');
+  if (topbarInput) {
+    topbarInput.addEventListener('focus', (e) => {
+      e.preventDefault();
+      topbarInput.blur();
+      openSearchModal();
+    });
+    topbarInput.addEventListener('click', () => openSearchModal());
+  }
+
+  // Input handler
+  if (input) {
+    input.addEventListener('input', () => {
+      const q = input.value.trim();
+      renderCategoryList(q);
+      renderResults(q);
+    });
+  }
+};
+
+/* --------------------------------------------------------------------------
+   8. Sidebar search filter (small inline filter, secondary)
+   -------------------------------------------------------------------------- */
+const bindDocsFilter = () => {
+  // Topbar input now opens the modal — handled in bindSearchModal
+  // Nothing else to do here for now
+};
+
+/* --------------------------------------------------------------------------
+   9. Copy-to-clipboard
    -------------------------------------------------------------------------- */
 const bindCopyButtons = () => {
   const content = $('.docs-content');
@@ -245,7 +594,7 @@ const bindCopyButtons = () => {
 
     const btn = document.createElement('button');
     btn.className = 'copy-btn';
-    btn.setAttribute('type', 'button');
+    btn.type = 'button';
     btn.setAttribute('aria-label', 'Copy code to clipboard');
     btn.innerHTML = '<i data-lucide="copy"></i>';
     pre.style.position = 'relative';
@@ -259,14 +608,13 @@ const bindCopyButtons = () => {
         btn.classList.add('copied');
         btn.innerHTML = '<i data-lucide="check"></i> Copied!';
         if (window.lucide) window.lucide.createIcons({ nodes: [btn] });
-
         setTimeout(() => {
           btn.classList.remove('copied');
           btn.innerHTML = '<i data-lucide="copy"></i>';
           if (window.lucide) window.lucide.createIcons({ nodes: [btn] });
         }, 2000);
       } catch {
-        btn.textContent = 'Failed';
+        btn.textContent = 'Error';
         setTimeout(() => {
           btn.innerHTML = '<i data-lucide="copy"></i>';
           if (window.lucide) window.lucide.createIcons({ nodes: [btn] });
@@ -277,7 +625,7 @@ const bindCopyButtons = () => {
 };
 
 /* --------------------------------------------------------------------------
-   Mermaid diagrams
+   10. Mermaid
    -------------------------------------------------------------------------- */
 const prepareMermaid = () => {
   $$('pre > code.language-mermaid').forEach((block) => {
@@ -310,51 +658,127 @@ const prepareMermaid = () => {
 };
 
 /* --------------------------------------------------------------------------
-   Syntax highlighting
+   11. Syntax highlighting
    -------------------------------------------------------------------------- */
 const highlightCode = () => {
   if (!window.hljs) return;
-  $$('pre code:not(.language-mermaid)').forEach((block) =>
-    window.hljs.highlightElement(block)
-  );
+  $$('pre code:not(.language-mermaid)').forEach((b) => window.hljs.highlightElement(b));
 };
 
 /* --------------------------------------------------------------------------
-   Heading anchor links
+   12. Theme toggle
    -------------------------------------------------------------------------- */
-const addHeadingAnchors = () => {
-  const content = $('.docs-content');
-  if (!content) return;
+const applyThemeIcon = () => {
+  const toggles = $$('[data-theme-toggle]');
+  toggles.forEach((toggle) => {
+    const isLight = document.documentElement.dataset.theme === 'light';
+    toggle.setAttribute('aria-pressed', String(isLight));
+    toggle.innerHTML = `<i data-lucide="${isLight ? 'moon' : 'sun'}"></i>`;
+    if (window.lucide) window.lucide.createIcons({ nodes: [toggle] });
+  });
+};
 
-  $$('h2[id], h3[id]', content).forEach((heading) => {
-    const anchor = document.createElement('a');
-    anchor.href = `#${heading.id}`;
-    anchor.className = 'heading-anchor';
-    anchor.setAttribute('aria-label', `Permalink: ${heading.textContent}`);
-    anchor.innerHTML = '#';
-    heading.append(anchor);
+const setTheme = (theme) => {
+  const update = () => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('meld-docs-theme', theme);
+    applyThemeIcon();
+  };
+  if (document.startViewTransition && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    document.startViewTransition(update);
+  } else {
+    update();
+  }
+};
+
+const bindThemeToggle = () => {
+  applyThemeIcon();
+  $$('[data-theme-toggle]').forEach((toggle) => {
+    toggle.addEventListener('click', () => {
+      const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
+      setTheme(next);
+    });
   });
 };
 
 /* --------------------------------------------------------------------------
-   Render Lucide icons
+   13. Mobile sidebar
+   -------------------------------------------------------------------------- */
+const bindSidebarToggle = () => {
+  const toggle = $('[data-sidebar-toggle]');
+  if (!toggle) return;
+  const nav = $('#docs-nav');
+
+  const close = () => {
+    document.body.dataset.sidebarOpen = 'false';
+    toggle.setAttribute('aria-expanded', 'false');
+    toggle.innerHTML = '<i data-lucide="menu"></i>';
+    if (window.lucide) window.lucide.createIcons({ nodes: [toggle] });
+  };
+
+  const open = () => {
+    document.body.dataset.sidebarOpen = 'true';
+    toggle.setAttribute('aria-expanded', 'true');
+    toggle.innerHTML = '<i data-lucide="x"></i>';
+    if (window.lucide) window.lucide.createIcons({ nodes: [toggle] });
+    $('a', nav)?.focus();
+  };
+
+  toggle.addEventListener('click', () => {
+    document.body.dataset.sidebarOpen === 'true' ? close() : open();
+  });
+
+  if (nav) $$('a', nav).forEach((l) => l.addEventListener('click', close));
+
+  document.addEventListener('click', (e) => {
+    if (document.body.dataset.sidebarOpen === 'true' &&
+        nav && !nav.contains(e.target) && !toggle.contains(e.target)) {
+      close();
+    }
+  });
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.body.dataset.sidebarOpen === 'true') {
+      close();
+      toggle.focus();
+    }
+  });
+
+  window.addEventListener('resize', () => {
+    if (window.matchMedia('(min-width: 769px)').matches) close();
+  });
+};
+
+/* --------------------------------------------------------------------------
+   14. Render Lucide icons
    -------------------------------------------------------------------------- */
 const renderIcons = () => {
   if (window.lucide) window.lucide.createIcons();
 };
 
 /* --------------------------------------------------------------------------
-   Init
+   15. Init
    -------------------------------------------------------------------------- */
 window.addEventListener('DOMContentLoaded', () => {
+  // Record this page as visited
+  recordPageView();
+
+  // Build the search index from the sidebar
+  searchIndex = buildSiteIndex();
+
+  // Bind all features
   buildPageToc();
-  bindDocsFilter();
   bindTocHighlight();
   bindThemeToggle();
   bindSidebarToggle();
+  bindDocsFilter();
+  bindSearchModal();
   highlightCode();
   prepareMermaid();
   bindCopyButtons();
   addHeadingAnchors();
   renderIcons();
+
+  // Scroll active sidebar item into view (after icons render)
+  requestAnimationFrame(scrollSidebarToActive);
 });
