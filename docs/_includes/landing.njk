@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title or "Meld.js" }} — Micro-Frontend Engine</title>
+    <meta name="description" content="Meld.js — A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/docs.css">
+    <script>document.documentElement.dataset.theme = localStorage.getItem('meld-docs-theme') || 'dark';</script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/highlight.js@11.11.1/lib/common.min.js" defer></script>
+    <script src="/assets/docs.js" defer></script>
+  </head>
+  <body class="landing-page">
+
+    {# Warp animated grid #}
+    <div class="warp-bg" aria-hidden="true">
+      <div class="warp-grid"></div>
+    </div>
+
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    {# ── Topbar ─────────────────────────────────────────────────── #}
+    <header class="site-topbar site-topbar--landing">
+      <a class="brand" href="/">
+        <img src="/assets/logo.svg" alt="" class="brand-mark" width="36" height="36">
+        <span class="brand-copy">
+          <span class="brand-name">Meld.js</span>
+          <span class="brand-kicker">Micro-frontend engine</span>
+        </span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Primary navigation">
+        <a href="/installation/"><i data-lucide="terminal"></i>Install</a>
+        <a href="/architecture/"><i data-lucide="network"></i>Architecture</a>
+        <a href="/core-api/"><i data-lucide="braces"></i>API</a>
+        <a href="/plugins/"><i data-lucide="blocks"></i>Plugins</a>
+        <a href="/bootcamp/"><i data-lucide="graduation-cap"></i>Bootcamp</a>
+      </nav>
+
+      <div class="topbar-tools">
+        <label class="header-search" aria-label="Search documentation">
+          <i data-lucide="search"></i>
+          <span class="sr-only">Search documentation</span>
+          <input type="search" placeholder="Search docs…" data-docs-filter aria-label="Search docs">
+        </label>
+        <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false">
+          <i data-lucide="sun"></i>
+        </button>
+        <a class="icon-button" href="https://github.com/meldjs/meld" aria-label="GitHub repository" target="_blank" rel="noopener">
+          <i data-lucide="github"></i>
+        </a>
+      </div>
+    </header>
+
+    <main id="content">
+      {{ content | safe }}
+    </main>
+
+    {# ── Footer ──────────────────────────────────────────────────── #}
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-heading head-brand">Meld.js</div>
+          <p class="footer-brand-text">Reactive state, native custom elements, and plugin-driven integration for browser UI modules.</p>
+          <div class="footer-social">
+            <a href="https://github.com/meldjs/meld" aria-label="GitHub" target="_blank" rel="noopener"><i data-lucide="github"></i></a>
+            <a href="/releases/" aria-label="Changelog"><i data-lucide="tag"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <div class="footer-heading head-docs">Documentation</div>
+          <div class="footer-links">
+            <a href="/installation/" class="footer-link">Installation</a>
+            <a href="/architecture/" class="footer-link">Architecture</a>
+            <a href="/core-api/"     class="footer-link">Core API</a>
+            <a href="/plugins/"      class="footer-link">Plugins</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <div class="footer-heading head-social">Guides</div>
+          <div class="footer-links">
+            <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
+            <a href="/integrations/frontend/" class="footer-link">Frontend</a>
+            <a href="/integrations/backend/"  class="footer-link">Backend</a>
+            <a href="/testing/"               class="footer-link">Testing</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <div class="footer-heading head-sub">Local Docs</div>
+          <p class="footer-brand-text">Start the Eleventy dev server from the project root.</p>
+          <code class="footer-command">npm run docs:serve</code>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Meld.js. MIT License.</span>
+        <div class="footer-bottom-links">
+          <a href="/roadmap/">Roadmap</a>
+          <a href="/releases/">Releases</a>
+          <a href="/faq/">FAQ</a>
+        </div>
+      </div>
+    </footer>
+
+  </body>
+</html>

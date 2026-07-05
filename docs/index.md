@@ -1,45 +1,170 @@
 ---
-title: Introduction
-layout: default
+title: Meld.js
+layout: landing.njk
 nav_order: 1
 ---
 
-# 🔗 Meld.js
+<section class="landing-hero" aria-label="Hero">
+  <div class="hero-copy animate-fade-up">
+    <div class="hero-badge">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span>v1.4 — Stable Release</span>
+    </div>
+    <h1>Meld.<br>js</h1>
+    <p class="hero-lede">
+      A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration. No build step required.
+    </p>
+    <div class="hero-actions">
+      <a href="/installation/" class="ui-button ui-button--primary">
+        <i data-lucide="terminal"></i>
+        Get Started
+      </a>
+      <a href="/architecture/" class="ui-button ui-button--secondary">
+        <i data-lucide="network"></i>
+        Architecture
+      </a>
+      <a href="/core-api/" class="ui-button ui-button--ghost">
+        <i data-lucide="braces"></i>
+        API Reference
+      </a>
+    </div>
+  </div>
 
-**The 2kb Micro-Frontend Engine.**
-*Reactive State. Native Components. No Build Step.*
+  <div class="terminal-window animate-fade-up" aria-label="Meld.js quick start example" role="figure">
+    <div class="terminal-header" aria-hidden="true">
+      <span class="dot dot-r"></span>
+      <span class="dot dot-y"></span>
+      <span class="dot dot-g"></span>
+      <span class="terminal-title">src/counter.js</span>
+    </div>
+    <pre><code class="language-javascript">import { defineMeld, meldHtml, meldState }
+  from '@meldjs/meld';
 
+defineMeld('task-counter', () => {
+  const state = meldState({ count: 0 });
 
+  return meldHtml`
+    &lt;div class="counter"&gt;
+      &lt;button onclick="${() => state.count--}"&gt;−&lt;/button&gt;
+      &lt;span&gt;${() => state.count}&lt;/span&gt;
+      &lt;button onclick="${() => state.count++}"&gt;+&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+});</code></pre>
+  </div>
+</section>
 
-**Meld** is a razor-thin JavaScript framework designed for building high-performance, isolated UI widgets and micro-frontends. It combines the fine-grained reactivity of **SolidJS** with the native interoperability of **Web Components**.
+<section class="landing-metrics" aria-label="Framework characteristics">
+  <div>
+    <i data-lucide="atom" class="metric-icon"></i>
+    <strong>~2kb</strong>
+    <span>Minified + gzipped core</span>
+  </div>
+  <div>
+    <i data-lucide="zap" class="metric-icon"></i>
+    <strong>Reactive</strong>
+    <span>Proxy-backed state, no VDOM</span>
+  </div>
+  <div>
+    <i data-lucide="puzzle" class="metric-icon"></i>
+    <strong>Modular</strong>
+    <span>Router, Query, Forms, AI, WASM</span>
+  </div>
+  <div>
+    <i data-lucide="package" class="metric-icon"></i>
+    <strong>Portable</strong>
+    <span>Static, SSR, SPA, legacy pages</span>
+  </div>
+</section>
 
-### **Why Choose Meld?**
+<section class="landing-section">
+  <div class="section-heading">
+    <p class="section-label">Documentation Paths</p>
+    <h2>Choose your starting point</h2>
+    <p>Whether you are building a quick widget or a full-stack application, Meld has a path for you.</p>
+  </div>
+  <div class="link-card-grid">
+    <a href="/installation/" class="link-card">
+      <i data-lucide="download"></i>
+      <strong>Install &amp; Scaffold</strong>
+      <span>Set up the runtime, imports, and local project workflow with the Artisan CLI.</span>
+    </a>
+    <a href="/architecture/" class="link-card">
+      <i data-lucide="workflow"></i>
+      <strong>Understand the Runtime</strong>
+      <span>Review component topology, lifecycle diagrams, and integration patterns.</span>
+    </a>
+    <a href="/core-api/" class="link-card">
+      <i data-lucide="braces"></i>
+      <strong>Core API Reference</strong>
+      <span>State, templates, lifecycle hooks, and custom element definition.</span>
+    </a>
+    <a href="/plugins/" class="link-card">
+      <i data-lucide="blocks"></i>
+      <strong>Plugin Library</strong>
+      <span>Official plugins for routing, persistence, async data, forms, and UX.</span>
+    </a>
+    <a href="/bootcamp/" class="link-card">
+      <i data-lucide="graduation-cap"></i>
+      <strong>Bootcamp</strong>
+      <span>Step-by-step tutorials from zero to production-ready component systems.</span>
+    </a>
+    <a href="/nested-components/" class="link-card">
+      <i data-lucide="component"></i>
+      <strong>Component Patterns</strong>
+      <span>Nested components, provide/inject, slot composition, and reuse strategies.</span>
+    </a>
+  </div>
+</section>
 
-| Feature | Description |
-| :--- | :--- |
-| **🚀 Zero Build Step** | Runs directly in the browser via ES Modules. No Webpack, no Vite required for development. |
-| **⚡ Fine-Grained** | Uses **JavaScript Proxies** to update exact text nodes. Avoids Virtual DOM overhead entirely. |
-| **🛡️ True Isolation** | Components are Native Custom Elements with **Shadow DOM** for guaranteed style encapsulation. |
-| **🔗 Native Integration** | Works seamlessly inside any existing application (React, Vue, legacy jQuery) because it relies on web standards. |
+<section class="landing-section landing-split">
+  <div>
+    <p class="section-label">Runtime Model</p>
+    <h2>Framework-owned where needed. Platform-owned everywhere else.</h2>
+    <p>
+      Meld registers browser custom elements and lets the platform manage lifecycle boundaries. Reactive reads are captured from template bindings and updated directly — without a virtual DOM pass or diffing step.
+    </p>
+    <p>
+      Plugins extend the component context without modifying the core. Each plugin is independently loadable and tree-shakeable.
+    </p>
+    <div style="margin-top: 1.5rem;">
+      <a href="/architecture/" class="ui-button ui-button--ghost">
+        <i data-lucide="arrow-right"></i>
+        Read the architecture docs
+      </a>
+    </div>
+  </div>
+  <div class="diagram-panel">
+    <pre><code class="language-mermaid">flowchart TD
+  State["meldState()"] --> Bindings["Template Bindings"]
+  Bindings --> DOM["Targeted DOM Update"]
+  Plugins["Plugin Context"] --> Ctx["Component Context"]
+  Ctx --> Bindings
+  CE["Custom Element\nlifecycle"] --> Ctx</code></pre>
+  </div>
+</section>
 
-### **Quick Start: The "No-Build" Way**
-
-To start, you only need `index.html` and the `meld.core.js` file.
-
-```html
-<script type="module">
-  import { defineMeld, meldState, meldHtml } from './src/meld.core.js';
-
-  defineMeld('hello-world', () => {
-    const state = meldState({ count: 0 });
-    
-    return meldHtml`
-      <button onclick="\${() => state.count++}">
-        Clicked \${() => state.count} times
-      </button>
-    `;
-  });
-</script>
-
-<hello-world></hello-world>
-```
+<section class="landing-section">
+  <div class="section-heading">
+    <p class="section-label">Can Be Used In</p>
+    <h2>Any deployment surface</h2>
+  </div>
+  <div class="surface-list">
+    <a href="/integrations/frontend/">
+      <i data-lucide="monitor"></i>
+      <span>Frontend applications</span>
+    </a>
+    <a href="/integrations/backend/">
+      <i data-lucide="server"></i>
+      <span>Server-rendered applications</span>
+    </a>
+    <a href="/architecture-kmel/">
+      <i data-lucide="database"></i>
+      <span>KMEL stack projects</span>
+    </a>
+    <a href="/nested-components/">
+      <i data-lucide="component"></i>
+      <span>Nested custom-element systems</span>
+    </a>
+  </div>
+</section>
