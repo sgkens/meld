@@ -46,3 +46,10 @@ CONTEXT-SOURCE/
 
 # devops
 automator-devops/
+
+#_concepts
+concepts/
+
+# coverage
+
+coverage/
