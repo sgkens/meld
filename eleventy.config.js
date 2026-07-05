@@ -35,7 +35,7 @@ export default function eleventyConfig(config) {
   };
 
   const sortPages = (pages) => {
-    return pages.sort((a, b) => {
+    return [...pages].sort((a, b) => {
       const aOrder = Number(a.data.nav_order ?? Number.MAX_SAFE_INTEGER);
       const bOrder = Number(b.data.nav_order ?? Number.MAX_SAFE_INTEGER);
 
@@ -54,9 +54,58 @@ export default function eleventyConfig(config) {
     'docs/**/*.svg': '.',
     'docs/assets': 'assets'
   });
+  config.ignores.add('docs/skipped/**');
 
   config.addFilter('categoryLabel', categoryLabel);
   config.addFilter('categoryId', categoryId);
+
+  const getDocsCategories = (pages) => {
+    const groups = new Map();
+    const rootIndexBySlug = new Map();
+
+    for (const page of pages) {
+      const normalizedInputPath = page.inputPath.replace(/^\.?\//, '');
+      const rootMatch = normalizedInputPath.match(/^docs\/([^/]+)\.(md|njk)$/);
+
+      if (rootMatch) {
+        rootIndexBySlug.set(rootMatch[1], page.url);
+      }
+    }
+
+    for (const page of pages) {
+      const label = categoryLabel(page.inputPath);
+      const id = categoryId(label);
+
+      if (!groups.has(id)) {
+        groups.set(id, { id, label, items: [], indexUrl: `/${id}/`, hasDocumentIndex: false });
+      }
+
+      const group = groups.get(id);
+      group.items.push(page);
+
+      if (rootIndexBySlug.has(id)) {
+        group.indexUrl = rootIndexBySlug.get(id);
+        group.hasDocumentIndex = true;
+      }
+    }
+
+    return Array.from(groups.values())
+      .map((group) => ({
+        ...group,
+        items: sortPages(group.items)
+      }))
+      .sort((a, b) => {
+        if (a.label === 'Foundations') {
+          return -1;
+        }
+
+        if (b.label === 'Foundations') {
+          return 1;
+        }
+
+        return a.label.localeCompare(b.label);
+      });
+  };
 
   config.addFilter('breadcrumbs', (url) => {
     if (!url || url === '/') {
@@ -99,36 +148,46 @@ export default function eleventyConfig(config) {
   });
 
   config.addCollection('docsCategories', (collectionApi) => {
-    const groups = new Map();
-    const pages = collectionApi.getFilteredByGlob('docs/**/*.md');
+    return getDocsCategories(collectionApi.getFilteredByGlob('docs/**/*.md'));
+  });
 
-    for (const page of pages) {
-      const label = categoryLabel(page.inputPath);
-      const id = categoryId(label);
+  config.addCollection('docsCategoryIndexes', (collectionApi) => {
+    return getDocsCategories(collectionApi.getFilteredByGlob('docs/**/*.md'))
+      .filter((category) => category.id !== 'foundations' && !category.hasDocumentIndex);
+  });
 
-      if (!groups.has(id)) {
-        groups.set(id, { id, label, items: [] });
-      }
+  const apiReferenceLinks = new Map([
+    ['defineMeld', 'defineMeld'],
+    ['meldState', 'meldState'],
+    ['computed', 'computed'],
+    ['meldHtml', 'meldHtml'],
+    ['onMount', 'onMount'],
+    ['onDestroy', 'onDestroy'],
+    ['provide', 'provide'],
+    ['inject', 'inject'],
+    ['use', 'use'],
+    ['meld.theme', 'meldTheme'],
+    ['meld.raw', 'meldRaw'],
+    ['meld.list', 'meldList'],
+    ['meld.css', 'meldCss'],
+    ['meld.style', 'meldStyle']
+  ]);
 
-      groups.get(id).items.push(page);
+  config.addTransform('apiReferenceLinks', function(content) {
+    if (!this.page?.outputPath?.endsWith('.html')) {
+      return content;
     }
 
-    return Array.from(groups.values())
-      .map((group) => ({
-        ...group,
-        items: sortPages(group.items)
-      }))
-      .sort((a, b) => {
-        if (a.label === 'Foundations') {
-          return -1;
-        }
+    return content.replace(/<code>([^<]+)<\/code>/g, (match, codeText) => {
+      const value = codeText.trim();
+      const anchor = apiReferenceLinks.get(value);
 
-        if (b.label === 'Foundations') {
-          return 1;
-        }
+      if (!anchor || this.page.url === '/api-reference/') {
+        return match;
+      }
 
-        return a.label.localeCompare(b.label);
-      });
+      return `<code><a href="/api-reference/#${anchor}">${codeText}</a></code>`;
+    });
   });
 
   return {
@@ -137,6 +196,7 @@ export default function eleventyConfig(config) {
       includes: '_includes',
       output: '_site'
     },
+    templateFormats: ['html', 'md', 'njk'],
     markdownTemplateEngine: false,
     htmlTemplateEngine: 'njk'
   };
