@@ -1,4 +1,4 @@
-# meldjs - Development Notes and Workflow Instructions
+﻿# meldjs - Development Notes and Workflow Instructions
 
 ## **REPO INSTRUCTIONS**
 
@@ -8,12 +8,8 @@ Use this tracker as the local source of truth for release hardening, testing gap
 
 ### **Issues Remaining (priority-1)**
 
-- [ ] 🔴🦀❓🔟 **Critical** - Fix local JavaScript toolchain availability: npm, npx, and node are not on PATH in the current shell, blocking npm test, npm run lint, and npm run build verification.
-- [x] 🔴🪲✅🔟 **Critical** - Re-enable GitLab CI test stage and require npm test plus coverage artifacts before build/deploy/release jobs.
-
+- [ ] 🔴🦀❓🔟 **Critical** - Fix local JavaScript toolchain availability: npm, npx, and node are not on PATH in this shell, blocking npm test, npm run lint, and npm run build verification.
 ### **Enhancements (priority-2)**
-
-- [x] 🟠🌟✅7️⃣ **Enhancement** - Add coverage enforcement to Jest config or npm test script so core and plugin regression tests cannot silently remain at one assertion before launch.
 
 - [ ] 🟡🌟⏳6️⃣ **Enhancement** - Generate Meld custom data from current core, components, and plugins so LSP/VS Code completions stay aligned with the package instead of hardcoded CORE_DATA.
 ### **Features (priority-3)**
@@ -23,23 +19,19 @@ Use this tracker as the local source of truth for release hardening, testing gap
 
 - [ ] 🟠🌟⏳8️⃣ **Feature** - Finish meld-lsp TypeScript server plugin: install dependencies, make tsc build pass, implement real meldHtml template completions, diagnostics, hover data, and plugin/custom-element metadata loading.
 - [ ] 🟠🌟⏳8️⃣ **Feature** - Finish meld-vscode extension packaging: bundle or depend on meld-lsp, add VS Code package scripts, README, marketplace metadata, icon, license, vsce packaging, and extension smoke tests.
-- [x] 🔴🌟✅🔟 **Feature** - Build release-ready Meld Eleventy/Nunjucks documentation site from docs/meld-11ty-nunchucks-theme-sot.html and move non-site legacy docs into an Eleventy ignored skipped folder.
+- [ ] 🟠🌟❓8️⃣ **Feature** - Finish meld-socket WebSocket plugin integration: runtime hardening, package exports, type declarations, smoke tests, and merge readiness with develop.
+  - Runtime/export/docs integration is in place; final verification is blocked until node/npm/npx are available for lint, tests, and docs build.
+- [ ] 🟠🌟❓8️⃣ **Feature** - Consolidate Meld docs UI: smaller H1 scale, site-wide API reference styling, Mermaid theme alignment, dismissible release banner, and benchmark harness for Meld/Vue/React/HTMX.
+  - Implementation is in place across docs templates, CSS, docs JS, benchmark harness, and performance docs; build/runtime verification is blocked until node/npm/npx are available.
 ### **Bug Fixes (priority-4)**
-
-- [x] 🟠🪲✅9️⃣ **BugFix** - Audit vite.config.js against automator-devops/templates/javascript/vite.config.js after syntax fix; confirm four-file UMD/ESM output, copied package metadata, README, lockfile, and JSR config are correct for meldjs.
-- [x] 🟠🪲✅9️⃣ **BugFix** - Replace copied logcad values in jsr.jsonc with meldjs package name, version, exports, publish includes, and runtime tasks before attempting JSR publish.
-- [x] 🟠🪲✅9️⃣ **BugFix** - Investigate meldHtml dynamic function rendering: raw HTML and Node replacement currently mutate parent.innerHTML/replaceChildren, which can remove sibling dynamic anchors and break multiple reactive values in the same parent.
-- [x] 🟠🪲✅8️⃣ **BugFix** - Investigate createEffect activeEffect restoration for nested computed/effects; current single global activeEffect can drop parent tracking when an effect is created during another effect.
-- [x] 🟠🪲✅8️⃣ **BugFix** - Test and harden MeldA11y focusTrap: empty focusable lists currently index focusable[0] and focusable[-1], so modal/dialog edge cases need guards and tests.
-- [x] 🟠🪲✅8️⃣ **BugFix** - Test and harden MeldPortal cleanup: current ref appends rendered nodes to document.body but does not prove disconnection removes the teleported DOM.
-- [x] 🟠🪲✅8️⃣ **BugFix** - Test and harden network plugins MeldAI, MeldQuery, MeldQuiver, and MeldWasm for failed fetch, invalid JSON, stream absence, non-ok responses, and abort/error state propagation.
 
 - [ ] 🟠🦀❓7️⃣ **BugFix** - Fix meld-vscode TypeScript server plugin contribution: current package references meld-lsp by name but does not ship the plugin inside the extension package.
 ### **Documentation (priority-5)**
 
-- [x] 🟢🎨✅8️⃣ **Documentation** - Epic polish pass on 11ty docs site: full CSS overhaul (glassmorphism, premium tokens, animated backgrounds, copy-to-clipboard, heading anchors, keyboard shortcuts, view transitions), improved Nunjucks layouts (default.njk, landing.njk), enhanced JS (sidebar backdrop, Escape key, Ctrl+K search), refreshed logo SVG (elliptical orbital rings), and expanded landing page hero + 6-card grid.
-
+- [x] 🟠🌟✅7️⃣ **Docs** - Add docs collection index pages, fix collection breadcrumbs, and complete API reference links/highlighting
 ### **Refactoring (priority-6)**
+
+- [ ] 🟠🌟⏳7️⃣ **Refactoring** - Convert all 11ty theme templates (`default.njk`, `landing.njk`) into modular Nunjucks macro components. Extract: topbar, sidebar, TOC, footer, search-modal, breadcrumbs, doc-pager into `_includes/components/*.njk` macros so the theme is easy to develop, extend, and test in isolation. Follow skill fluent-ui-v1 SOT component approach.
 
 ### **Refine Features (priority-7)**
 
