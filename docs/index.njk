@@ -37,19 +37,19 @@ nav_order: 1
       <span class="dot dot-g"></span>
       <span class="terminal-title">src/counter.js</span>
     </div>
-    <pre class="language-javascript"><code class="language-javascript">import { defineMeld, meldHtml, meldState } from '@meldjs/meld';
+    {% highlight "javascript" %}import { defineMeld, meldHtml, meldState } from '@meldjs/meld';
 
-defineMeld('task-counter', () =&gt; {
+defineMeld('task-counter', () => {
   const state = meldState({ count: 0 });
 
   return meldHtml`
-    &lt;div class="counter"&gt;
-      &lt;button onclick="${() =&gt; state.count--}"&gt;-&lt;/button&gt;
-      &lt;span&gt;${() =&gt; state.count}&lt;/span&gt;
-      &lt;button onclick="${() =&gt; state.count++}"&gt;+&lt;/button&gt;
-    &lt;/div&gt;
+    <div class="counter">
+      <button onclick="${() => state.count--}">-</button>
+      <span>${() => state.count}</span>
+      <button onclick="${() => state.count++}">+</button>
+    </div>
   `;
-});</code></pre>
+});{% endhighlight %}
   </div>
 </section>
 

@@ -3174,14 +3174,14 @@ table.api-params td.pname {
   font-weight: 700;
   color: var(--text-main);
   white-space: nowrap;
-  padding-right: 20px;
+  padding-right: 12px;
 }
 table.api-params td.ptype {
   font-family: var(--font-mono);
   font-size: 0.82rem;
   color: var(--accent-cyan);
   white-space: nowrap;
-  padding-right: 20px;
+  padding-right: 12px;
   opacity: 0.9;
 }
 table.api-params td.pdesc {

@@ -157,19 +157,19 @@
       <span class="dot dot-g"></span>
       <span class="terminal-title">src/counter.js</span>
     </div>
-    <pre class="language-javascript"><code class="language-javascript">import { defineMeld, meldHtml, meldState } from '@meldjs/meld';
+    <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml<span class="token punctuation">,</span> meldState <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@meldjs/meld'</span><span class="token punctuation">;</span>
 
-defineMeld('task-counter', () =&gt; {
-  const state = meldState({ count: 0 });
+<span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'task-counter'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> state <span class="token operator">=</span> <span class="token function">meldState</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">count</span><span class="token operator">:</span> <span class="token number">0</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
-  return meldHtml`
-    &lt;div class="counter"&gt;
-      &lt;button onclick="${() =&gt; state.count--}"&gt;-&lt;/button&gt;
-      &lt;span&gt;${() =&gt; state.count}&lt;/span&gt;
-      &lt;button onclick="${() =&gt; state.count++}"&gt;+&lt;/button&gt;
-    &lt;/div&gt;
-  `;
-});</code></pre>
+  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+    &lt;div class="counter">
+      &lt;button onclick="</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> state<span class="token punctuation">.</span>count<span class="token operator">--</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">">-&lt;/button>
+      &lt;span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> state<span class="token punctuation">.</span>count<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">&lt;/span>
+      &lt;button onclick="</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> state<span class="token punctuation">.</span>count<span class="token operator">++</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">">+&lt;/button>
+    &lt;/div>
+  </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
   </div>
 </section>
 

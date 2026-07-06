@@ -51,9 +51,9 @@ Use this tracker as the local source of truth for release hardening, testing gap
  - [x] improve the collection index to instead of showing the file, show the Excerpt and the catagory and tags, this will make it easier to find the right page.
  - [x] gitlab/github icons are collections need reversing 
  - [x] the splash page has lost some of its color please have a loog see where we lost it and re-add it.
- - [ ] meld artisan cli docs page has a double up remnants of the recents change consolidate it
- - [ ] shoud we use the api layout of the strict-api-reference for the api pages to display api related data.
- - [ ] Styling parameteter table first column needs let padding to make it easier to read.
+ - [x] meld artisan cli docs page has a double up remnants of the recents change consolidate it
+ - [x] shoud we use the api layout of the strict-api-reference for the api pages to display api related data.
+ - [x] Styling parameteter table first column needs let padding to make it easier to read.
  - [ ] lets add solidjs, svelte, and react examples to the rendering page, we should also add a comparison of the different frameworks and how meld compares to them., also sveltkit, angular, nextjs, astro, and remix, we should also add a comparison of the different frameworks and how meld compares to them or hw meld is used with theme, remember we are comparing not to complete to define where meld sits what it can do what it cant. profrossional and open i dont like hiddent caviats, prefre straight up heres the pros and cons no builshit, if you want to build this, use this instead of.
- - [ ] the splash code block sytax highlighting is not working, please fix it
+ - [x] the splash code block sytax highlighting is not working, please fix it
 ### **Backlog**
