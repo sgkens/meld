@@ -10,7 +10,7 @@ eleventyExcludeFromCollections: true
 <header class="collection-index-hero">
   <p class="section-label">Documentation Collection</p>
   <h1>{{ category.label }}</h1>
-  <p>Browse every page in the {{ category.label | lower }} collection.</p>
+  <p>Browse the {{ category.label }} collection. Select a page below.</p>
 </header>
 
 <div class="collection-index-grid">
@@ -18,10 +18,26 @@ eleventyExcludeFromCollections: true
     <a class="link-card" href="{{ item.url }}">
       <i data-lucide="file-text"></i>
       <strong>{{ item.data.title or item.fileSlug }}</strong>
-      {% if item.data.description %}
-        <span>{{ item.data.description }}</span>
+      {% if item.data.excerpt %}
+        <span class="link-card-excerpt">{{ item.data.excerpt }}</span>
+      {% elif item.data.description %}
+        <span class="link-card-excerpt">{{ item.data.description }}</span>
       {% else %}
-        <span>{{ item.inputPath | replace("./docs/", "") }}</span>
+        <span class="link-card-excerpt">{{ item.inputPath | replace("./docs/", "") }}</span>
+      {% endif %}
+      {% if item.data.tags and item.data.tags.length %}
+        <div class="link-card-meta">
+          {% for tag in item.data.tags %}
+            <span class="badge badge-tag">{{ tag }}</span>
+          {% endfor %}
+          {% if item.data.category %}
+            <span class="badge badge-category">{{ item.data.category }}</span>
+          {% endif %}
+        </div>
+      {% elif item.data.category %}
+        <div class="link-card-meta">
+          <span class="badge badge-category">{{ item.data.category }}</span>
+        </div>
       {% endif %}
     </a>
   {% endfor %}

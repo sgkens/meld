@@ -1,6 +1,9 @@
 ---
 title: Backend Integration (KMEL Stack)
 nav_order: 8
+excerpt: Connecting the Meld.js frontend to a Node.js backend using Knex for database access and Lucia for session-based authentication.
+tags: [backend, knex, lucia, express, authentication, database, kmel]
+category: Docs
 ---
 
 # Backend Integration: Knex, Lucia, Express

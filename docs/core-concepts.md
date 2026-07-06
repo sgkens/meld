@@ -1,6 +1,9 @@
 ---
 title: Core Concepts
 nav_order: 3
+excerpt: "Fundamental concepts behind Meld.js: proxy-based reactivity, Native Custom Elements, Shadow DOM encapsulation, and the no-build architecture."
+tags: [core-concepts, reactivity, proxy, custom-elements, shadow-dom, no-build]
+category: Docs
 ---
 
 # Core Concepts

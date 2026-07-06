@@ -1,0 +1,1138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Editor Setup | Meld.js</title>
+    <meta name="description" content="Meld.js documentation — a 2kb micro-frontend engine for reactive state, native custom elements, and plugin-driven integration.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/prism-meld.css">
+    <link rel="stylesheet" href="/assets/docs.css">
+    
+    <script>document.documentElement.dataset.theme = localStorage.getItem('meld-docs-theme') || 'dark';</script>
+    
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+    
+    <script src="/assets/docs.js" defer></script>
+  </head>
+  <body>
+    
+    <div class="space-grid" aria-hidden="true"></div>
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <aside
+      class="release-banner"
+      data-release-banner
+      data-release-id="meld-launch-2026-07"
+      aria-label="Release notice"
+    >
+      <div class="release-banner__inner">
+        <span class="release-banner__eyebrow">Release</span>
+        <p>Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.</p>
+        <a href="/releases/">View details</a>
+        <button type="button" class="release-banner__dismiss" data-release-banner-dismiss aria-label="Dismiss release notice">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+    </aside>
+
+    
+    <header class="site-topbar">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 120 120" width="36" height="36" xmlns="http://www.w3.org/2000/svg" aria-label="Meld.js logo" role="img">
+          <defs>
+            <mask id="seam-mask">
+              <rect x="0" y="0" width="120" height="120" fill="white" />
+              <line x1="60" y1="48" x2="60" y2="72" stroke="black" stroke-width="14" stroke-linecap="round"/>
+            </mask>
+          </defs>
+          <path d="M 22 92 L 22 28 L 60 60 L 98 28 L 98 92" fill="none" stroke="var(--logo-path-stroke)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" mask="url(#seam-mask)"/>
+          <circle cx="60" cy="48" r="5.5" fill="var(--logo-path-stroke)"/>
+          <circle cx="60" cy="72" r="5.5" fill="var(--logo-path-stroke)"/>
+        </svg>
+        <span class="brand-copy">
+          <span class="brand-name">Meldjs.dev</span>
+          <span class="brand-kicker">Micro-frontend engine</span>
+        </span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Primary navigation">
+        <a href="/" >
+          <i data-lucide="book-open"></i>
+          Docs
+        </a>
+        <a href="/core-api/" >
+          <i data-lucide="braces"></i>
+          API
+        </a>
+        <a href="/plugins/" >
+          <i data-lucide="blocks"></i>
+          Plugins
+        </a>
+        <a href="/architecture/" >
+          <i data-lucide="network"></i>
+          Architecture
+        </a>
+        <a href="/bootcamp/" >
+          <i data-lucide="graduation-cap"></i>
+          Bootcamp
+        </a>
+      </nav>
+
+      <div class="topbar-tools">
+        <label class="header-search" aria-label="Search documentation">
+          <i data-lucide="search"></i>
+          <span class="sr-only">Search documentation</span>
+          <input type="search" placeholder="Search docs…" data-docs-filter aria-label="Search docs">
+        </label>
+        <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false">
+          <i data-lucide="sun"></i>
+        </button>
+        <a class="icon-button" href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab repository" target="_blank" rel="noopener">
+          <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+        </a>
+        <a class="icon-button" href="https://github.com/meldjs/meld" aria-label="GitHub repository" target="_blank" rel="noopener">
+          <i data-lucide="github"></i>
+        </a>
+        <button class="icon-button mobile-menu-button" type="button" data-sidebar-toggle aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="docs-nav">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </header>
+
+    
+    <div class="docs-shell">
+
+      
+      <aside class="docs-nav" id="docs-nav" aria-label="Documentation navigation">
+        <div class="docs-nav-head">
+          <div class="docs-nav-title">
+            <i data-lucide="panel-left"></i>
+            Documentation
+          </div>
+        </div>
+
+        <nav class="category-nav" aria-label="Documentation sections">
+          
+            <section class="nav-category" aria-labelledby="nav-cat-foundations" >
+              <h2 id="nav-cat-foundations">
+                <a href="/foundations/">Foundations</a>
+              </h2>
+              
+                <a
+                  href="/architecture/"
+                  
+                  data-excerpt=""
+                  data-tags=""
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Meld Architecture</span>
+                </a>
+              
+                <a
+                  href="/core-concepts/"
+                  
+                  data-excerpt="Fundamental concepts behind Meld.js: proxy-based reactivity, Native Custom Elements, Shadow DOM encapsulation, and the no-build architecture."
+                  data-tags="core-concepts,reactivity,proxy,custom-elements,shadow-dom,no-build"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Core Concepts</span>
+                </a>
+              
+                <a
+                  href="/backend-integration/"
+                  
+                  data-excerpt="Connecting the Meld.js frontend to a Node.js backend using Knex for database access and Lucia for session-based authentication."
+                  data-tags="backend,knex,lucia,express,authentication,database,kmel"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Backend Integration (KMEL Stack)</span>
+                </a>
+              
+                <a
+                  href="/releases/"
+                  
+                  data-excerpt=""
+                  data-tags=""
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Releases and Changelog</span>
+                </a>
+              
+                <a
+                  href="/api-reference/"
+                  
+                  data-excerpt="Canonical technical reference for the Meld.js public runtime API, covering reactivity, DOM templating, lifecycle hooks, and context/dependency injection."
+                  data-tags="api,reference,defineMeld,meldState,meldHtml,lifecycle,context"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Strict API Reference</span>
+                </a>
+              
+                <a
+                  href="/release-audit/"
+                  
+                  data-excerpt=""
+                  data-tags=""
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Release Audit</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-getting-started" >
+              <h2 id="nav-cat-getting-started">
+                <a href="/getting-started/">Getting Started</a>
+              </h2>
+              
+                <a
+                  href="/getting-started/installation/"
+                  
+                  data-excerpt=""
+                  data-tags="installation,setup,artisan-cli,scaffolding"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Installation &amp; Scaffolding</span>
+                </a>
+              
+                <a
+                  href="/getting-started/editor-setup/"
+                  aria-current="page"
+                  data-excerpt="A guide to configuring your code editor for optimal syntax highlighting and development experience with Meld.js."
+                  data-tags="editor,setup,syntax highlighting,configuration"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Editor Setup</span>
+                </a>
+              
+                <a
+                  href="/getting-started/nested-components/"
+                  
+                  data-excerpt="A guide to nesting components and enabling communication between parent and child components in Meld.js."
+                  data-tags="components,nesting,communication,props,events"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Component Nesting &amp; Communication</span>
+                </a>
+              
+                <a
+                  href="/getting-started/rendering/"
+                  
+                  data-excerpt="A guide to rendering templates and using the `meldHtml` tag for reactive UI updates in Meld.js."
+                  data-tags="rendering,templating,meldHtml,meld.list,meld.css"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Rendering &amp; Templating</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-architecture" >
+              <h2 id="nav-cat-architecture">
+                <a href="/architecture/">Architecture</a>
+              </h2>
+              
+                <a
+                  href="/architecture/architecture-deep-dive/"
+                  
+                  data-excerpt="An in-depth look at Meld.js core pillars: proxy-based reactivity, Shadow DOM encapsulation, and the no-build ESM architecture."
+                  data-tags="architecture,deep-dive,meld"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Architectural Deep Dive</span>
+                </a>
+              
+                <a
+                  href="/architecture/advanced-architecture/"
+                  
+                  data-excerpt="A deep dive into the recommended full-stack architecture for Meld, including Knex, Express, and Lucia."
+                  data-tags="architecture,kmel,full-stack,meld"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Advanced Architecture (KMEL)</span>
+                </a>
+              
+                <a
+                  href="/architecture/performance/"
+                  
+                  data-excerpt="Live browser benchmarks and technical analysis of Meld.js rendering performance — no Virtual DOM, no diffing, O(1) targeted DOM updates."
+                  data-tags="performance,benchmarks,rendering"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Performance &amp; Benchmarks</span>
+                </a>
+              
+                <a
+                  href="/architecture/architecture-kmel/"
+                  
+                  data-excerpt=""
+                  data-tags="architecture,kmel,full-stack,meld"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>The KMEL Stack</span>
+                </a>
+              
+                <a
+                  href="/architecture/plugins/"
+                  
+                  data-excerpt="Overview of Meld.js plugin architecture — a tiny core (&lt;2kb) extended by opt-in plugins for routing, state, forms, WebSocket, and developer tooling."
+                  data-tags="plugins,architecture,ecosystem"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>The Plugin Ecosystem</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-plugins" >
+              <h2 id="nav-cat-plugins">
+                <a href="/plugins/">Plugins</a>
+              </h2>
+              
+                <a
+                  href="/plugins/architecture/"
+                  
+                  data-excerpt="Plugins for structuring SPAs and managing global application state, including meld-router and meld-store."
+                  data-tags="plugins,architecture,state-management,router,store,spa"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Architecture &amp; State</span>
+                </a>
+              
+                <a
+                  href="/plugins/data/"
+                  
+                  data-excerpt="Plugins for API interaction and data persistence, including meld-query for reactive fetch and meld-local for localStorage management."
+                  data-tags="plugins,data,networking,fetch,api,local-storage,reactive"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Data &amp; Networking</span>
+                </a>
+              
+                <a
+                  href="/plugins/meld-socket/"
+                  
+                  data-excerpt="Official WebSocket plugin for Meld.js with auto-reconnect, heartbeat, structured message routing, presence tracking, and request-response support."
+                  data-tags="plugins,websocket,real-time,messaging,presence,meld-socket"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>meld-socket</span>
+                </a>
+              
+                <a
+                  href="/plugins/ui/"
+                  
+                  data-excerpt="UI pattern plugins for complex DOM rendering, including meld-portal for modals and tooltips and meld-animate for transitions."
+                  data-tags="plugins,ui,portal,modal,tooltip,animation,shadow-dom"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>UI Patterns</span>
+                </a>
+              
+                <a
+                  href="/plugins/content/"
+                  
+                  data-excerpt="Plugins for rendering content and handling user input, including meld-markdown, meld-time, and meld-forms."
+                  data-tags="plugins,content,forms,markdown,validation,input"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Content &amp; Forms</span>
+                </a>
+              
+                <a
+                  href="/plugins/dx/"
+                  
+                  data-excerpt="Developer experience and quality assurance plugins including meld-devtools for visual debugging, meld-logger, and meld-a11y for accessibility checks."
+                  data-tags="plugins,dx,developer-experience,devtools,logging,accessibility,testing"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>DX &amp; Quality</span>
+                </a>
+              
+                <a
+                  href="/plugins/diagnostics/"
+                  
+                  data-excerpt="The meld-diagnostics plugin installs a runtime diagnostics hook and reports initialization details to the browser console."
+                  data-tags="plugins,diagnostics,debugging,console,runtime"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Diagnostics Plugin</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-integrations" >
+              <h2 id="nav-cat-integrations">
+                <a href="/integrations/">Integrations</a>
+              </h2>
+              
+                <a
+                  href="/integrations/frontend/"
+                  
+                  data-excerpt="Using Meld.js Native Custom Elements inside React, Vue, Svelte, or any HTML-standards-compliant frontend framework."
+                  data-tags="integration,frontend,react,vue,svelte,custom-elements"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Frontend Frameworks</span>
+                </a>
+              
+                <a
+                  href="/integrations/backend/"
+                  
+                  data-excerpt="How to integrate Meld.js components into server-rendered MVC applications using Laravel Blade, Django, or EJS templates."
+                  data-tags="integration,backend,mvc,laravel,blade,server-rendered"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Backend &amp; MVC</span>
+                </a>
+              
+                <a
+                  href="/integrations/lagacy/"
+                  
+                  data-excerpt="Integrating Meld.js components into legacy codebases and vanilla JavaScript projects using Shadow DOM isolation."
+                  data-tags="integration,legacy,vanilla-js,shadow-dom,progressive-enhancement"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Legacy &amp; Vanilla JS</span>
+                </a>
+              
+                <a
+                  href="/integrations/inertia/"
+                  
+                  data-excerpt="How to use Meld.js as a client-side Inertia.js adapter for Laravel, replacing Vue or React in a monolith architecture."
+                  data-tags="integration,inertia,laravel,adapter,spa"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Laravel Inertia Adapter</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-stacks" >
+              <h2 id="nav-cat-stacks">
+                <a href="/stacks/">Stacks</a>
+              </h2>
+              
+                <a
+                  href="/stacks/KMEL Stack/"
+                  
+                  data-excerpt="A practical guide to the KMEL stack (Knex, Meld, Express, Lucia), covering directory structure, database migrations, auth, and API integration."
+                  data-tags="knex,meld,express,lucia,stack,kmel,full-stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>KMEL Stack</span>
+                </a>
+              
+                <a
+                  href="/stacks/vue-meld/"
+                  
+                  data-excerpt="Use Meld.js custom elements inside a Vue 3 application. Covers Vite compiler config, import patterns, property passing, and shared reactive state between Vue and Meld."
+                  data-tags="vue,vite,custom-elements,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Vue + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/react-meld/"
+                  
+                  data-excerpt="Embed Meld.js custom elements inside React components. Covers import patterns, useRef for element access, useEffect for imperative initialisation, and CustomEvent bridging."
+                  data-tags="react,custom-elements,useeffect,useref,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>React + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/astro-meld/"
+                  
+                  data-excerpt="Use Meld.js as a client-side island framework within Astro pages. Covers script imports, client-side hydration strategy, is:inline usage, and partial hydration patterns."
+                  data-tags="astro,islands,hydration,custom-elements,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Astro + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/htmx-meld/"
+                  
+                  data-excerpt="Combine HTMX for server-driven HTML navigation with Meld.js for reactive client-side state. Covers hx-boost with Meld, wiring HTMX events to Meld components, and re-registration after partial page swaps."
+                  data-tags="htmx,custom-elements,server-driven,reactive,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>HTMX + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/docker-postgres/"
+                  
+                  data-excerpt="Full docker-compose and podman-compose configuration for a local PostgreSQL development environment with a Node.js Meld application, pgAdmin, persistent volumes, and migration tooling."
+                  data-tags="docker,podman,postgresql,postgres,local-dev,docker-compose,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Docker / Podman Local Development with PostgreSQL</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-bootcamp" >
+              <h2 id="nav-cat-bootcamp">
+                <a href="/bootcamp/">Bootcamp</a>
+              </h2>
+              
+                <a
+                  href="/bootcamp/part-1-setup-and-architecture/"
+                  
+                  data-excerpt="Part 1 of the Meld.js bootcamp — scaffold a project with Meld Artisan, configure global state with Meld Store, and set up client-side routing."
+                  data-tags="bootcamp,tutorial,setup,artisan,store,router,spa"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Bootcamp Part 1 - Setup &amp; Architecture</span>
+                </a>
+              
+                <a
+                  href="/bootcamp/part-2/"
+                  
+                  data-excerpt="Part 2 of the Meld.js bootcamp — build Kanban board components using meld.list for efficient list rendering and meld-time for relative timestamps."
+                  data-tags="bootcamp,tutorial,kanban,list-rendering,meld-time,components"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Bootcamp Part 2 - The Kanban Board</span>
+                </a>
+              
+                <a
+                  href="/bootcamp/part-3-forms-and-portals/"
+                  
+                  data-excerpt="Part 3 of the Meld.js bootcamp — implement a modal dialog with meld-portal and a validated task form using meld-forms."
+                  data-tags="bootcamp,tutorial,forms,portal,modal,validation,meld-forms"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Bootcamp Part 3 - Forms and Portals</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-tooling" >
+              <h2 id="nav-cat-tooling">
+                <a href="/tooling/">Tooling</a>
+              </h2>
+              
+                <a
+                  href="/tooling/cli/"
+                  
+                  data-excerpt="Reference for the Meld Artisan CLI — project scaffolding, component and plugin generation, local dev server, and build commands."
+                  data-tags="tooling,cli,artisan,scaffolding,build,dev-server"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Meld Artisan CLI</span>
+                </a>
+              
+            </section>
+          
+        </nav>
+      </aside>
+
+      
+      <main class="docs-content" id="content" tabindex="-1">
+        <div class="content-topline">
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            
+              
+                <a href="/">Docs</a>
+                <i data-lucide="chevron-right"></i>
+              
+            
+              
+                <a href="/getting-started/">Getting Started</a>
+                <i data-lucide="chevron-right"></i>
+              
+            
+              
+                <span aria-current="page">Editor Setup</span>
+              
+            
+          </nav>
+          <a class="edit-link" href="https://github.com/meldjs/meld/edit/main/./docs/getting-started/editor-setup.md" target="_blank" rel="noopener">
+            <i data-lucide="pencil"></i>
+            Edit this page
+          </a>
+        </div>
+
+        <h1>Editor Setup &amp; Syntax Highlighting</h1>
+<p>Meld uses standard JavaScript Template Literals. To get the best experience (syntax highlighting for HTML inside JS), we recommend configuring your editor.</p>
+<h2>1. VS Code</h2>
+<p>We provide an official extension that handles syntax highlighting and provides snippets.</p>
+<h3>Option A: Install Official Extension</h3>
+<p>Search for <strong>&quot;Meld.js Support&quot;</strong> in the VS Code Marketplace and install it. The extension provides:</p>
+<ul>
+<li>Syntax highlighting for <code><a href="/api-reference/#meldHtml">meldHtml</a></code>, <code><a href="/api-reference/#meldRaw">meld.raw</a></code>, and <code><a href="/api-reference/#meldTheme">meld.theme</a></code> template literals.</li>
+<li>Snippet library for common Meld component patterns.</li>
+<li>Integration with the <code>meld-lsp</code> language server for diagnostics and completions.</li>
+</ul>
+<h3>Option B: Manual Configuration</h3>
+<p>If you prefer not to install specific extensions, you can use the generic <strong>&quot;ES6 String HTML&quot;</strong> extension.</p>
+<ol>
+<li>Install <strong>ES6 String HTML</strong>.</li>
+<li>Add this to your <code>.vscode/settings.json</code>:</li>
+</ol>
+<pre class="language-json" tabindex="0"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"es6-string-html.functionNames"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"meldHtml"</span><span class="token punctuation">,</span>
+    <span class="token string">"meld.raw"</span><span class="token punctuation">,</span>
+    <span class="token string">"meld.theme"</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<h3>TypeScript / JSDoc Type Checking</h3>
+<p>Meld ships type definitions that work with VS Code's built-in TypeScript checker even in plain <code>.js</code> files. Add a <code>jsconfig.json</code> (or <code>tsconfig.json</code>) at your project root:</p>
+<pre class="language-json" tabindex="0"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"compilerOptions"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"target"</span><span class="token operator">:</span> <span class="token string">"ESNext"</span><span class="token punctuation">,</span>
+    <span class="token property">"module"</span><span class="token operator">:</span> <span class="token string">"ESNext"</span><span class="token punctuation">,</span>
+    <span class="token property">"moduleResolution"</span><span class="token operator">:</span> <span class="token string">"Bundler"</span><span class="token punctuation">,</span>
+    <span class="token property">"checkJs"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"strict"</span><span class="token operator">:</span> <span class="token boolean">false</span><span class="token punctuation">,</span>
+    <span class="token property">"allowJs"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"noEmit"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"paths"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"meldjs"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"./node_modules/meldjs/dist/index.d.ts"</span><span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"include"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"src/**/*"</span><span class="token punctuation">,</span> <span class="token string">"components/**/*"</span><span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Enable per-file type checking with a JSDoc comment at the top of any <code>.js</code> file:</p>
+<pre class="language-js" tabindex="0"><code class="language-js"><span class="token comment">// @ts-check</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span></code></pre>
+<h3>.vscode/settings.json — Formatting</h3>
+<p>The following workspace settings enforce consistent formatting with Prettier and enable JS type checking:</p>
+<pre class="language-json" tabindex="0"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"editor.defaultFormatter"</span><span class="token operator">:</span> <span class="token string">"esbenp.prettier-vscode"</span><span class="token punctuation">,</span>
+  <span class="token property">"editor.formatOnSave"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"[javascript]"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"editor.defaultFormatter"</span><span class="token operator">:</span> <span class="token string">"esbenp.prettier-vscode"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"[typescript]"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"editor.defaultFormatter"</span><span class="token operator">:</span> <span class="token string">"esbenp.prettier-vscode"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"js/ts.implicitProjectConfig.checkJs"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"typescript.preferences.importModuleSpecifier"</span><span class="token operator">:</span> <span class="token string">"relative"</span><span class="token punctuation">,</span>
+  <span class="token property">"editor.tabSize"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+  <span class="token property">"editor.insertSpaces"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"files.eol"</span><span class="token operator">:</span> <span class="token string">"\n"</span><span class="token punctuation">,</span>
+  <span class="token property">"es6-string-html.functionNames"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"meldHtml"</span><span class="token punctuation">,</span>
+    <span class="token string">"meld.raw"</span><span class="token punctuation">,</span>
+    <span class="token string">"meld.theme"</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<h3>.vscode/extensions.json — Workspace Recommendations</h3>
+<p>Commit this file to share recommended extensions with your team:</p>
+<pre class="language-json" tabindex="0"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"recommendations"</span><span class="token operator">:</span> <span class="token punctuation">[</span>
+    <span class="token string">"esbenp.prettier-vscode"</span><span class="token punctuation">,</span>
+    <span class="token string">"dbaeumer.vscode-eslint"</span><span class="token punctuation">,</span>
+    <span class="token string">"Tobermory.es6-string-html"</span><span class="token punctuation">,</span>
+    <span class="token string">"meldjs.meldjs-support"</span><span class="token punctuation">,</span>
+    <span class="token string">"ms-vscode.vscode-typescript-next"</span><span class="token punctuation">,</span>
+    <span class="token string">"mtxr.sqltools"</span><span class="token punctuation">,</span>
+    <span class="token string">"mtxr.sqltools-driver-pg"</span>
+  <span class="token punctuation">]</span>
+<span class="token punctuation">}</span></code></pre>
+<h3>meld-lsp Language Server Plugin</h3>
+<p><code>meld-lsp</code> is the official language server for Meld.js. It provides:</p>
+<ul>
+<li>Completions and hover documentation for <code>meld.*</code> APIs.</li>
+<li>Diagnostic errors for invalid component tree structures.</li>
+<li>Go-to-definition support for named Meld slots and refs.</li>
+</ul>
+<p><strong>Install:</strong></p>
+<pre class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">npm</span> <span class="token function">install</span> --save-dev meld-lsp</code></pre>
+<p><strong>Configure in <code>.vscode/settings.json</code>:</strong></p>
+<pre class="language-json" tabindex="0"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"meld-lsp.enable"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"meld-lsp.rootDir"</span><span class="token operator">:</span> <span class="token string">"./src"</span><span class="token punctuation">,</span>
+  <span class="token property">"meld-lsp.diagnostics.strictSlots"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span></code></pre>
+<p>The LSP server starts automatically when VS Code opens a workspace containing a <code>meldjs</code> dependency.</p>
+<hr>
+<h2>2. Neovim (Tree-sitter)</h2>
+<p>Neovim users can get perfect highlighting by adding a Tree-sitter query injection.</p>
+<p><strong>File:</strong> <code>~/.config/nvim/after/queries/javascript/injections.scm</code> (and <code>typescript/injections.scm</code>)</p>
+<pre class="language-scheme" tabindex="0"><code class="language-scheme"><span class="token comment">; Inject HTML into meldHtml`...`</span>
+<span class="token punctuation">(</span><span class="token function">call_expression</span>
+  function: <span class="token punctuation">(</span><span class="token function">identifier</span><span class="token punctuation">)</span> @func_name <span class="token punctuation">(</span><span class="token function">#eq?</span> @func_name <span class="token string">"meldHtml"</span><span class="token punctuation">)</span>
+  arguments: <span class="token punctuation">(</span><span class="token function">template_string</span><span class="token punctuation">)</span> @injection.content<span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">#set!</span> injection.language <span class="token string">"html"</span><span class="token punctuation">)</span>
+
+<span class="token comment">; Inject CSS into meld.theme(`...`)</span>
+<span class="token punctuation">(</span><span class="token function">call_expression</span>
+  function: <span class="token punctuation">(</span><span class="token function">member_expression</span>
+    object: <span class="token punctuation">(</span><span class="token function">identifier</span><span class="token punctuation">)</span> @obj
+    property: <span class="token punctuation">(</span><span class="token function">property_identifier</span><span class="token punctuation">)</span> @prop<span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">#eq?</span> @obj <span class="token string">"meld"</span><span class="token punctuation">)</span>
+    <span class="token punctuation">(</span><span class="token function">#eq?</span> @prop <span class="token string">"theme"</span><span class="token punctuation">)</span>
+  arguments: <span class="token punctuation">(</span><span class="token function">arguments</span> <span class="token punctuation">(</span><span class="token builtin">string</span> <span class="token punctuation">(</span><span class="token function">string_fragment</span><span class="token punctuation">)</span> @injection.content<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+  <span class="token punctuation">(</span><span class="token function">#set!</span> injection.language <span class="token string">"css"</span><span class="token punctuation">)</span></code></pre>
+<hr>
+<h2>3. Vim / Vim + CoC</h2>
+<p>Classic Vim users can achieve language server integration via <strong>coc.nvim</strong> (Conquer of Completion).</p>
+<h3>Install coc.nvim</h3>
+<p>Follow the <a href="https://github.com/neoclide/coc.nvim">coc.nvim installation guide</a>. With vim-plug:</p>
+<pre class="language-vim" tabindex="0"><code class="language-vim">Plug <span class="token string">'neoclide/coc.nvim'</span><span class="token punctuation">,</span> <span class="token punctuation">{</span><span class="token string">'branch'</span><span class="token punctuation">:</span> <span class="token string">'release'</span><span class="token punctuation">}</span></code></pre>
+<h3>Install meld-lsp globally</h3>
+<pre class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">npm</span> <span class="token function">install</span> <span class="token parameter variable">-g</span> meld-lsp</code></pre>
+<h3>coc-settings.json</h3>
+<p>Open the settings file with <code>:CocConfig</code> and add:</p>
+<pre class="language-json" tabindex="0"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"languageserver"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"meld-lsp"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"command"</span><span class="token operator">:</span> <span class="token string">"meld-lsp"</span><span class="token punctuation">,</span>
+      <span class="token property">"args"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"--stdio"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"filetypes"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"javascript"</span><span class="token punctuation">,</span> <span class="token string">"typescript"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"rootPatterns"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"package.json"</span><span class="token punctuation">,</span> <span class="token string">".git"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+      <span class="token property">"initializationOptions"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+        <span class="token property">"rootDir"</span><span class="token operator">:</span> <span class="token string">"./src"</span><span class="token punctuation">,</span>
+        <span class="token property">"diagnostics"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+          <span class="token property">"strictSlots"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"coc.preferences.formatOnSave"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"prettier.enable"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"prettier.tabWidth"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+  <span class="token property">"prettier.singleQuote"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+<span class="token punctuation">}</span></code></pre>
+<h3>Syntax Highlighting for Template Literals (Vim)</h3>
+<p>Install <strong>vim-javascript</strong> and <strong>vim-html-template-literals</strong> for tagged template literal highlighting:</p>
+<pre class="language-vim" tabindex="0"><code class="language-vim">Plug <span class="token string">'pangloss/vim-javascript'</span>
+Plug <span class="token string">'jonsmithers/vim-html-template-literals'</span></code></pre>
+<p>Then add to your <code>~/.vimrc</code> or <code>~/.config/nvim/init.vim</code>:</p>
+<pre class="language-vim" tabindex="0"><code class="language-vim"><span class="token keyword">let</span> g<span class="token punctuation">:</span>htl_all_templates <span class="token operator">=</span> <span class="token number">0</span>
+<span class="token keyword">let</span> g<span class="token punctuation">:</span>htl_css_templates <span class="token operator">=</span> <span class="token number">1</span>
+<span class="token keyword">let</span> g<span class="token punctuation">:</span>javascript_plugin_jsdoc <span class="token operator">=</span> <span class="token number">1</span></code></pre>
+<hr>
+<h2>4. Zed Editor</h2>
+<p>Zed also uses Tree-sitter. You can create a local extension or configure your user settings.</p>
+<p><strong>File:</strong> <code>~/.config/zed/languages/javascript/injections.scm</code></p>
+<pre class="language-scheme" tabindex="0"><code class="language-scheme"><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token function">call_expression</span>
+  function: <span class="token punctuation">(</span><span class="token function">identifier</span><span class="token punctuation">)</span> @name
+  arguments: <span class="token punctuation">(</span><span class="token function">template_string</span><span class="token punctuation">)</span> @content<span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">#eq?</span> @name <span class="token string">"meldHtml"</span><span class="token punctuation">)</span>
+ <span class="token punctuation">(</span><span class="token function">#set!</span> injection.language <span class="token string">"html"</span><span class="token punctuation">)</span><span class="token punctuation">)</span></code></pre>
+<hr>
+<h2>5. IntelliJ / WebStorm</h2>
+<p>JetBrains IDEs support &quot;Language Injection&quot; via comments.</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// Add //language=html before the backtick</span>
+<span class="token keyword">return</span> meldHtml<span class="token comment">//language=html`</span>
+  <span class="token operator">&lt;</span>div <span class="token keyword">class</span><span class="token operator">=</span><span class="token string">"card"</span><span class="token operator">></span><span class="token operator">...</span><span class="token operator">&lt;</span><span class="token operator">/</span>div<span class="token operator">></span>
+`<span class="token punctuation">;</span></code></pre>
+<p>Alternatively, you can configure a <strong>Global Language Injection</strong> in settings:</p>
+<ol>
+<li>Go to <strong>Settings</strong> &gt; <strong>Editor</strong> &gt; <strong>Language Injections</strong>.</li>
+<li>Add a new <strong>Generic JS</strong> injection.</li>
+<li><strong>ID:</strong> HTML</li>
+<li><strong>Places Patterns:</strong> <code>+ taggedString(&quot;meldHtml&quot;)</code></li>
+</ol>
+<h3>Live Templates</h3>
+<p>Live Templates in WebStorm let you expand short abbreviations into full Meld component boilerplate.</p>
+<p><strong>To create a Live Template:</strong></p>
+<ol>
+<li>Go to <strong>Settings</strong> &gt; <strong>Editor</strong> &gt; <strong>Live Templates</strong>.</li>
+<li>Create or select a group (e.g., <code>Meld</code>).</li>
+<li>Click <strong>+</strong> &gt; <strong>Live Template</strong>.</li>
+</ol>
+<p><strong>Example — <code>mcomp</code> (Meld component stub):</strong></p>
+<ul>
+<li><strong>Abbreviation:</strong> <code>mcomp</code></li>
+<li><strong>Description:</strong> Meld component boilerplate</li>
+<li><strong>Template text:</strong></li>
+</ul>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> meldHtml<span class="token punctuation">,</span> meld <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span>
+
+<span class="token keyword">export</span> <span class="token keyword">function</span> $<span class="token constant">NAME</span><span class="token function">$</span><span class="token punctuation">(</span><span class="token parameter">$<span class="token constant">PROPS</span>$</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+    &lt;div class="$NAME$">
+      $END$
+    &lt;/div>
+  </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Set <strong>Applicable in:</strong> JavaScript, TypeScript.</p>
+<p><strong>Example — <code>mtheme</code> (meld.theme block):</strong></p>
+<ul>
+<li><strong>Abbreviation:</strong> <code>mtheme</code></li>
+<li><strong>Template text:</strong></li>
+</ul>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript">meld<span class="token punctuation">.</span><span class="token function">theme</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+  .$NAME$ {
+    $END$
+  }
+</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<h3>Language Injections for meld.theme and meld.raw</h3>
+<p>To get CSS highlighting inside <code>meld.theme(...)</code> and HTML highlighting inside <code>meld.raw(...)</code>:</p>
+<ol>
+<li>Go to <strong>Settings</strong> &gt; <strong>Editor</strong> &gt; <strong>Language Injections</strong>.</li>
+<li>Add a <strong>Generic JS</strong> injection for <code><a href="/api-reference/#meldTheme">meld.theme</a></code>:
+<ul>
+<li><strong>ID:</strong> CSS</li>
+<li><strong>Places Patterns:</strong> <code>+ callExpression(&quot;meld.theme&quot;)</code></li>
+</ul>
+</li>
+<li>Add a second <strong>Generic JS</strong> injection for <code><a href="/api-reference/#meldRaw">meld.raw</a></code>:
+<ul>
+<li><strong>ID:</strong> HTML</li>
+<li><strong>Places Patterns:</strong> <code>+ callExpression(&quot;meld.raw&quot;)</code></li>
+</ul>
+</li>
+</ol>
+<p>These injections activate embedded language support (formatting, completion, error highlighting) inside the respective template strings.</p>
+<hr>
+<h2>6. PostgreSQL Editor Integration</h2>
+<p>When working on a KMEL (KMEL/Meld/Express/Linux) stack project, you will typically connect editors to a local PostgreSQL development instance. The following covers the three most common tools.</p>
+<h3>Connection String Format</h3>
+<p>All tools accept a standard PostgreSQL connection URI:</p>
+<pre><code>postgresql://USERNAME:PASSWORD@HOST:PORT/DATABASE
+</code></pre>
+<p>For a local development instance using the default <code>postgres</code> superuser:</p>
+<pre><code>postgresql://postgres:yourpassword@localhost:5432/kmel_dev
+</code></pre>
+<h3>.pgpass File</h3>
+<p>Store credentials outside your shell history and tooling config by using <code>~/.pgpass</code>:</p>
+<pre><code># hostname:port:database:username:password
+localhost:5432:kmel_dev:postgres:yourpassword
+localhost:5432:kmel_test:postgres:yourpassword
+</code></pre>
+<p>Set correct permissions — PostgreSQL ignores the file otherwise:</p>
+<pre class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">chmod</span> 0600 ~/.pgpass</code></pre>
+<h3>DBeaver</h3>
+<ol>
+<li>Open <strong>Database</strong> &gt; <strong>New Database Connection</strong>.</li>
+<li>Select <strong>PostgreSQL</strong>.</li>
+<li>Fill in:
+<ul>
+<li><strong>Host:</strong> <code>localhost</code></li>
+<li><strong>Port:</strong> <code>5432</code></li>
+<li><strong>Database:</strong> <code>kmel_dev</code></li>
+<li><strong>Username:</strong> <code>postgres</code></li>
+<li><strong>Password:</strong> leave blank; DBeaver reads <code>~/.pgpass</code> automatically when the file is present and correctly permissioned.</li>
+</ul>
+</li>
+<li>Under <strong>Connection settings</strong> &gt; <strong>PostgreSQL</strong>, enable:
+<ul>
+<li><strong>Show all databases:</strong> on</li>
+<li><strong>Read all data types from server:</strong> on</li>
+</ul>
+</li>
+<li>Under <strong>SQL Editor</strong> &gt; <strong>Query execution</strong>, set:
+<ul>
+<li><strong>Statement delimiter:</strong> <code>;</code></li>
+<li><strong>Invalidate results before each execute:</strong> on</li>
+</ul>
+</li>
+</ol>
+<h3>DataGrip</h3>
+<ol>
+<li>Open the <strong>Database</strong> tool window &gt; <strong>+</strong> &gt; <strong>Data Source</strong> &gt; <strong>PostgreSQL</strong>.</li>
+<li>Set <strong>URL:</strong> <code>jdbc:postgresql://localhost:5432/kmel_dev</code></li>
+<li>Set <strong>User:</strong> <code>postgres</code> — leave <strong>Password</strong> blank and tick <strong>Use ~/.pgpass</strong>.</li>
+<li>Under <strong>Options</strong> tab, set:
+<ul>
+<li><strong>Transaction mode:</strong> Auto</li>
+<li><strong>Dialect:</strong> PostgreSQL</li>
+</ul>
+</li>
+<li>In <strong>Settings</strong> &gt; <strong>Database</strong> &gt; <strong>Query Execution</strong>, enable:
+<ul>
+<li><strong>Submit queries on Enter in console:</strong> off (use Ctrl+Enter)</li>
+<li><strong>Explain plan format:</strong> TEXT</li>
+</ul>
+</li>
+</ol>
+<p>DataGrip supports per-schema introspection. After connecting, right-click the <code>kmel_dev</code> data source and select <strong>Refresh</strong> to introspect all tables and views.</p>
+<h3>TablePlus</h3>
+<ol>
+<li>Click <strong>+</strong> &gt; <strong>Create a new connection</strong> &gt; <strong>PostgreSQL</strong>.</li>
+<li>Fill in:
+<ul>
+<li><strong>Name:</strong> <code>kmel_dev local</code></li>
+<li><strong>Host:</strong> <code>127.0.0.1</code></li>
+<li><strong>Port:</strong> <code>5432</code></li>
+<li><strong>User:</strong> <code>postgres</code></li>
+<li><strong>Password:</strong> <code>yourpassword</code></li>
+<li><strong>Database:</strong> <code>kmel_dev</code></li>
+</ul>
+</li>
+<li>Click <strong>Test</strong> to verify, then <strong>Connect</strong>.</li>
+</ol>
+<p>Recommended query settings (accessible from <strong>Preferences</strong> &gt; <strong>Editor</strong>):</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Recommended value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Auto-commit</td>
+<td>Off (manual transaction control)</td>
+</tr>
+<tr>
+<td>Query terminator</td>
+<td><code>;</code></td>
+</tr>
+<tr>
+<td>Fetch limit (rows)</td>
+<td>1000</td>
+</tr>
+<tr>
+<td>Wrap long lines</td>
+<td>On</td>
+</tr>
+<tr>
+<td>Syntax highlight dialect</td>
+<td>PostgreSQL</td>
+</tr>
+</tbody>
+</table>
+<h3>Environment Variable Pattern</h3>
+<p>For parity between local tooling and the Node.js runtime, store the connection string in a <code>.env</code> file at the project root:</p>
+<pre class="language-bash" tabindex="0"><code class="language-bash"><span class="token comment"># .env (never commit to version control)</span>
+<span class="token assign-left variable">DATABASE_URL</span><span class="token operator">=</span>postgresql://postgres:yourpassword@localhost:5432/kmel_dev
+<span class="token assign-left variable">PGUSER</span><span class="token operator">=</span>postgres
+<span class="token assign-left variable">PGPASSWORD</span><span class="token operator">=</span>yourpassword
+<span class="token assign-left variable">PGHOST</span><span class="token operator">=</span>localhost
+<span class="token assign-left variable">PGPORT</span><span class="token operator">=</span><span class="token number">5432</span>
+<span class="token assign-left variable">PGDATABASE</span><span class="token operator">=</span>kmel_dev</code></pre>
+<p>Add <code>.env</code> to <code>.gitignore</code>. Provide a committed <code>.env.example</code> with placeholder values.</p>
+<hr>
+<h2>7. Recommended Workspace Layout</h2>
+<p>The following layout is the reference structure for a full KMEL stack project using Meld.js.</p>
+<h3>.editorconfig</h3>
+<p>Place this file at the project root. Most editors pick it up automatically (VS Code requires the <strong>EditorConfig for VS Code</strong> extension).</p>
+<pre class="language-ini" tabindex="0"><code class="language-ini"><span class="token comment"># .editorconfig</span>
+<span class="token key attr-name">root</span> <span class="token punctuation">=</span> <span class="token value attr-value">true</span>
+
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">*</span><span class="token punctuation">]</span></span>
+<span class="token key attr-name">charset</span> <span class="token punctuation">=</span> <span class="token value attr-value">utf-8</span>
+<span class="token key attr-name">end_of_line</span> <span class="token punctuation">=</span> <span class="token value attr-value">lf</span>
+<span class="token key attr-name">insert_final_newline</span> <span class="token punctuation">=</span> <span class="token value attr-value">true</span>
+<span class="token key attr-name">trim_trailing_whitespace</span> <span class="token punctuation">=</span> <span class="token value attr-value">true</span>
+<span class="token key attr-name">indent_style</span> <span class="token punctuation">=</span> <span class="token value attr-value">space</span>
+<span class="token key attr-name">indent_size</span> <span class="token punctuation">=</span> <span class="token value attr-value">2</span>
+
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">*.md</span><span class="token punctuation">]</span></span>
+<span class="token key attr-name">trim_trailing_whitespace</span> <span class="token punctuation">=</span> <span class="token value attr-value">false</span>
+
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">*.sql</span><span class="token punctuation">]</span></span>
+<span class="token key attr-name">indent_size</span> <span class="token punctuation">=</span> <span class="token value attr-value">4</span>
+
+<span class="token section"><span class="token punctuation">[</span><span class="token section-name selector">Makefile</span><span class="token punctuation">]</span></span>
+<span class="token key attr-name">indent_style</span> <span class="token punctuation">=</span> <span class="token value attr-value">tab</span></code></pre>
+<h3>Project Root Structure</h3>
+<pre><code>kmel-project/
+├── .editorconfig
+├── .env                        # local secrets — not committed
+├── .env.example                # committed placeholder
+├── .eslintrc.json
+├── .gitignore
+├── .pgpass                     # PostgreSQL credentials — not committed
+├── .prettierrc.json
+├── .vscode/
+│   ├── extensions.json         # workspace extension recommendations
+│   └── settings.json           # workspace editor settings
+├── db/
+│   ├── migrations/             # SQL migration files (numbered)
+│   └── seeds/                  # seed data scripts
+├── docs/                       # project documentation (Eleventy/Meld docs site)
+├── jsconfig.json               # or tsconfig.json
+├── package.json
+├── public/                     # static assets served by Express
+│   ├── css/
+│   ├── fonts/
+│   └── js/
+├── server/
+│   ├── app.js                  # Express entry point
+│   ├── middleware/
+│   └── routes/
+└── src/
+    ├── components/             # Meld components
+    ├── layouts/                # page-level Meld layouts
+    └── pages/                  # route-level page components
+</code></pre>
+<h3>.prettierrc.json</h3>
+<pre class="language-json" tabindex="0"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"semi"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"singleQuote"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token property">"trailingComma"</span><span class="token operator">:</span> <span class="token string">"es5"</span><span class="token punctuation">,</span>
+  <span class="token property">"tabWidth"</span><span class="token operator">:</span> <span class="token number">2</span><span class="token punctuation">,</span>
+  <span class="token property">"printWidth"</span><span class="token operator">:</span> <span class="token number">100</span><span class="token punctuation">,</span>
+  <span class="token property">"endOfLine"</span><span class="token operator">:</span> <span class="token string">"lf"</span>
+<span class="token punctuation">}</span></code></pre>
+<h3>.eslintrc.json</h3>
+<pre class="language-json" tabindex="0"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"env"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"browser"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"es2022"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token property">"node"</span><span class="token operator">:</span> <span class="token boolean">true</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"extends"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"eslint:recommended"</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token property">"parserOptions"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"ecmaVersion"</span><span class="token operator">:</span> <span class="token string">"latest"</span><span class="token punctuation">,</span>
+    <span class="token property">"sourceType"</span><span class="token operator">:</span> <span class="token string">"module"</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token property">"rules"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"no-unused-vars"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"warn"</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token property">"argsIgnorePattern"</span><span class="token operator">:</span> <span class="token string">"^_"</span> <span class="token punctuation">}</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+    <span class="token property">"no-console"</span><span class="token operator">:</span> <span class="token string">"off"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+
+
+        
+        
+        
+          <nav class="doc-pager" aria-label="Documentation pagination">
+            
+              <a href="/plugins/data/" class="doc-pager-link" rel="prev">
+                <span>← Previous</span>
+                <strong>Data &amp; Networking</strong>
+              </a>
+            
+            
+              <a href="/architecture/" class="doc-pager-link doc-pager-link--next" rel="next">
+                <span>Next →</span>
+                <strong>Meld Architecture</strong>
+              </a>
+            
+          </nav>
+        
+      </main>
+
+      
+      <aside class="page-toc" aria-label="On this page">
+        <div class="page-toc-title">
+          <i data-lucide="list"></i>
+          On This Page
+        </div>
+        <nav data-page-toc aria-label="Page sections"></nav>
+        
+      </aside>
+
+    </div>
+
+    
+    <div
+      id="search-modal"
+      class="search-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search documentation"
+      hidden
+    >
+      <div class="search-dialog" role="document">
+
+        
+        <div class="search-input-row">
+          <span class="search-input-icon"><i data-lucide="search"></i></span>
+          <input
+            id="search-modal-input"
+            type="search"
+            placeholder="Search docs…"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Search documentation"
+          >
+          <span class="search-kbd">Esc</span>
+          <button class="search-close-btn" id="search-modal-close" type="button" aria-label="Close search">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        
+        <div class="search-body">
+          <div class="search-col-categories" id="search-categories" aria-label="Categories"></div>
+          <div class="search-col-results"    id="search-results"    role="listbox" aria-label="Search results"></div>
+          <div class="search-col-preview"    id="search-preview"    aria-label="Result preview">
+            <div class="search-hint">
+              <i data-lucide="search"></i>
+              <span>Type to search across all docs, API references, and anchors</span>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="search-footer" aria-hidden="true">
+          <span class="search-footer-hint"><span class="search-kbd">↑↓</span> Navigate</span>
+          <span class="search-footer-hint"><span class="search-kbd">↵</span> Go</span>
+          <span class="search-footer-hint"><span class="search-kbd">Esc</span> Close</span>
+          <span class="search-footer-hint"><span class="search-kbd">⌘K</span> Toggle</span>
+        </div>
+
+      </div>
+    </div>
+
+    
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-heading head-brand">Meld.js</div>
+          <p class="footer-brand-text">
+            A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration.
+          </p>
+          <div class="footer-social">
+            <a href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab" target="_blank" rel="noopener">
+              <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align: middle; margin-top: -2px;"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+            </a>
+            <a href="https://github.com/meldjs/meld" aria-label="GitHub" target="_blank" rel="noopener">
+              <i data-lucide="github"></i>
+            </a>
+            <a href="/releases/" aria-label="Releases changelog">
+              <i data-lucide="tag"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading head-docs">Resources</div>
+          <div class="footer-links">
+            <a href="/"           class="footer-link">Documentation</a>
+            <a href="/core-api/"  class="footer-link">Core API</a>
+            <a href="/plugins/"   class="footer-link">Plugin Library</a>
+            <a href="/testing/"   class="footer-link">Testing</a>
+            <a href="/releases/"  class="footer-link">Releases</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading head-social">Build Paths</div>
+          <div class="footer-links">
+            <a href="/installation/"          class="footer-link">Install</a>
+            <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
+            <a href="/integrations/frontend/" class="footer-link">Frontend Integration</a>
+            <a href="/integrations/backend/"  class="footer-link">Backend Integration</a>
+            <a href="/architecture-kmel/"     class="footer-link">KMEL Stack</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading head-sub">Local Development</div>
+          <p class="footer-brand-text">Run the Eleventy docs server with live reload from the repository root.</p>
+          <code class="footer-command">npm run docs:serve</code>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Meld.js. Released under the MIT License.</span>
+        <div class="footer-bottom-links">
+          <a href="/roadmap/">Roadmap</a>
+          <a href="/deployment/">Deployment</a>
+          <a href="/faq/">FAQ</a>
+        </div>
+      </div>
+    </footer>
+
+  </body>
+</html>

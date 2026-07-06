@@ -1,7 +1,10 @@
-
 ---
-title: Bootcamp Part 2 - Setup & Architecture
-nav_order: 4
+title: Bootcamp Part 1 - Setup & Architecture
+nav_order: 3
+parent: Bootcamp
+excerpt: Part 1 of the Meld.js bootcamp — scaffold a project with Meld Artisan, configure global state with Meld Store, and set up client-side routing.
+tags: [bootcamp, tutorial, setup, artisan, store, router, spa]
+category: Bootcamp
 ---
 
 ## Bootcamp Part 1: Setup & Architecture

@@ -1,0 +1,351 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Meld.js — Micro-Frontend Engine</title>
+    <meta name="description" content="Meld.js — A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/prism-meld.css">
+    <link rel="stylesheet" href="/assets/docs.css">
+    <script>document.documentElement.dataset.theme = localStorage.getItem('meld-docs-theme') || 'dark';</script>
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+    <script src="/assets/docs.js" defer></script>
+  </head>
+  <body class="landing-page">
+
+    
+    <div class="warp-bg" aria-hidden="true">
+      <div class="warp-grid"></div>
+    </div>
+
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <aside
+      class="release-banner"
+      data-release-banner
+      data-release-id="meld-launch-2026-07"
+      aria-label="Release notice"
+    >
+      <div class="release-banner__inner">
+        <span class="release-banner__eyebrow">Release</span>
+        <p>Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.</p>
+        <a href="/releases/">View details</a>
+        <button type="button" class="release-banner__dismiss" data-release-banner-dismiss aria-label="Dismiss release notice">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+    </aside>
+
+    
+    <header class="site-topbar site-topbar--landing">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 120 120" width="36" height="36" xmlns="http://www.w3.org/2000/svg" aria-label="Meld.js logo" role="img">
+          <defs>
+            <mask id="seam-mask">
+              <rect x="0" y="0" width="120" height="120" fill="white" />
+              <line x1="60" y1="48" x2="60" y2="72" stroke="black" stroke-width="14" stroke-linecap="round"/>
+            </mask>
+          </defs>
+          <path d="M 22 92 L 22 28 L 60 60 L 98 28 L 98 92" fill="none" stroke="var(--logo-path-stroke)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" mask="url(#seam-mask)"/>
+          <circle cx="60" cy="48" r="5.5" fill="var(--logo-path-stroke)"/>
+          <circle cx="60" cy="72" r="5.5" fill="var(--logo-path-stroke)"/>
+        </svg>
+        <span class="brand-copy">
+          <span class="brand-name">Meld.js</span>
+          <span class="brand-kicker">Micro-frontend engine</span>
+        </span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Primary navigation">
+        <a href="/installation/"><i data-lucide="terminal"></i>Install</a>
+        <a href="/architecture/"><i data-lucide="network"></i>Architecture</a>
+        <a href="/core-api/"><i data-lucide="braces"></i>API</a>
+        <a href="/plugins/"><i data-lucide="blocks"></i>Plugins</a>
+        <a href="/bootcamp/"><i data-lucide="graduation-cap"></i>Bootcamp</a>
+      </nav>
+
+      <div class="topbar-tools">
+        <label class="header-search" aria-label="Search documentation">
+          <i data-lucide="search"></i>
+          <span class="sr-only">Search documentation</span>
+          <input type="search" placeholder="Search docs…" data-docs-filter aria-label="Search docs">
+        </label>
+        <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false">
+          <i data-lucide="sun"></i>
+        </button>
+        <a class="icon-button" href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab repository" target="_blank" rel="noopener">
+          <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+        </a>
+        <a class="icon-button" href="https://github.com/meldjs/meld" aria-label="GitHub repository" target="_blank" rel="noopener">
+          <i data-lucide="github"></i>
+        </a>
+      </div>
+    </header>
+
+    <main id="content">
+      
+<section class="landing-hero" aria-label="Hero">
+  <div class="hero-copy animate-fade-up">
+    <div class="hero-badge">
+      <span class="status-dot" aria-hidden="true"></span>
+      <span>v1.4 — Stable Release</span>
+    </div>
+    <h1>Meld.<br>js</h1>
+    <p class="hero-lede">
+      A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration. No build step required.
+    </p>
+    <div class="hero-actions">
+      <a href="/installation/" class="ui-button ui-button--primary">
+        <i data-lucide="terminal"></i>
+        Get Started
+      </a>
+      <a href="/architecture/" class="ui-button ui-button--secondary">
+        <i data-lucide="network"></i>
+        Architecture
+      </a>
+      <a href="/core-api/" class="ui-button ui-button--ghost">
+        <i data-lucide="braces"></i>
+        API Reference
+      </a>
+    </div>
+  </div>
+
+  <div class="terminal-window animate-fade-up" aria-label="Meld.js quick start example" role="figure">
+    <div class="terminal-header" aria-hidden="true">
+      <span class="dot dot-r"></span>
+      <span class="dot dot-y"></span>
+      <span class="dot dot-g"></span>
+      <span class="terminal-title">src/counter.js</span>
+    </div>
+    <pre class="language-javascript"><code class="language-javascript">import { defineMeld, meldHtml, meldState } from '@meldjs/meld';
+
+defineMeld('task-counter', () =&gt; {
+  const state = meldState({ count: 0 });
+
+  return meldHtml`
+    &lt;div class="counter"&gt;
+      &lt;button onclick="${() =&gt; state.count--}"&gt;-&lt;/button&gt;
+      &lt;span&gt;${() =&gt; state.count}&lt;/span&gt;
+      &lt;button onclick="${() =&gt; state.count++}"&gt;+&lt;/button&gt;
+    &lt;/div&gt;
+  `;
+});</code></pre>
+  </div>
+</section>
+
+<section class="landing-metrics" aria-label="Framework characteristics">
+  <div>
+    <i data-lucide="atom" class="metric-icon"></i>
+    <strong>~2kb</strong>
+    <span>Minified + gzipped core</span>
+  </div>
+  <div>
+    <i data-lucide="zap" class="metric-icon"></i>
+    <strong>Reactive</strong>
+    <span>Proxy-backed state, no VDOM</span>
+  </div>
+  <div>
+    <i data-lucide="puzzle" class="metric-icon"></i>
+    <strong>Modular</strong>
+    <span>Router, Query, Forms, AI, WASM</span>
+  </div>
+  <div>
+    <i data-lucide="package" class="metric-icon"></i>
+    <strong>Portable</strong>
+    <span>Static, SSR, SPA, legacy pages</span>
+  </div>
+</section>
+
+<section class="landing-section">
+  <div class="section-heading">
+    <p class="section-label">Documentation Paths</p>
+    <h2>Choose your starting point</h2>
+    <p>Whether you are building a quick widget or a full-stack application, Meld has a path for you.</p>
+  </div>
+  <div class="link-card-grid">
+    <a href="/installation/" class="link-card">
+      <i data-lucide="download"></i>
+      <strong>Install &amp; Scaffold</strong>
+      <span>Set up the runtime, imports, and local project workflow with the Artisan CLI.</span>
+    </a>
+    <a href="/architecture/" class="link-card">
+      <i data-lucide="workflow"></i>
+      <strong>Understand the Runtime</strong>
+      <span>Review component topology, lifecycle diagrams, and integration patterns.</span>
+    </a>
+    <a href="/core-api/" class="link-card">
+      <i data-lucide="braces"></i>
+      <strong>Core API Reference</strong>
+      <span>State, templates, lifecycle hooks, and custom element definition.</span>
+    </a>
+    <a href="/plugins/" class="link-card">
+      <i data-lucide="blocks"></i>
+      <strong>Plugin Library</strong>
+      <span>Official plugins for routing, persistence, async data, forms, and UX.</span>
+    </a>
+    <a href="/bootcamp/" class="link-card">
+      <i data-lucide="graduation-cap"></i>
+      <strong>Bootcamp</strong>
+      <span>Step-by-step tutorials from zero to production-ready component systems.</span>
+    </a>
+    <a href="/nested-components/" class="link-card">
+      <i data-lucide="component"></i>
+      <strong>Component Patterns</strong>
+      <span>Nested components, provide/inject, slot composition, and reuse strategies.</span>
+    </a>
+  </div>
+</section>
+
+<section class="landing-section landing-split">
+  <div>
+    <p class="section-label">Runtime Model</p>
+    <h2>Framework-owned where needed. Platform-owned everywhere else.</h2>
+    <p>
+      Meld registers browser custom elements and lets the platform manage lifecycle boundaries. Reactive reads are captured from template bindings and updated directly — without a virtual DOM pass or diffing step.
+    </p>
+    <p>
+      Plugins extend the component context without modifying the core. Each plugin is independently loadable and tree-shakeable.
+    </p>
+    <div style="margin-top: 1.5rem;">
+      <a href="/architecture/" class="ui-button ui-button--ghost">
+        <i data-lucide="arrow-right"></i>
+        Read the architecture docs
+      </a>
+    </div>
+  </div>
+  <div class="diagram-panel">
+    <pre class="language-mermaid" tabindex="0"><code class="language-mermaid"><span class="token keyword">flowchart</span> TD
+  <span class="token keyword">State</span><span class="token text string">["meldState()"]</span> <span class="token arrow operator">--></span> Bindings<span class="token text string">["Template Bindings"]</span>
+  Bindings <span class="token arrow operator">--></span> DOM<span class="token text string">["Targeted DOM Update"]</span>
+  Plugins<span class="token text string">["Plugin Context"]</span> <span class="token arrow operator">--></span> Ctx<span class="token text string">["Component Context"]</span>
+  Ctx <span class="token arrow operator">--></span> Bindings
+  CE<span class="token text string">["Custom Element\nlifecycle"]</span> <span class="token arrow operator">--></span> Ctx</code></pre>
+  </div>
+</section>
+
+<section class="landing-section">
+  <div class="section-heading">
+    <p class="section-label">Can Be Used In</p>
+    <h2>Any deployment surface</h2>
+  </div>
+  <div class="surface-list">
+    <a href="/integrations/frontend/">
+      <i data-lucide="monitor"></i>
+      <span>Frontend applications</span>
+    </a>
+    <a href="/integrations/backend/">
+      <i data-lucide="server"></i>
+      <span>Server-rendered applications</span>
+    </a>
+    <a href="/architecture-kmel/">
+      <i data-lucide="database"></i>
+      <span>KMEL stack projects</span>
+    </a>
+    <a href="/nested-components/">
+      <i data-lucide="component"></i>
+      <span>Nested custom-element systems</span>
+    </a>
+  </div>
+</section>
+
+    </main>
+
+    
+    <div
+      id="search-modal"
+      class="search-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search documentation"
+      hidden
+    >
+      <div class="search-dialog" role="document">
+        <div class="search-input-row">
+          <span class="search-input-icon"><i data-lucide="search"></i></span>
+          <input
+            id="search-modal-input"
+            type="search"
+            placeholder="Search docs…"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Search documentation"
+          >
+          <span class="search-kbd">Esc</span>
+          <button class="search-close-btn" id="search-modal-close" type="button" aria-label="Close search">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+        <div class="search-body">
+          <div class="search-col-categories" id="search-categories" aria-label="Categories"></div>
+          <div class="search-col-results"    id="search-results"    role="listbox" aria-label="Search results"></div>
+          <div class="search-col-preview"    id="search-preview"    aria-label="Result preview">
+            <div class="search-hint">
+              <i data-lucide="search"></i>
+              <span>Type to search across all docs, API references, and anchors</span>
+            </div>
+          </div>
+        </div>
+        <div class="search-footer" aria-hidden="true">
+          <span class="search-footer-hint"><span class="search-kbd">↑↓</span> Navigate</span>
+          <span class="search-footer-hint"><span class="search-kbd">↵</span> Go</span>
+          <span class="search-footer-hint"><span class="search-kbd">Esc</span> Close</span>
+          <span class="search-footer-hint"><span class="search-kbd">⌘K</span> Toggle</span>
+        </div>
+      </div>
+    </div>
+
+    
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-heading head-brand">Meld.js</div>
+          <p class="footer-brand-text">Reactive state, native custom elements, and plugin-driven integration for browser UI modules.</p>
+          <div class="footer-social">
+            <a href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab" target="_blank" rel="noopener">
+              <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align: middle; margin-top: -2px;"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+            </a>
+            <a href="https://github.com/meldjs/meld" aria-label="GitHub" target="_blank" rel="noopener"><i data-lucide="github"></i></a>
+            <a href="/releases/" aria-label="Changelog"><i data-lucide="tag"></i></a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <div class="footer-heading head-docs">Documentation</div>
+          <div class="footer-links">
+            <a href="/installation/" class="footer-link">Installation</a>
+            <a href="/architecture/" class="footer-link">Architecture</a>
+            <a href="/core-api/"     class="footer-link">Core API</a>
+            <a href="/plugins/"      class="footer-link">Plugins</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <div class="footer-heading head-social">Guides</div>
+          <div class="footer-links">
+            <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
+            <a href="/integrations/frontend/" class="footer-link">Frontend</a>
+            <a href="/integrations/backend/"  class="footer-link">Backend</a>
+            <a href="/testing/"               class="footer-link">Testing</a>
+          </div>
+        </div>
+        <div class="footer-col">
+          <div class="footer-heading head-sub">Local Docs</div>
+          <p class="footer-brand-text">Start the Eleventy dev server from the project root.</p>
+          <code class="footer-command">npm run docs:serve</code>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Meld.js. MIT License.</span>
+        <div class="footer-bottom-links">
+          <a href="/roadmap/">Roadmap</a>
+          <a href="/releases/">Releases</a>
+          <a href="/faq/">FAQ</a>
+        </div>
+      </div>
+    </footer>
+
+  </body>
+</html>

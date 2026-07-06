@@ -2,6 +2,9 @@
 title: Data & Networking
 parent: Plugin Ecosystem
 nav_order: 2
+excerpt: Plugins for API interaction and data persistence, including meld-query for reactive fetch and meld-local for localStorage management.
+tags: [plugins, data, networking, fetch, api, local-storage, reactive]
+category: Plugin Ecosystem
 ---
 
 # Data & Networking Plugins

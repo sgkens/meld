@@ -2,6 +2,9 @@
 title: DX & Quality
 parent: Plugin Ecosystem
 nav_order: 5
+excerpt: Developer experience and quality assurance plugins including meld-devtools for visual debugging, meld-logger, and meld-a11y for accessibility checks.
+tags: [plugins, dx, developer-experience, devtools, logging, accessibility, testing]
+category: Plugin Ecosystem
 ---
 
 # DX & Quality Assurance

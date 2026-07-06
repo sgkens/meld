@@ -1,5 +1,20 @@
 import syntaxHighlight from '@11ty/eleventy-plugin-syntaxhighlight';
 
+// Explicit category order for the sidebar and collection index.
+// Keep in sync with docs/docs.11tydata.js → categoryOrder.
+const CATEGORY_ORDER = [
+  'Foundations',
+  'Getting Started',
+  'Architecture',
+  'Core Concepts',
+  'Plugins',
+  'Plugin Ecosystem',
+  'Integrations',
+  'Stacks',
+  'Bootcamp',
+  'Tooling'
+];
+
 export default function eleventyConfig(config) {
   // Server-side syntax highlighting via Prism (outputs .language-* classes
   // that are styled by docs/assets/prism-meld.css — the "Meld Ember" theme).
@@ -90,20 +105,22 @@ export default function eleventyConfig(config) {
       }
     }
 
+    // Read explicit category order from CATEGORY_ORDER constant.
+    // Pages outside the ordered list fall alphabetically after listed categories.
+    const getCategoryRank = (label) => {
+      const idx = CATEGORY_ORDER.indexOf(label);
+      return idx === -1 ? CATEGORY_ORDER.length : idx;
+    };
+
     return Array.from(groups.values())
       .map((group) => ({
         ...group,
         items: sortPages(group.items)
       }))
       .sort((a, b) => {
-        if (a.label === 'Foundations') {
-          return -1;
-        }
-
-        if (b.label === 'Foundations') {
-          return 1;
-        }
-
+        const rankA = getCategoryRank(a.label);
+        const rankB = getCategoryRank(b.label);
+        if (rankA !== rankB) return rankA - rankB;
         return a.label.localeCompare(b.label);
       });
   };

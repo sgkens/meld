@@ -1,6 +1,10 @@
 ---
 title: Bootcamp Part 3 - Forms and Portals
 nav_order: 5
+parent: Bootcamp
+excerpt: Part 3 of the Meld.js bootcamp — implement a modal dialog with meld-portal and a validated task form using meld-forms.
+tags: [bootcamp, tutorial, forms, portal, modal, validation, meld-forms]
+category: Bootcamp
 ---
 
 ## Bootcamp Part 3: Forms & Portals

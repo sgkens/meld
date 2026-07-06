@@ -2,6 +2,9 @@
 title: Frontend Frameworks
 parent: Integrations
 nav_order: 1
+excerpt: Using Meld.js Native Custom Elements inside React, Vue, Svelte, or any HTML-standards-compliant frontend framework.
+tags: [integration, frontend, react, vue, svelte, custom-elements]
+category: Integrations
 ---
 
 # Integrating with Frontend Frameworks

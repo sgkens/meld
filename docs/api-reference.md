@@ -2,6 +2,9 @@
 title: Strict API Reference
 nav_order: 10
 templateEngineOverride: njk,md
+excerpt: Canonical technical reference for the Meld.js public runtime API, covering reactivity, DOM templating, lifecycle hooks, and context/dependency injection.
+tags: [api, reference, defineMeld, meldState, meldHtml, lifecycle, context]
+category: Docs
 ---
 
 # Strict API Reference

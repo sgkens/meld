@@ -1,0 +1,1273 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>meld-socket | Meld.js</title>
+    <meta name="description" content="Full-featured WebSocket plugin for Meld.js — auto-reconnect, heartbeat, message channels, presence tracking, and request-response pattern.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/prism-meld.css">
+    <link rel="stylesheet" href="/assets/docs.css">
+    
+    <script>document.documentElement.dataset.theme = localStorage.getItem('meld-docs-theme') || 'dark';</script>
+    
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+    
+    <script src="/assets/docs.js" defer></script>
+  </head>
+  <body>
+    
+    <div class="space-grid" aria-hidden="true"></div>
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <aside
+      class="release-banner"
+      data-release-banner
+      data-release-id="meld-launch-2026-07"
+      aria-label="Release notice"
+    >
+      <div class="release-banner__inner">
+        <span class="release-banner__eyebrow">Release</span>
+        <p>Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.</p>
+        <a href="/releases/">View details</a>
+        <button type="button" class="release-banner__dismiss" data-release-banner-dismiss aria-label="Dismiss release notice">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+    </aside>
+
+    
+    <header class="site-topbar">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 120 120" width="36" height="36" xmlns="http://www.w3.org/2000/svg" aria-label="Meld.js logo" role="img">
+          <defs>
+            <mask id="seam-mask">
+              <rect x="0" y="0" width="120" height="120" fill="white" />
+              <line x1="60" y1="48" x2="60" y2="72" stroke="black" stroke-width="14" stroke-linecap="round"/>
+            </mask>
+          </defs>
+          <path d="M 22 92 L 22 28 L 60 60 L 98 28 L 98 92" fill="none" stroke="var(--logo-path-stroke)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" mask="url(#seam-mask)"/>
+          <circle cx="60" cy="48" r="5.5" fill="var(--logo-path-stroke)"/>
+          <circle cx="60" cy="72" r="5.5" fill="var(--logo-path-stroke)"/>
+        </svg>
+        <span class="brand-copy">
+          <span class="brand-name">Meldjs.dev</span>
+          <span class="brand-kicker">Micro-frontend engine</span>
+        </span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Primary navigation">
+        <a href="/" >
+          <i data-lucide="book-open"></i>
+          Docs
+        </a>
+        <a href="/core-api/" >
+          <i data-lucide="braces"></i>
+          API
+        </a>
+        <a href="/plugins/" aria-current="page">
+          <i data-lucide="blocks"></i>
+          Plugins
+        </a>
+        <a href="/architecture/" >
+          <i data-lucide="network"></i>
+          Architecture
+        </a>
+        <a href="/bootcamp/" >
+          <i data-lucide="graduation-cap"></i>
+          Bootcamp
+        </a>
+      </nav>
+
+      <div class="topbar-tools">
+        <label class="header-search" aria-label="Search documentation">
+          <i data-lucide="search"></i>
+          <span class="sr-only">Search documentation</span>
+          <input type="search" placeholder="Search docs…" data-docs-filter aria-label="Search docs">
+        </label>
+        <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false">
+          <i data-lucide="sun"></i>
+        </button>
+        <a class="icon-button" href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab repository" target="_blank" rel="noopener">
+          <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+        </a>
+        <a class="icon-button" href="https://github.com/meldjs/meld" aria-label="GitHub repository" target="_blank" rel="noopener">
+          <i data-lucide="github"></i>
+        </a>
+        <button class="icon-button mobile-menu-button" type="button" data-sidebar-toggle aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="docs-nav">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </header>
+
+    
+    <div class="docs-shell">
+
+      
+      <aside class="docs-nav" id="docs-nav" aria-label="Documentation navigation">
+        <div class="docs-nav-head">
+          <div class="docs-nav-title">
+            <i data-lucide="panel-left"></i>
+            Documentation
+          </div>
+        </div>
+
+        <nav class="category-nav" aria-label="Documentation sections">
+          
+            <section class="nav-category" aria-labelledby="nav-cat-foundations" >
+              <h2 id="nav-cat-foundations">
+                <a href="/foundations/">Foundations</a>
+              </h2>
+              
+                <a
+                  href="/architecture/"
+                  
+                  data-excerpt=""
+                  data-tags=""
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Meld Architecture</span>
+                </a>
+              
+                <a
+                  href="/core-concepts/"
+                  
+                  data-excerpt="Fundamental concepts behind Meld.js: proxy-based reactivity, Native Custom Elements, Shadow DOM encapsulation, and the no-build architecture."
+                  data-tags="core-concepts,reactivity,proxy,custom-elements,shadow-dom,no-build"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Core Concepts</span>
+                </a>
+              
+                <a
+                  href="/backend-integration/"
+                  
+                  data-excerpt="Connecting the Meld.js frontend to a Node.js backend using Knex for database access and Lucia for session-based authentication."
+                  data-tags="backend,knex,lucia,express,authentication,database,kmel"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Backend Integration (KMEL Stack)</span>
+                </a>
+              
+                <a
+                  href="/releases/"
+                  
+                  data-excerpt=""
+                  data-tags=""
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Releases and Changelog</span>
+                </a>
+              
+                <a
+                  href="/api-reference/"
+                  
+                  data-excerpt="Canonical technical reference for the Meld.js public runtime API, covering reactivity, DOM templating, lifecycle hooks, and context/dependency injection."
+                  data-tags="api,reference,defineMeld,meldState,meldHtml,lifecycle,context"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Strict API Reference</span>
+                </a>
+              
+                <a
+                  href="/release-audit/"
+                  
+                  data-excerpt=""
+                  data-tags=""
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Release Audit</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-getting-started" >
+              <h2 id="nav-cat-getting-started">
+                <a href="/getting-started/">Getting Started</a>
+              </h2>
+              
+                <a
+                  href="/getting-started/installation/"
+                  
+                  data-excerpt=""
+                  data-tags="installation,setup,artisan-cli,scaffolding"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Installation &amp; Scaffolding</span>
+                </a>
+              
+                <a
+                  href="/getting-started/editor-setup/"
+                  
+                  data-excerpt="A guide to configuring your code editor for optimal syntax highlighting and development experience with Meld.js."
+                  data-tags="editor,setup,syntax highlighting,configuration"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Editor Setup</span>
+                </a>
+              
+                <a
+                  href="/getting-started/nested-components/"
+                  
+                  data-excerpt="A guide to nesting components and enabling communication between parent and child components in Meld.js."
+                  data-tags="components,nesting,communication,props,events"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Component Nesting &amp; Communication</span>
+                </a>
+              
+                <a
+                  href="/getting-started/rendering/"
+                  
+                  data-excerpt="A guide to rendering templates and using the `meldHtml` tag for reactive UI updates in Meld.js."
+                  data-tags="rendering,templating,meldHtml,meld.list,meld.css"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Rendering &amp; Templating</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-architecture" >
+              <h2 id="nav-cat-architecture">
+                <a href="/architecture/">Architecture</a>
+              </h2>
+              
+                <a
+                  href="/architecture/architecture-deep-dive/"
+                  
+                  data-excerpt="An in-depth look at Meld.js core pillars: proxy-based reactivity, Shadow DOM encapsulation, and the no-build ESM architecture."
+                  data-tags="architecture,deep-dive,meld"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Architectural Deep Dive</span>
+                </a>
+              
+                <a
+                  href="/architecture/advanced-architecture/"
+                  
+                  data-excerpt="A deep dive into the recommended full-stack architecture for Meld, including Knex, Express, and Lucia."
+                  data-tags="architecture,kmel,full-stack,meld"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Advanced Architecture (KMEL)</span>
+                </a>
+              
+                <a
+                  href="/architecture/performance/"
+                  
+                  data-excerpt="Live browser benchmarks and technical analysis of Meld.js rendering performance — no Virtual DOM, no diffing, O(1) targeted DOM updates."
+                  data-tags="performance,benchmarks,rendering"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Performance &amp; Benchmarks</span>
+                </a>
+              
+                <a
+                  href="/architecture/architecture-kmel/"
+                  
+                  data-excerpt=""
+                  data-tags="architecture,kmel,full-stack,meld"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>The KMEL Stack</span>
+                </a>
+              
+                <a
+                  href="/architecture/plugins/"
+                  
+                  data-excerpt="Overview of Meld.js plugin architecture — a tiny core (&lt;2kb) extended by opt-in plugins for routing, state, forms, WebSocket, and developer tooling."
+                  data-tags="plugins,architecture,ecosystem"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>The Plugin Ecosystem</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-plugins" >
+              <h2 id="nav-cat-plugins">
+                <a href="/plugins/">Plugins</a>
+              </h2>
+              
+                <a
+                  href="/plugins/architecture/"
+                  
+                  data-excerpt="Plugins for structuring SPAs and managing global application state, including meld-router and meld-store."
+                  data-tags="plugins,architecture,state-management,router,store,spa"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Architecture &amp; State</span>
+                </a>
+              
+                <a
+                  href="/plugins/data/"
+                  
+                  data-excerpt="Plugins for API interaction and data persistence, including meld-query for reactive fetch and meld-local for localStorage management."
+                  data-tags="plugins,data,networking,fetch,api,local-storage,reactive"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Data &amp; Networking</span>
+                </a>
+              
+                <a
+                  href="/plugins/meld-socket/"
+                  aria-current="page"
+                  data-excerpt="Official WebSocket plugin for Meld.js with auto-reconnect, heartbeat, structured message routing, presence tracking, and request-response support."
+                  data-tags="plugins,websocket,real-time,messaging,presence,meld-socket"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>meld-socket</span>
+                </a>
+              
+                <a
+                  href="/plugins/ui/"
+                  
+                  data-excerpt="UI pattern plugins for complex DOM rendering, including meld-portal for modals and tooltips and meld-animate for transitions."
+                  data-tags="plugins,ui,portal,modal,tooltip,animation,shadow-dom"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>UI Patterns</span>
+                </a>
+              
+                <a
+                  href="/plugins/content/"
+                  
+                  data-excerpt="Plugins for rendering content and handling user input, including meld-markdown, meld-time, and meld-forms."
+                  data-tags="plugins,content,forms,markdown,validation,input"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Content &amp; Forms</span>
+                </a>
+              
+                <a
+                  href="/plugins/dx/"
+                  
+                  data-excerpt="Developer experience and quality assurance plugins including meld-devtools for visual debugging, meld-logger, and meld-a11y for accessibility checks."
+                  data-tags="plugins,dx,developer-experience,devtools,logging,accessibility,testing"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>DX &amp; Quality</span>
+                </a>
+              
+                <a
+                  href="/plugins/diagnostics/"
+                  
+                  data-excerpt="The meld-diagnostics plugin installs a runtime diagnostics hook and reports initialization details to the browser console."
+                  data-tags="plugins,diagnostics,debugging,console,runtime"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Diagnostics Plugin</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-integrations" >
+              <h2 id="nav-cat-integrations">
+                <a href="/integrations/">Integrations</a>
+              </h2>
+              
+                <a
+                  href="/integrations/frontend/"
+                  
+                  data-excerpt="Using Meld.js Native Custom Elements inside React, Vue, Svelte, or any HTML-standards-compliant frontend framework."
+                  data-tags="integration,frontend,react,vue,svelte,custom-elements"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Frontend Frameworks</span>
+                </a>
+              
+                <a
+                  href="/integrations/backend/"
+                  
+                  data-excerpt="How to integrate Meld.js components into server-rendered MVC applications using Laravel Blade, Django, or EJS templates."
+                  data-tags="integration,backend,mvc,laravel,blade,server-rendered"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Backend &amp; MVC</span>
+                </a>
+              
+                <a
+                  href="/integrations/lagacy/"
+                  
+                  data-excerpt="Integrating Meld.js components into legacy codebases and vanilla JavaScript projects using Shadow DOM isolation."
+                  data-tags="integration,legacy,vanilla-js,shadow-dom,progressive-enhancement"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Legacy &amp; Vanilla JS</span>
+                </a>
+              
+                <a
+                  href="/integrations/inertia/"
+                  
+                  data-excerpt="How to use Meld.js as a client-side Inertia.js adapter for Laravel, replacing Vue or React in a monolith architecture."
+                  data-tags="integration,inertia,laravel,adapter,spa"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Laravel Inertia Adapter</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-stacks" >
+              <h2 id="nav-cat-stacks">
+                <a href="/stacks/">Stacks</a>
+              </h2>
+              
+                <a
+                  href="/stacks/KMEL Stack/"
+                  
+                  data-excerpt="A practical guide to the KMEL stack (Knex, Meld, Express, Lucia), covering directory structure, database migrations, auth, and API integration."
+                  data-tags="knex,meld,express,lucia,stack,kmel,full-stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>KMEL Stack</span>
+                </a>
+              
+                <a
+                  href="/stacks/vue-meld/"
+                  
+                  data-excerpt="Use Meld.js custom elements inside a Vue 3 application. Covers Vite compiler config, import patterns, property passing, and shared reactive state between Vue and Meld."
+                  data-tags="vue,vite,custom-elements,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Vue + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/react-meld/"
+                  
+                  data-excerpt="Embed Meld.js custom elements inside React components. Covers import patterns, useRef for element access, useEffect for imperative initialisation, and CustomEvent bridging."
+                  data-tags="react,custom-elements,useeffect,useref,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>React + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/astro-meld/"
+                  
+                  data-excerpt="Use Meld.js as a client-side island framework within Astro pages. Covers script imports, client-side hydration strategy, is:inline usage, and partial hydration patterns."
+                  data-tags="astro,islands,hydration,custom-elements,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Astro + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/htmx-meld/"
+                  
+                  data-excerpt="Combine HTMX for server-driven HTML navigation with Meld.js for reactive client-side state. Covers hx-boost with Meld, wiring HTMX events to Meld components, and re-registration after partial page swaps."
+                  data-tags="htmx,custom-elements,server-driven,reactive,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>HTMX + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/docker-postgres/"
+                  
+                  data-excerpt="Full docker-compose and podman-compose configuration for a local PostgreSQL development environment with a Node.js Meld application, pgAdmin, persistent volumes, and migration tooling."
+                  data-tags="docker,podman,postgresql,postgres,local-dev,docker-compose,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Docker / Podman Local Development with PostgreSQL</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-bootcamp" >
+              <h2 id="nav-cat-bootcamp">
+                <a href="/bootcamp/">Bootcamp</a>
+              </h2>
+              
+                <a
+                  href="/bootcamp/part-1-setup-and-architecture/"
+                  
+                  data-excerpt="Part 1 of the Meld.js bootcamp — scaffold a project with Meld Artisan, configure global state with Meld Store, and set up client-side routing."
+                  data-tags="bootcamp,tutorial,setup,artisan,store,router,spa"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Bootcamp Part 1 - Setup &amp; Architecture</span>
+                </a>
+              
+                <a
+                  href="/bootcamp/part-2/"
+                  
+                  data-excerpt="Part 2 of the Meld.js bootcamp — build Kanban board components using meld.list for efficient list rendering and meld-time for relative timestamps."
+                  data-tags="bootcamp,tutorial,kanban,list-rendering,meld-time,components"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Bootcamp Part 2 - The Kanban Board</span>
+                </a>
+              
+                <a
+                  href="/bootcamp/part-3-forms-and-portals/"
+                  
+                  data-excerpt="Part 3 of the Meld.js bootcamp — implement a modal dialog with meld-portal and a validated task form using meld-forms."
+                  data-tags="bootcamp,tutorial,forms,portal,modal,validation,meld-forms"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Bootcamp Part 3 - Forms and Portals</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-tooling" >
+              <h2 id="nav-cat-tooling">
+                <a href="/tooling/">Tooling</a>
+              </h2>
+              
+                <a
+                  href="/tooling/cli/"
+                  
+                  data-excerpt="Reference for the Meld Artisan CLI — project scaffolding, component and plugin generation, local dev server, and build commands."
+                  data-tags="tooling,cli,artisan,scaffolding,build,dev-server"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Meld Artisan CLI</span>
+                </a>
+              
+            </section>
+          
+        </nav>
+      </aside>
+
+      
+      <main class="docs-content" id="content" tabindex="-1">
+        <div class="content-topline">
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            
+              
+                <a href="/">Docs</a>
+                <i data-lucide="chevron-right"></i>
+              
+            
+              
+                <a href="/plugins/">Plugins</a>
+                <i data-lucide="chevron-right"></i>
+              
+            
+              
+                <span aria-current="page">meld-socket</span>
+              
+            
+          </nav>
+          <a class="edit-link" href="https://github.com/meldjs/meld/edit/main/./docs/plugins/meld-socket.md" target="_blank" rel="noopener">
+            <i data-lucide="pencil"></i>
+            Edit this page
+          </a>
+        </div>
+
+        <h1>meld-socket</h1>
+<p><code>meld-socket</code> is the official WebSocket integration plugin for Meld.js. It wraps the browser <code>WebSocket</code> API with reactive state, automatic reconnection, structured message routing, and a full developer-experience layer.</p>
+<div class="api-filter-row">
+  <div class="api-chip is-active" data-filter="all" style="background:var(--text-main); border-color:var(--text-main); color:var(--bg-main);">All</div>
+  <div class="api-chip" data-filter="core"><span class="dot" style="background:var(--c-core)"></span>Core</div>
+  <div class="api-chip" data-filter="dom"><span class="dot" style="background:var(--c-dom)"></span>Messaging</div>
+  <div class="api-chip" data-filter="lifecycle"><span class="dot" style="background:var(--c-lifecycle)"></span>Lifecycle</div>
+  <div class="api-chip" data-filter="context"><span class="dot" style="background:var(--c-context)"></span>Advanced</div>
+</div>
+<hr>
+<h2>Installation</h2>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> use <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./meld.core.js'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> MeldSocket <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./plugins/meld-socket.js'</span><span class="token punctuation">;</span>
+
+<span class="token function">use</span><span class="token punctuation">(</span>MeldSocket<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'wss://api.example.com/ws'</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">reconnect</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">heartbeat</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">enabled</span><span class="token operator">:</span>  <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">interval</span><span class="token operator">:</span> <span class="token number">30_000</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">message</span><span class="token operator">:</span>  <span class="token punctuation">{</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'ping'</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">pongType</span><span class="token operator">:</span> <span class="token string">'pong'</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">debug</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span> <span class="token comment">// log all WS events to console</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>Once installed, <code>useSocket()</code> is available inside any component setup function.</p>
+<hr>
+<h2>Quick Start</h2>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'live-feed'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter"><span class="token punctuation">{</span> el <span class="token punctuation">}</span><span class="token punctuation">,</span> <span class="token punctuation">{</span> useSocket <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> socket <span class="token operator">=</span> <span class="token function">useSocket</span><span class="token punctuation">(</span><span class="token string">'wss://api.example.com/ws'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> messages <span class="token operator">=</span> <span class="token function">meldState</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">items</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Subscribe to a named channel</span>
+  socket<span class="token punctuation">.</span><span class="token function">subscribe</span><span class="token punctuation">(</span><span class="token string">'chat:message'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">msg</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    messages<span class="token punctuation">.</span>items <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token operator">...</span>messages<span class="token punctuation">.</span>items<span class="token punctuation">,</span> msg<span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Send a message</span>
+  <span class="token keyword">const</span> <span class="token function-variable function">post</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> socket<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'chat:message'</span><span class="token punctuation">,</span> <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">'Hello!'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+    &lt;div class="feed">
+      &lt;p>Status: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> socket<span class="token punctuation">.</span>status<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">&lt;/p>
+      &lt;p>Latency: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> socket<span class="token punctuation">.</span>latency <span class="token operator">?</span> socket<span class="token punctuation">.</span>latency <span class="token operator">+</span> <span class="token string">'ms'</span> <span class="token operator">:</span> <span class="token string">'—'</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">&lt;/p>
+      &lt;ul>
+        </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> meld<span class="token punctuation">.</span><span class="token function">list</span><span class="token punctuation">(</span>
+          <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> messages<span class="token punctuation">.</span>items<span class="token punctuation">,</span>
+          <span class="token parameter">m</span> <span class="token operator">=></span> m<span class="token punctuation">.</span>id<span class="token punctuation">,</span>
+          <span class="token parameter">m</span> <span class="token operator">=></span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;li></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>m<span class="token punctuation">.</span>text<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">&lt;/li></span><span class="token template-punctuation string">`</span></span>
+        <span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">
+      &lt;/ul>
+      &lt;button onclick="</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>post<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">">Post&lt;/button>
+    &lt;/div>
+  </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<hr>
+<h2>Configuration Reference</h2>
+<p>All options can be set globally via <code>use(MeldSocket, options)</code> or overridden per-connection in <code>useSocket(options)</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Option</th>
+<th>Type</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>url</code></td>
+<td><code>string | () =&gt; string</code></td>
+<td><code>null</code></td>
+<td>WebSocket endpoint URL. Can be a factory function that returns a dynamic URL.</td>
+</tr>
+<tr>
+<td><code>protocols</code></td>
+<td><code>string[]</code></td>
+<td><code>[]</code></td>
+<td>WebSocket sub-protocols list.</td>
+</tr>
+<tr>
+<td><code>reconnect</code></td>
+<td><code>boolean</code></td>
+<td><code>true</code></td>
+<td>Enable auto-reconnect on unexpected close.</td>
+</tr>
+<tr>
+<td><code>reconnectDelay</code></td>
+<td><code>number</code></td>
+<td><code>1000</code></td>
+<td>Base reconnect delay in ms. Doubles on each attempt.</td>
+</tr>
+<tr>
+<td><code>reconnectMax</code></td>
+<td><code>number</code></td>
+<td><code>30000</code></td>
+<td>Maximum reconnect backoff ceiling in ms.</td>
+</tr>
+<tr>
+<td><code>reconnectAttempts</code></td>
+<td><code>number</code></td>
+<td><code>Infinity</code></td>
+<td>Maximum number of reconnect attempts before giving up.</td>
+</tr>
+<tr>
+<td><code>heartbeat.enabled</code></td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Enable ping-pong keep-alive.</td>
+</tr>
+<tr>
+<td><code>heartbeat.interval</code></td>
+<td><code>number</code></td>
+<td><code>30000</code></td>
+<td>Milliseconds between pings.</td>
+</tr>
+<tr>
+<td><code>heartbeat.timeout</code></td>
+<td><code>number</code></td>
+<td><code>10000</code></td>
+<td>Milliseconds to wait for pong before forcing reconnect.</td>
+</tr>
+<tr>
+<td><code>heartbeat.message</code></td>
+<td><code>object</code></td>
+<td><code>{ type: 'ping' }</code></td>
+<td>Payload sent as a ping.</td>
+</tr>
+<tr>
+<td><code>heartbeat.pongType</code></td>
+<td><code>string</code></td>
+<td><code>'pong'</code></td>
+<td>Value of the <code>type</code> field expected in the pong reply.</td>
+</tr>
+<tr>
+<td><code>serialize</code></td>
+<td><code>Function</code></td>
+<td><code>JSON.stringify</code></td>
+<td>Outbound serialiser. Replace for MessagePack or CBOR.</td>
+</tr>
+<tr>
+<td><code>deserialize</code></td>
+<td><code>Function</code></td>
+<td><code>JSON.parse</code></td>
+<td>Inbound deserialiser.</td>
+</tr>
+<tr>
+<td><code>typeField</code></td>
+<td><code>string</code></td>
+<td><code>'type'</code></td>
+<td>Field name used to route messages to named channels.</td>
+</tr>
+<tr>
+<td><code>idField</code></td>
+<td><code>string</code></td>
+<td><code>'id'</code></td>
+<td>Field name used for request-response correlation IDs.</td>
+</tr>
+<tr>
+<td><code>requestTimeout</code></td>
+<td><code>number</code></td>
+<td><code>10000</code></td>
+<td>Milliseconds before a <code>request()</code> call rejects.</td>
+</tr>
+<tr>
+<td><code>presence.enabled</code></td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Enable presence tracking.</td>
+</tr>
+<tr>
+<td><code>presence.joinType</code></td>
+<td><code>string</code></td>
+<td><code>'presence:join'</code></td>
+<td>Message type for a peer joining.</td>
+</tr>
+<tr>
+<td><code>presence.leaveType</code></td>
+<td><code>string</code></td>
+<td><code>'presence:leave'</code></td>
+<td>Message type for a peer leaving.</td>
+</tr>
+<tr>
+<td><code>presence.listType</code></td>
+<td><code>string</code></td>
+<td><code>'presence:list'</code></td>
+<td>Message type carrying the full member list.</td>
+</tr>
+<tr>
+<td><code>onOpen</code></td>
+<td><code>Function</code></td>
+<td><code>null</code></td>
+<td>Callback fired when the connection opens.</td>
+</tr>
+<tr>
+<td><code>onClose</code></td>
+<td><code>Function</code></td>
+<td><code>null</code></td>
+<td>Callback fired when the connection closes.</td>
+</tr>
+<tr>
+<td><code>onError</code></td>
+<td><code>Function</code></td>
+<td><code>null</code></td>
+<td>Callback fired on WebSocket error.</td>
+</tr>
+<tr>
+<td><code>onMessage</code></td>
+<td><code>Function</code></td>
+<td><code>null</code></td>
+<td>Global raw message callback (fires after middleware).</td>
+</tr>
+<tr>
+<td><code>debug</code></td>
+<td><code>boolean</code></td>
+<td><code>false</code></td>
+<td>Log connection and message events to the browser console.</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<section class="api-entry" id="useSocket" data-category="core">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-core-soft); color:var(--c-core);">core</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-core);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-core);">useSocket</span><span class="fn-punct">(</span><span class="fn-param">urlOrOptions</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">→</span>SocketHandle</div>
+  </div>
+  <p class="api-entry-desc">Creates a managed WebSocket connection scoped to the calling component. The connection is automatically closed when the component is destroyed.</p>
+  <div class="api-subhead">Parameters</div>
+  <table class="api-params">
+    <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="pname">urlOrOptions</td><td class="ptype">string | object</td><td class="pdesc">Either a WebSocket URL string, or a full options object (same shape as the global plugin options).</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="api-entry" id="socket-send" data-category="dom">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">messaging</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-dom);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-dom);">socket.send</span><span class="fn-punct">(</span><span class="fn-param">payload, options?</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">→</span>Promise&lt;void&gt;</div>
+  </div>
+  <p class="api-entry-desc">Sends a message through the outbound middleware pipeline. If the socket is not yet open, the message is queued and flushed automatically on reconnect.</p>
+  <div class="api-subhead">Parameters</div>
+  <table class="api-params">
+    <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="pname">payload</td><td class="ptype">object | ArrayBuffer | Blob</td><td class="pdesc">The message to send. Objects are serialised through <code>serialize</code> (default: <code>JSON.stringify</code>). Binary types are passed through directly.</td></tr>
+      <tr><td class="pname">options.queue</td><td class="ptype">boolean</td><td class="pdesc">When <code>true</code> (default), messages sent while disconnected are buffered. Set to <code>false</code> to throw immediately if disconnected.</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="api-entry" id="socket-subscribe" data-category="dom">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">messaging</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-dom);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-dom);">socket.subscribe</span><span class="fn-punct">(</span><span class="fn-param">type, handler</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">→</span>() =&gt; void</div>
+  </div>
+  <p class="api-entry-desc">Subscribes to a named message channel. The <code>handler</code> is called whenever an inbound message has a <code>type</code> field matching the given string. Returns an unsubscribe function.</p>
+  <div class="api-subhead">Parameters</div>
+  <table class="api-params">
+    <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="pname">type</td><td class="ptype">string</td><td class="pdesc">The message type to listen for (e.g. <code>'chat:message'</code>, <code>'order:update'</code>).</td></tr>
+      <tr><td class="pname">handler</td><td class="ptype">Function</td><td class="pdesc">Callback receiving the full deserialized message object.</td></tr>
+    </tbody>
+  </table>
+  <div class="api-subhead">Example</div>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> unsub <span class="token operator">=</span> socket<span class="token punctuation">.</span><span class="token function">subscribe</span><span class="token punctuation">(</span><span class="token string">'order:update'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">msg</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  state<span class="token punctuation">.</span>order <span class="token operator">=</span> msg<span class="token punctuation">.</span>payload<span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// On component cleanup, or conditionally:</span>
+<span class="token function">unsub</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+</section>
+<section class="api-entry" id="socket-request" data-category="dom">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">messaging</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-dom);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-dom);">socket.request</span><span class="fn-punct">(</span><span class="fn-param">payload, options?</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">→</span>Promise&lt;object&gt;</div>
+  </div>
+  <p class="api-entry-desc">Sends a message and waits for a correlated response from the server. Automatically injects a unique <code>id</code> field. The server must echo the same <code>id</code> in its reply. Rejects after <code>requestTimeout</code> ms.</p>
+  <div class="api-subhead">Parameters</div>
+  <table class="api-params">
+    <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="pname">payload</td><td class="ptype">object</td><td class="pdesc">Message to send. An <code>id</code> field is automatically merged in.</td></tr>
+      <tr><td class="pname">options.timeout</td><td class="ptype">number</td><td class="pdesc">Override the global <code>requestTimeout</code> for this call (milliseconds).</td></tr>
+    </tbody>
+  </table>
+  <div class="api-subhead">Example</div>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">try</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> response <span class="token operator">=</span> <span class="token keyword">await</span> socket<span class="token punctuation">.</span><span class="token function">request</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'user:get'</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">userId</span><span class="token operator">:</span> <span class="token number">42</span><span class="token punctuation">,</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  state<span class="token punctuation">.</span>user <span class="token operator">=</span> response<span class="token punctuation">.</span>data<span class="token punctuation">;</span>
+<span class="token punctuation">}</span> <span class="token keyword">catch</span> <span class="token punctuation">(</span>err<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  state<span class="token punctuation">.</span>error <span class="token operator">=</span> err<span class="token punctuation">.</span>message<span class="token punctuation">;</span> <span class="token comment">// 'Request timed out: meld_5_abc12'</span>
+<span class="token punctuation">}</span></code></pre>
+</section>
+<section class="api-entry" id="socket-useInbound" data-category="context">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-context-soft); color:var(--c-context);">advanced</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-context);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-context);">socket.useInbound</span><span class="fn-punct">(</span><span class="fn-param">middleware</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">→</span>void</div>
+  </div>
+  <p class="api-entry-desc">Registers an inbound middleware function. Middleware receives each message after deserialization, before channel routing. Useful for authentication checks, decryption, or logging.</p>
+  <div class="api-subhead">Parameters</div>
+  <table class="api-params">
+    <thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="pname">middleware</td><td class="ptype">async Function(msg, next)</td><td class="pdesc">Async function receiving the message and a <code>next(transformed?)</code> function. Call <code>next()</code> to pass through, <code>next(newMsg)</code> to transform, or return <code>false</code> to drop the message entirely.</td></tr>
+    </tbody>
+  </table>
+  <div class="api-subhead">Example — Auth token injection</div>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// Outbound: stamp every message with an auth token</span>
+socket<span class="token punctuation">.</span><span class="token function">useOutbound</span><span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token parameter">msg<span class="token punctuation">,</span> next</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token operator">...</span>msg<span class="token punctuation">,</span> <span class="token literal-property property">token</span><span class="token operator">:</span> localStorage<span class="token punctuation">.</span><span class="token function">getItem</span><span class="token punctuation">(</span><span class="token string">'auth_token'</span><span class="token punctuation">)</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// Inbound: reject server messages if 'ok' is false</span>
+socket<span class="token punctuation">.</span><span class="token function">useInbound</span><span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token parameter">msg<span class="token punctuation">,</span> next</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>msg<span class="token punctuation">.</span>ok <span class="token operator">===</span> <span class="token boolean">false</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">warn</span><span class="token punctuation">(</span><span class="token string">'Server error:'</span><span class="token punctuation">,</span> msg<span class="token punctuation">.</span>error<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token boolean">false</span><span class="token punctuation">;</span> <span class="token comment">// drop — no further processing</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">return</span> <span class="token function">next</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+</section>
+<section class="api-entry" id="socket-on" data-category="lifecycle">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-lifecycle-soft); color:var(--c-lifecycle);">lifecycle</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-lifecycle);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-lifecycle);">socket.on</span><span class="fn-punct">(</span><span class="fn-param">event, handler</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">→</span>() =&gt; void</div>
+  </div>
+  <p class="api-entry-desc">Registers a listener for internal socket lifecycle events. Returns an unsubscribe function.</p>
+  <div class="api-subhead">Events</div>
+  <table class="api-params">
+    <thead><tr><th>Event</th><th>Payload</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="pname">connect</td><td class="ptype">—</td><td class="pdesc">Fired when the WebSocket opens successfully.</td></tr>
+      <tr><td class="pname">disconnect</td><td class="ptype">CloseEvent</td><td class="pdesc">Fired when the WebSocket closes (cleanly or not).</td></tr>
+      <tr><td class="pname">error</td><td class="ptype">Event</td><td class="pdesc">Fired on a WebSocket error.</td></tr>
+      <tr><td class="pname">message</td><td class="ptype">any</td><td class="pdesc">Fired for every inbound message after middleware processing.</td></tr>
+      <tr><td class="pname">reconnect:attempt</td><td class="ptype">{ attempt, delay }</td><td class="pdesc">Fired before each reconnection attempt.</td></tr>
+      <tr><td class="pname">reconnect:exhausted</td><td class="ptype">—</td><td class="pdesc">Fired when all reconnect attempts are used up.</td></tr>
+    </tbody>
+  </table>
+</section>
+<section class="api-entry" id="socket-state" data-category="core">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-core-soft); color:var(--c-core);">core</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-core);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-core);">socket.state</span><span class="fn-punct"> — </span><span class="fn-param">Reactive state object</span></div>
+    <div class="api-return-pill"><span class="arrow">→</span>Proxy</div>
+  </div>
+  <p class="api-entry-desc">The reactive state proxy for the connection. All fields are observable by Meld's reactivity system — bind them directly in templates.</p>
+  <div class="api-subhead">State Fields</div>
+  <table class="api-params">
+    <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+    <tbody>
+      <tr><td class="pname">status</td><td class="ptype">string</td><td class="pdesc"><code>'connecting'</code> | <code>'open'</code> | <code>'closing'</code> | <code>'closed'</code> | <code>'reconnecting'</code></td></tr>
+      <tr><td class="pname">latency</td><td class="ptype">number | null</td><td class="pdesc">Round-trip latency of the last heartbeat ping in milliseconds. <code>null</code> if heartbeat is disabled or no ping has completed.</td></tr>
+      <tr><td class="pname">error</td><td class="ptype">string | null</td><td class="pdesc">Last error message string, or <code>null</code>.</td></tr>
+      <tr><td class="pname">attempts</td><td class="ptype">number</td><td class="pdesc">Current reconnect attempt count. Resets to <code>0</code> on a successful connection.</td></tr>
+      <tr><td class="pname">sentCount</td><td class="ptype">number</td><td class="pdesc">Total messages sent during this session.</td></tr>
+      <tr><td class="pname">recvCount</td><td class="ptype">number</td><td class="pdesc">Total messages received during this session.</td></tr>
+      <tr><td class="pname">presence</td><td class="ptype">object[]</td><td class="pdesc">Live array of peer presence objects (only populated when <code>presence.enabled</code> is <code>true</code>).</td></tr>
+    </tbody>
+  </table>
+</section>
+<hr>
+<h2>Patterns &amp; Recipes</h2>
+<h3>Pattern 1 — Status indicator badge</h3>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'ws-status'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> useSocket <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> socket <span class="token operator">=</span> <span class="token function">useSocket</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'wss://api.example.com/ws'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+    &lt;span class="badge" style="background: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span>
+      socket<span class="token punctuation">.</span>status <span class="token operator">===</span> <span class="token string">'open'</span>         <span class="token operator">?</span> <span class="token string">'#10b981'</span> <span class="token operator">:</span>
+      socket<span class="token punctuation">.</span>status <span class="token operator">===</span> <span class="token string">'reconnecting'</span> <span class="token operator">?</span> <span class="token string">'#f59e0b'</span> <span class="token operator">:</span> <span class="token string">'#ef4444'</span>
+    <span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">">
+      </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> socket<span class="token punctuation">.</span>status<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">
+      </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> socket<span class="token punctuation">.</span>latency <span class="token operator">?</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string"> · </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>socket<span class="token punctuation">.</span>latency<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">ms</span><span class="token template-punctuation string">`</span></span> <span class="token operator">:</span> <span class="token string">''</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">
+    &lt;/span>
+  </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<hr>
+<h3>Pattern 2 — Offline-aware message queue</h3>
+<p>Messages sent while the socket is disconnected are queued automatically and flushed when the connection is restored — no additional code required.</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> socket <span class="token operator">=</span> <span class="token function">useSocket</span><span class="token punctuation">(</span><span class="token string">'wss://...'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// This works even if the socket isn't open yet:</span>
+socket<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'chat:message'</span><span class="token punctuation">,</span> <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">'Will be delivered on connect'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<hr>
+<h3>Pattern 3 — Custom serialiser (MessagePack)</h3>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> encode<span class="token punctuation">,</span> decode <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'msgpack-lite'</span><span class="token punctuation">;</span>
+
+<span class="token function">use</span><span class="token punctuation">(</span>MeldSocket<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'wss://api.example.com/ws'</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">protocols</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">'msgpack'</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">serialize</span><span class="token operator">:</span>   encode<span class="token punctuation">,</span>
+  <span class="token literal-property property">deserialize</span><span class="token operator">:</span> decode<span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<hr>
+<h3>Pattern 4 — Global socket via provide/inject</h3>
+<p>Install once at the application root and inject into any child component.</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// app-root.js</span>
+<span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'app-root'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> useSocket<span class="token punctuation">,</span> provide <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> socket <span class="token operator">=</span> <span class="token function">useSocket</span><span class="token punctuation">(</span><span class="token string">'wss://api.example.com/ws'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token function">provide</span><span class="token punctuation">(</span><span class="token string">'socket'</span><span class="token punctuation">,</span> socket<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;slot>&lt;/slot></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token comment">// any-child.js</span>
+<span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'any-child'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> inject <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> socket <span class="token operator">=</span> <span class="token function">inject</span><span class="token punctuation">(</span><span class="token string">'socket'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  socket<span class="token punctuation">.</span><span class="token function">subscribe</span><span class="token punctuation">(</span><span class="token string">'notification'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">msg</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span> <span class="token comment">/* … */</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;div>Child&lt;/div></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<hr>
+<h3>Pattern 5 — Presence (who is online)</h3>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">use</span><span class="token punctuation">(</span>MeldSocket<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">url</span><span class="token operator">:</span> <span class="token string">'wss://chat.example.com/ws'</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">presence</span><span class="token operator">:</span> <span class="token punctuation">{</span> <span class="token literal-property property">enabled</span><span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+<span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'user-list'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> useSocket <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> socket <span class="token operator">=</span> <span class="token function">useSocket</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+    &lt;ul>
+      </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> meld<span class="token punctuation">.</span><span class="token function">list</span><span class="token punctuation">(</span>
+        <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> socket<span class="token punctuation">.</span>presence<span class="token punctuation">,</span>
+        <span class="token parameter">u</span> <span class="token operator">=></span> u<span class="token punctuation">.</span>id<span class="token punctuation">,</span>
+        <span class="token parameter">u</span> <span class="token operator">=></span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;li></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>u<span class="token punctuation">.</span>name<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">&lt;/li></span><span class="token template-punctuation string">`</span></span>
+      <span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">
+    &lt;/ul>
+  </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<hr>
+<h2>Devtools</h2>
+<p>When <code>debug: true</code>, all socket events are logged to the browser console under the <code>[MeldSocket]</code> namespace.</p>
+<p>A diagnostic handle is always attached to <code>window.__MELD_SOCKET__</code> in development builds:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// Browser console</span>
+window<span class="token punctuation">.</span>__MELD_SOCKET__<span class="token punctuation">.</span>status    <span class="token comment">// → 'open'</span>
+window<span class="token punctuation">.</span>__MELD_SOCKET__<span class="token punctuation">.</span>latency   <span class="token comment">// → 42 (ms)</span>
+window<span class="token punctuation">.</span>__MELD_SOCKET__<span class="token punctuation">.</span>queue     <span class="token comment">// → 0  (queued messages)</span>
+window<span class="token punctuation">.</span>__MELD_SOCKET__<span class="token punctuation">.</span>channels  <span class="token comment">// → ['chat:message', 'order:update']</span>
+window<span class="token punctuation">.</span>__MELD_SOCKET__<span class="token punctuation">.</span><span class="token function">disconnect</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment">// force close</span></code></pre>
+<hr>
+<h2>SOCKET_STATUS Constants</h2>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> <span class="token constant">SOCKET_STATUS</span> <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./plugins/meld-socket.js'</span><span class="token punctuation">;</span>
+
+<span class="token constant">SOCKET_STATUS</span><span class="token punctuation">.</span><span class="token constant">CONNECTING</span>   <span class="token comment">// 'connecting'</span>
+<span class="token constant">SOCKET_STATUS</span><span class="token punctuation">.</span><span class="token constant">OPEN</span>         <span class="token comment">// 'open'</span>
+<span class="token constant">SOCKET_STATUS</span><span class="token punctuation">.</span><span class="token constant">CLOSING</span>      <span class="token comment">// 'closing'</span>
+<span class="token constant">SOCKET_STATUS</span><span class="token punctuation">.</span><span class="token constant">CLOSED</span>       <span class="token comment">// 'closed'</span>
+<span class="token constant">SOCKET_STATUS</span><span class="token punctuation">.</span><span class="token constant">RECONNECTING</span> <span class="token comment">// 'reconnecting'</span></code></pre>
+<hr>
+<h2>API Quick-Reference</h2>
+<table>
+<thead>
+<tr>
+<th>Method / Property</th>
+<th>Returns</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>useSocket(opts)</code></td>
+<td><code>SocketHandle</code></td>
+<td>Create a managed connection</td>
+</tr>
+<tr>
+<td><code>socket.send(payload, opts?)</code></td>
+<td><code>Promise&lt;void&gt;</code></td>
+<td>Send a message (queues if offline)</td>
+</tr>
+<tr>
+<td><code>socket.subscribe(type, fn)</code></td>
+<td><code>() =&gt; void</code></td>
+<td>Subscribe to a named channel</td>
+</tr>
+<tr>
+<td><code>socket.request(payload, opts?)</code></td>
+<td><code>Promise&lt;object&gt;</code></td>
+<td>Send and await a correlated reply</td>
+</tr>
+<tr>
+<td><code>socket.on(event, fn)</code></td>
+<td><code>() =&gt; void</code></td>
+<td>Listen for lifecycle events</td>
+</tr>
+<tr>
+<td><code>socket.useInbound(fn)</code></td>
+<td><code>void</code></td>
+<td>Register inbound middleware</td>
+</tr>
+<tr>
+<td><code>socket.useOutbound(fn)</code></td>
+<td><code>void</code></td>
+<td>Register outbound middleware</td>
+</tr>
+<tr>
+<td><code>socket.connect()</code></td>
+<td><code>void</code></td>
+<td>Manually initiate connection</td>
+</tr>
+<tr>
+<td><code>socket.disconnect(code?, reason?)</code></td>
+<td><code>void</code></td>
+<td>Close the connection</td>
+</tr>
+<tr>
+<td><code>socket.state</code></td>
+<td><code>Proxy</code></td>
+<td>Reactive state object</td>
+</tr>
+<tr>
+<td><code>socket.status</code></td>
+<td><code>string</code></td>
+<td>Current connection status</td>
+</tr>
+<tr>
+<td><code>socket.latency</code></td>
+<td><code>number | null</code></td>
+<td>Last heartbeat round-trip (ms)</td>
+</tr>
+<tr>
+<td><code>socket.error</code></td>
+<td><code>string | null</code></td>
+<td>Last error message</td>
+</tr>
+<tr>
+<td><code>socket.presence</code></td>
+<td><code>object[]</code></td>
+<td>Live peer presence list</td>
+</tr>
+</tbody>
+</table>
+
+
+        
+        
+        
+          <nav class="doc-pager" aria-label="Documentation pagination">
+            
+              <a href="/integrations/lagacy/" class="doc-pager-link" rel="prev">
+                <span>← Previous</span>
+                <strong>Legacy &amp; Vanilla JS</strong>
+              </a>
+            
+            
+              <a href="/architecture/performance/" class="doc-pager-link doc-pager-link--next" rel="next">
+                <span>Next →</span>
+                <strong>Performance &amp; Benchmarks</strong>
+              </a>
+            
+          </nav>
+        
+      </main>
+
+      
+      <aside class="page-toc" aria-label="On this page">
+        <div class="page-toc-title">
+          <i data-lucide="list"></i>
+          On This Page
+        </div>
+        <nav data-page-toc aria-label="Page sections"></nav>
+        
+      </aside>
+
+    </div>
+
+    
+    <div
+      id="search-modal"
+      class="search-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search documentation"
+      hidden
+    >
+      <div class="search-dialog" role="document">
+
+        
+        <div class="search-input-row">
+          <span class="search-input-icon"><i data-lucide="search"></i></span>
+          <input
+            id="search-modal-input"
+            type="search"
+            placeholder="Search docs…"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Search documentation"
+          >
+          <span class="search-kbd">Esc</span>
+          <button class="search-close-btn" id="search-modal-close" type="button" aria-label="Close search">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        
+        <div class="search-body">
+          <div class="search-col-categories" id="search-categories" aria-label="Categories"></div>
+          <div class="search-col-results"    id="search-results"    role="listbox" aria-label="Search results"></div>
+          <div class="search-col-preview"    id="search-preview"    aria-label="Result preview">
+            <div class="search-hint">
+              <i data-lucide="search"></i>
+              <span>Type to search across all docs, API references, and anchors</span>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="search-footer" aria-hidden="true">
+          <span class="search-footer-hint"><span class="search-kbd">↑↓</span> Navigate</span>
+          <span class="search-footer-hint"><span class="search-kbd">↵</span> Go</span>
+          <span class="search-footer-hint"><span class="search-kbd">Esc</span> Close</span>
+          <span class="search-footer-hint"><span class="search-kbd">⌘K</span> Toggle</span>
+        </div>
+
+      </div>
+    </div>
+
+    
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-heading head-brand">Meld.js</div>
+          <p class="footer-brand-text">
+            A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration.
+          </p>
+          <div class="footer-social">
+            <a href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab" target="_blank" rel="noopener">
+              <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align: middle; margin-top: -2px;"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+            </a>
+            <a href="https://github.com/meldjs/meld" aria-label="GitHub" target="_blank" rel="noopener">
+              <i data-lucide="github"></i>
+            </a>
+            <a href="/releases/" aria-label="Releases changelog">
+              <i data-lucide="tag"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading head-docs">Resources</div>
+          <div class="footer-links">
+            <a href="/"           class="footer-link">Documentation</a>
+            <a href="/core-api/"  class="footer-link">Core API</a>
+            <a href="/plugins/"   class="footer-link">Plugin Library</a>
+            <a href="/testing/"   class="footer-link">Testing</a>
+            <a href="/releases/"  class="footer-link">Releases</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading head-social">Build Paths</div>
+          <div class="footer-links">
+            <a href="/installation/"          class="footer-link">Install</a>
+            <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
+            <a href="/integrations/frontend/" class="footer-link">Frontend Integration</a>
+            <a href="/integrations/backend/"  class="footer-link">Backend Integration</a>
+            <a href="/architecture-kmel/"     class="footer-link">KMEL Stack</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading head-sub">Local Development</div>
+          <p class="footer-brand-text">Run the Eleventy docs server with live reload from the repository root.</p>
+          <code class="footer-command">npm run docs:serve</code>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Meld.js. Released under the MIT License.</span>
+        <div class="footer-bottom-links">
+          <a href="/roadmap/">Roadmap</a>
+          <a href="/deployment/">Deployment</a>
+          <a href="/faq/">FAQ</a>
+        </div>
+      </div>
+    </footer>
+
+  </body>
+</html>

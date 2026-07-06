@@ -2,6 +2,9 @@
 title: UI Patterns
 parent: Plugin Ecosystem
 nav_order: 3
+excerpt: UI pattern plugins for complex DOM rendering, including meld-portal for modals and tooltips and meld-animate for transitions.
+tags: [plugins, ui, portal, modal, tooltip, animation, shadow-dom]
+category: Plugin Ecosystem
 ---
 
 # UI Patterns & Interaction

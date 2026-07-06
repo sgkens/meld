@@ -1,6 +1,10 @@
 ---
 title: Bootcamp Part 2 - The Kanban Board
 nav_order: 4
+parent: Bootcamp
+excerpt: Part 2 of the Meld.js bootcamp — build Kanban board components using meld.list for efficient list rendering and meld-time for relative timestamps.
+tags: [bootcamp, tutorial, kanban, list-rendering, meld-time, components]
+category: Bootcamp
 ---
 
 ## Bootcamp Part 2: The Kanban Board

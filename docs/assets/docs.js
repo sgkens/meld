@@ -83,12 +83,16 @@ const buildSiteIndex = () => {
     $$('.nav-category', sidebar).forEach((cat) => {
       const categoryLabel = $('h2', cat)?.textContent?.trim() ?? 'Docs';
       $$('a', cat).forEach((link) => {
+        const tags = link.dataset.tags
+          ? link.dataset.tags.split(',').map((t) => t.trim()).filter(Boolean)
+          : [];
         index.push({
           type: 'page',
           category: categoryLabel,
           title: link.querySelector('span')?.textContent?.trim() ?? link.textContent.trim(),
           url: link.href,
-          excerpt: '',
+          excerpt: link.dataset.excerpt ?? '',
+          tags,
         });
       });
     });
@@ -105,6 +109,7 @@ const buildSiteIndex = () => {
         title: h.textContent.replace(/#$/, '').trim(),
         url: `${window.location.pathname}#${h.id}`,
         excerpt: h.nextElementSibling?.textContent?.slice(0, 120) ?? '',
+        tags: [],
       });
     });
   }
@@ -510,13 +515,23 @@ const showPreview = (item) => {
   const preview = $('#search-preview');
   if (!preview) return;
 
+  const categoryHtml = item.category
+    ? `<span class="badge badge-category">${escHtml(item.category)}</span>`
+    : '';
+  const tagsHtml = Array.isArray(item.tags) && item.tags.length
+    ? item.tags.map((t) => `<span class="badge badge-tag">${escHtml(t)}</span>`).join('')
+    : '';
+  const metaHtml = (categoryHtml || tagsHtml)
+    ? `<div class="search-preview-tags">${categoryHtml}${tagsHtml}</div>`
+    : '';
+
   preview.innerHTML = `
     <div class="search-preview-header">
-      <span class="search-preview-cat">${escHtml(item.category)}</span>
       <a class="search-preview-url" href="${escHtml(item.url)}">${escHtml(item.url.replace(window.location.origin, ''))}</a>
     </div>
     <div class="search-preview-title">${escHtml(item.title)}</div>
     ${item.excerpt ? `<p class="search-preview-excerpt">${escHtml(item.excerpt)}</p>` : ''}
+    ${metaHtml}
     <div class="search-preview-tip">
       <i data-lucide="corner-down-left"></i>
       Press Enter or click to navigate

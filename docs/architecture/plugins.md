@@ -3,6 +3,7 @@ title: The Plugin Ecosystem
 parent: Architecture
 description: A deep dive into the plugin ecosystem of Meld, including routing, state management, and developer tools.
 nav_order:  6
+excerpt: Overview of Meld.js plugin architecture — a tiny core (<2kb) extended by opt-in plugins for routing, state, forms, WebSocket, and developer tooling.
 tags: [plugins, architecture, ecosystem]
 category: Architecture
 ---

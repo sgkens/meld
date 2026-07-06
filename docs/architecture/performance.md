@@ -3,6 +3,7 @@ title: Performance & Benchmarks
 nav_order: 3
 parent: Architecture
 description: Live in-browser benchmarks, framework comparison charts, and a deep-dive into how Meld.js achieves maximum rendering performance.
+excerpt: Live browser benchmarks and technical analysis of Meld.js rendering performance — no Virtual DOM, no diffing, O(1) targeted DOM updates.
 tags: [performance, benchmarks, rendering]
 category: Architecture
 ---

@@ -3,6 +3,7 @@ title: Architectural Deep Dive
 nav_order: 1
 parent: Architecture
 Description: A deep dive into the core architecture of Meld, including its reactivity model, Shadow DOM usage, and no-build philosophy.
+excerpt: "An in-depth look at Meld.js core pillars: proxy-based reactivity, Shadow DOM encapsulation, and the no-build ESM architecture."
 tags: [architecture, deep-dive, meld]
 category: Architecture
 ---

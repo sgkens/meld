@@ -2,6 +2,9 @@
 title: Backend & MVC
 parent: Integrations
 nav_order: 2
+excerpt: How to integrate Meld.js components into server-rendered MVC applications using Laravel Blade, Django, or EJS templates.
+tags: [integration, backend, mvc, laravel, blade, server-rendered]
+category: Integrations
 ---
 
 # Integrating with Backend MVC

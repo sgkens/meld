@@ -1,4 +1,4 @@
-﻿# meldjs - Development Notes and Workflow Instructions
+# meldjs - Development Notes and Workflow Instructions
 
 ## **REPO INSTRUCTIONS**
 
@@ -36,5 +36,12 @@ Use this tracker as the local source of truth for release hardening, testing gap
 ### **Refine Features (priority-7)**
 
 ### **Refine Documentation (priority-8)**
-
+ - [x] **Search Improvment** ive added the except, tags and descriptions, also catagory on getting started pages pleae update all other pages to have these fields so the search is more accurate and relevant, in the third colloum of the search we should use the exept and below the catagories and tags.
+ - [x] We also need the ability to sort which collections go where, i would like the ability make a collection or folder apear in the order i specify
+ - [x] ive created new collection called stacks ive put the kelm stack, the frameworks collection we need to expand this will more examples because meld can work with anything.
+ - [x] add more settings for the editor allowing coverage of more editors and IDEs, also add more information on how to configure the editor for meld development, 
+ - [x] We should add addition information how the stacks individal stacks for docker/podman config for local postgres, and other databases, also add more information on how to configure the editor for meld development postgres is melds preferred database.
+ - [x] improve the collection index to instead of showing the file, show the Excerpt and the catagory and tags, this will make it easier to find the right page.
+ - [x] gitlab/github icons are collections need reversing 
+ - [x] the splash page has lost some of its color please have a loog see where we lost it and re-add it.
 ### **Backlog**

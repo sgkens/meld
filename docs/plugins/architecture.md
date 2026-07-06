@@ -2,6 +2,9 @@
 title: Architecture & State
 parent: Plugin Ecosystem
 nav_order: 1
+excerpt: Plugins for structuring SPAs and managing global application state, including meld-router and meld-store.
+tags: [plugins, architecture, state-management, router, store, spa]
+category: Plugin Ecosystem
 ---
 
 # Architecture & State Plugins

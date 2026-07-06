@@ -1,3 +1,12 @@
+---
+title: Meld Artisan CLI
+parent: Tooling
+nav_order: 1
+excerpt: Reference for the Meld Artisan CLI — project scaffolding, component and plugin generation, local dev server, and build commands.
+tags: [tooling, cli, artisan, scaffolding, build, dev-server]
+category: Tooling
+---
+
 # Meld Artisan CLI
 
 **Meld Artisan** is a command-line interface (CLI) designed to streamline your development workflow. Inspired by Laravel's Artisan, it eliminates boilerplate and manages project structure.

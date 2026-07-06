@@ -2,6 +2,9 @@
 title: Legacy & Vanilla JS
 parent: Integrations
 nav_order: 3
+excerpt: Integrating Meld.js components into legacy codebases and vanilla JavaScript projects using Shadow DOM isolation.
+tags: [integration, legacy, vanilla-js, shadow-dom, progressive-enhancement]
+category: Integrations
 ---
 
 # Legacy & Vanilla JS

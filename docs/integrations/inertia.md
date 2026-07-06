@@ -2,6 +2,9 @@
 title: Laravel Inertia Adapter
 parent: Integrations
 nav_order: 4
+excerpt: How to use Meld.js as a client-side Inertia.js adapter for Laravel, replacing Vue or React in a monolith architecture.
+tags: [integration, inertia, laravel, adapter, spa]
+category: Integrations
 ---
 
 # Laravel Inertia Adapter

@@ -91,6 +91,9 @@
         <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false">
           <i data-lucide="sun"></i>
         </button>
+        <a class="icon-button" href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab repository" target="_blank" rel="noopener">
+          <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+        </a>
         <a class="icon-button" href="https://github.com/meldjs/meld" aria-label="GitHub repository" target="_blank" rel="noopener">
           <i data-lucide="github"></i>
         </a>
@@ -122,6 +125,8 @@
                 <a
                   href="{{ item.url }}"
                   {% if page.inputPath == item.inputPath %}aria-current="page"{% endif %}
+                  data-excerpt="{{ item.data.excerpt or item.data.description or '' }}"
+                  data-tags="{{ item.data.tags | join(',') if item.data.tags else '' }}"
                 >
                   <i data-lucide="file-text"></i>
                   <span>{{ item.data.title or item.fileSlug }}</span>
@@ -247,6 +252,9 @@
             A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration.
           </p>
           <div class="footer-social">
+            <a href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab" target="_blank" rel="noopener">
+              <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align: middle; margin-top: -2px;"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+            </a>
             <a href="https://github.com/meldjs/meld" aria-label="GitHub" target="_blank" rel="noopener">
               <i data-lucide="github"></i>
             </a>

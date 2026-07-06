@@ -2,6 +2,9 @@
 title: Diagnostics Plugin
 parent: Plugin Ecosystem
 nav_order: 6
+excerpt: The meld-diagnostics plugin installs a runtime diagnostics hook and reports initialization details to the browser console.
+tags: [plugins, diagnostics, debugging, console, runtime]
+category: Plugin Ecosystem
 ---
 
 # Diagnostics Plugin

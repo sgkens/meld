@@ -3,6 +3,9 @@ title: meld-socket
 parent: Plugin Ecosystem
 nav_order: 3
 description: "Full-featured WebSocket plugin for Meld.js — auto-reconnect, heartbeat, message channels, presence tracking, and request-response pattern."
+excerpt: Official WebSocket plugin for Meld.js with auto-reconnect, heartbeat, structured message routing, presence tracking, and request-response support.
+tags: [plugins, websocket, real-time, messaging, presence, meld-socket]
+category: Plugin Ecosystem
 ---
 
 # meld-socket

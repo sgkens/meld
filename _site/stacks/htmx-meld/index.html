@@ -1,0 +1,988 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>HTMX + Meld Integration | Meld.js</title>
+    <meta name="description" content="Meld.js documentation — a 2kb micro-frontend engine for reactive state, native custom elements, and plugin-driven integration.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Inter:ital,wght@0,400;0,500;0,600;0,700;1,400&family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/assets/prism-meld.css">
+    <link rel="stylesheet" href="/assets/docs.css">
+    
+    <script>document.documentElement.dataset.theme = localStorage.getItem('meld-docs-theme') || 'dark';</script>
+    
+    <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.min.js" defer></script>
+    
+    <script src="/assets/docs.js" defer></script>
+  </head>
+  <body>
+    
+    <div class="space-grid" aria-hidden="true"></div>
+    <a class="skip-link" href="#content">Skip to content</a>
+
+    <aside
+      class="release-banner"
+      data-release-banner
+      data-release-id="meld-launch-2026-07"
+      aria-label="Release notice"
+    >
+      <div class="release-banner__inner">
+        <span class="release-banner__eyebrow">Release</span>
+        <p>Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.</p>
+        <a href="/releases/">View details</a>
+        <button type="button" class="release-banner__dismiss" data-release-banner-dismiss aria-label="Dismiss release notice">
+          <i data-lucide="x"></i>
+        </button>
+      </div>
+    </aside>
+
+    
+    <header class="site-topbar">
+      <a class="brand" href="/">
+        <svg class="brand-mark" viewBox="0 0 120 120" width="36" height="36" xmlns="http://www.w3.org/2000/svg" aria-label="Meld.js logo" role="img">
+          <defs>
+            <mask id="seam-mask">
+              <rect x="0" y="0" width="120" height="120" fill="white" />
+              <line x1="60" y1="48" x2="60" y2="72" stroke="black" stroke-width="14" stroke-linecap="round"/>
+            </mask>
+          </defs>
+          <path d="M 22 92 L 22 28 L 60 60 L 98 28 L 98 92" fill="none" stroke="var(--logo-path-stroke)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" mask="url(#seam-mask)"/>
+          <circle cx="60" cy="48" r="5.5" fill="var(--logo-path-stroke)"/>
+          <circle cx="60" cy="72" r="5.5" fill="var(--logo-path-stroke)"/>
+        </svg>
+        <span class="brand-copy">
+          <span class="brand-name">Meldjs.dev</span>
+          <span class="brand-kicker">Micro-frontend engine</span>
+        </span>
+      </a>
+
+      <nav class="topbar-nav" aria-label="Primary navigation">
+        <a href="/" >
+          <i data-lucide="book-open"></i>
+          Docs
+        </a>
+        <a href="/core-api/" >
+          <i data-lucide="braces"></i>
+          API
+        </a>
+        <a href="/plugins/" >
+          <i data-lucide="blocks"></i>
+          Plugins
+        </a>
+        <a href="/architecture/" >
+          <i data-lucide="network"></i>
+          Architecture
+        </a>
+        <a href="/bootcamp/" >
+          <i data-lucide="graduation-cap"></i>
+          Bootcamp
+        </a>
+      </nav>
+
+      <div class="topbar-tools">
+        <label class="header-search" aria-label="Search documentation">
+          <i data-lucide="search"></i>
+          <span class="sr-only">Search documentation</span>
+          <input type="search" placeholder="Search docs…" data-docs-filter aria-label="Search docs">
+        </label>
+        <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false">
+          <i data-lucide="sun"></i>
+        </button>
+        <a class="icon-button" href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab repository" target="_blank" rel="noopener">
+          <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+        </a>
+        <a class="icon-button" href="https://github.com/meldjs/meld" aria-label="GitHub repository" target="_blank" rel="noopener">
+          <i data-lucide="github"></i>
+        </a>
+        <button class="icon-button mobile-menu-button" type="button" data-sidebar-toggle aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="docs-nav">
+          <i data-lucide="menu"></i>
+        </button>
+      </div>
+    </header>
+
+    
+    <div class="docs-shell">
+
+      
+      <aside class="docs-nav" id="docs-nav" aria-label="Documentation navigation">
+        <div class="docs-nav-head">
+          <div class="docs-nav-title">
+            <i data-lucide="panel-left"></i>
+            Documentation
+          </div>
+        </div>
+
+        <nav class="category-nav" aria-label="Documentation sections">
+          
+            <section class="nav-category" aria-labelledby="nav-cat-foundations" >
+              <h2 id="nav-cat-foundations">
+                <a href="/foundations/">Foundations</a>
+              </h2>
+              
+                <a
+                  href="/architecture/"
+                  
+                  data-excerpt=""
+                  data-tags=""
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Meld Architecture</span>
+                </a>
+              
+                <a
+                  href="/core-concepts/"
+                  
+                  data-excerpt="Fundamental concepts behind Meld.js: proxy-based reactivity, Native Custom Elements, Shadow DOM encapsulation, and the no-build architecture."
+                  data-tags="core-concepts,reactivity,proxy,custom-elements,shadow-dom,no-build"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Core Concepts</span>
+                </a>
+              
+                <a
+                  href="/backend-integration/"
+                  
+                  data-excerpt="Connecting the Meld.js frontend to a Node.js backend using Knex for database access and Lucia for session-based authentication."
+                  data-tags="backend,knex,lucia,express,authentication,database,kmel"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Backend Integration (KMEL Stack)</span>
+                </a>
+              
+                <a
+                  href="/releases/"
+                  
+                  data-excerpt=""
+                  data-tags=""
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Releases and Changelog</span>
+                </a>
+              
+                <a
+                  href="/api-reference/"
+                  
+                  data-excerpt="Canonical technical reference for the Meld.js public runtime API, covering reactivity, DOM templating, lifecycle hooks, and context/dependency injection."
+                  data-tags="api,reference,defineMeld,meldState,meldHtml,lifecycle,context"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Strict API Reference</span>
+                </a>
+              
+                <a
+                  href="/release-audit/"
+                  
+                  data-excerpt=""
+                  data-tags=""
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Release Audit</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-getting-started" >
+              <h2 id="nav-cat-getting-started">
+                <a href="/getting-started/">Getting Started</a>
+              </h2>
+              
+                <a
+                  href="/getting-started/installation/"
+                  
+                  data-excerpt=""
+                  data-tags="installation,setup,artisan-cli,scaffolding"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Installation &amp; Scaffolding</span>
+                </a>
+              
+                <a
+                  href="/getting-started/editor-setup/"
+                  
+                  data-excerpt="A guide to configuring your code editor for optimal syntax highlighting and development experience with Meld.js."
+                  data-tags="editor,setup,syntax highlighting,configuration"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Editor Setup</span>
+                </a>
+              
+                <a
+                  href="/getting-started/nested-components/"
+                  
+                  data-excerpt="A guide to nesting components and enabling communication between parent and child components in Meld.js."
+                  data-tags="components,nesting,communication,props,events"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Component Nesting &amp; Communication</span>
+                </a>
+              
+                <a
+                  href="/getting-started/rendering/"
+                  
+                  data-excerpt="A guide to rendering templates and using the `meldHtml` tag for reactive UI updates in Meld.js."
+                  data-tags="rendering,templating,meldHtml,meld.list,meld.css"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Rendering &amp; Templating</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-architecture" >
+              <h2 id="nav-cat-architecture">
+                <a href="/architecture/">Architecture</a>
+              </h2>
+              
+                <a
+                  href="/architecture/architecture-deep-dive/"
+                  
+                  data-excerpt="An in-depth look at Meld.js core pillars: proxy-based reactivity, Shadow DOM encapsulation, and the no-build ESM architecture."
+                  data-tags="architecture,deep-dive,meld"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Architectural Deep Dive</span>
+                </a>
+              
+                <a
+                  href="/architecture/advanced-architecture/"
+                  
+                  data-excerpt="A deep dive into the recommended full-stack architecture for Meld, including Knex, Express, and Lucia."
+                  data-tags="architecture,kmel,full-stack,meld"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Advanced Architecture (KMEL)</span>
+                </a>
+              
+                <a
+                  href="/architecture/performance/"
+                  
+                  data-excerpt="Live browser benchmarks and technical analysis of Meld.js rendering performance — no Virtual DOM, no diffing, O(1) targeted DOM updates."
+                  data-tags="performance,benchmarks,rendering"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Performance &amp; Benchmarks</span>
+                </a>
+              
+                <a
+                  href="/architecture/architecture-kmel/"
+                  
+                  data-excerpt=""
+                  data-tags="architecture,kmel,full-stack,meld"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>The KMEL Stack</span>
+                </a>
+              
+                <a
+                  href="/architecture/plugins/"
+                  
+                  data-excerpt="Overview of Meld.js plugin architecture — a tiny core (&lt;2kb) extended by opt-in plugins for routing, state, forms, WebSocket, and developer tooling."
+                  data-tags="plugins,architecture,ecosystem"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>The Plugin Ecosystem</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-plugins" >
+              <h2 id="nav-cat-plugins">
+                <a href="/plugins/">Plugins</a>
+              </h2>
+              
+                <a
+                  href="/plugins/architecture/"
+                  
+                  data-excerpt="Plugins for structuring SPAs and managing global application state, including meld-router and meld-store."
+                  data-tags="plugins,architecture,state-management,router,store,spa"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Architecture &amp; State</span>
+                </a>
+              
+                <a
+                  href="/plugins/data/"
+                  
+                  data-excerpt="Plugins for API interaction and data persistence, including meld-query for reactive fetch and meld-local for localStorage management."
+                  data-tags="plugins,data,networking,fetch,api,local-storage,reactive"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Data &amp; Networking</span>
+                </a>
+              
+                <a
+                  href="/plugins/meld-socket/"
+                  
+                  data-excerpt="Official WebSocket plugin for Meld.js with auto-reconnect, heartbeat, structured message routing, presence tracking, and request-response support."
+                  data-tags="plugins,websocket,real-time,messaging,presence,meld-socket"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>meld-socket</span>
+                </a>
+              
+                <a
+                  href="/plugins/ui/"
+                  
+                  data-excerpt="UI pattern plugins for complex DOM rendering, including meld-portal for modals and tooltips and meld-animate for transitions."
+                  data-tags="plugins,ui,portal,modal,tooltip,animation,shadow-dom"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>UI Patterns</span>
+                </a>
+              
+                <a
+                  href="/plugins/content/"
+                  
+                  data-excerpt="Plugins for rendering content and handling user input, including meld-markdown, meld-time, and meld-forms."
+                  data-tags="plugins,content,forms,markdown,validation,input"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Content &amp; Forms</span>
+                </a>
+              
+                <a
+                  href="/plugins/dx/"
+                  
+                  data-excerpt="Developer experience and quality assurance plugins including meld-devtools for visual debugging, meld-logger, and meld-a11y for accessibility checks."
+                  data-tags="plugins,dx,developer-experience,devtools,logging,accessibility,testing"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>DX &amp; Quality</span>
+                </a>
+              
+                <a
+                  href="/plugins/diagnostics/"
+                  
+                  data-excerpt="The meld-diagnostics plugin installs a runtime diagnostics hook and reports initialization details to the browser console."
+                  data-tags="plugins,diagnostics,debugging,console,runtime"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Diagnostics Plugin</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-integrations" >
+              <h2 id="nav-cat-integrations">
+                <a href="/integrations/">Integrations</a>
+              </h2>
+              
+                <a
+                  href="/integrations/frontend/"
+                  
+                  data-excerpt="Using Meld.js Native Custom Elements inside React, Vue, Svelte, or any HTML-standards-compliant frontend framework."
+                  data-tags="integration,frontend,react,vue,svelte,custom-elements"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Frontend Frameworks</span>
+                </a>
+              
+                <a
+                  href="/integrations/backend/"
+                  
+                  data-excerpt="How to integrate Meld.js components into server-rendered MVC applications using Laravel Blade, Django, or EJS templates."
+                  data-tags="integration,backend,mvc,laravel,blade,server-rendered"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Backend &amp; MVC</span>
+                </a>
+              
+                <a
+                  href="/integrations/lagacy/"
+                  
+                  data-excerpt="Integrating Meld.js components into legacy codebases and vanilla JavaScript projects using Shadow DOM isolation."
+                  data-tags="integration,legacy,vanilla-js,shadow-dom,progressive-enhancement"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Legacy &amp; Vanilla JS</span>
+                </a>
+              
+                <a
+                  href="/integrations/inertia/"
+                  
+                  data-excerpt="How to use Meld.js as a client-side Inertia.js adapter for Laravel, replacing Vue or React in a monolith architecture."
+                  data-tags="integration,inertia,laravel,adapter,spa"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Laravel Inertia Adapter</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-stacks" >
+              <h2 id="nav-cat-stacks">
+                <a href="/stacks/">Stacks</a>
+              </h2>
+              
+                <a
+                  href="/stacks/KMEL Stack/"
+                  
+                  data-excerpt="A practical guide to the KMEL stack (Knex, Meld, Express, Lucia), covering directory structure, database migrations, auth, and API integration."
+                  data-tags="knex,meld,express,lucia,stack,kmel,full-stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>KMEL Stack</span>
+                </a>
+              
+                <a
+                  href="/stacks/vue-meld/"
+                  
+                  data-excerpt="Use Meld.js custom elements inside a Vue 3 application. Covers Vite compiler config, import patterns, property passing, and shared reactive state between Vue and Meld."
+                  data-tags="vue,vite,custom-elements,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Vue + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/react-meld/"
+                  
+                  data-excerpt="Embed Meld.js custom elements inside React components. Covers import patterns, useRef for element access, useEffect for imperative initialisation, and CustomEvent bridging."
+                  data-tags="react,custom-elements,useeffect,useref,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>React + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/astro-meld/"
+                  
+                  data-excerpt="Use Meld.js as a client-side island framework within Astro pages. Covers script imports, client-side hydration strategy, is:inline usage, and partial hydration patterns."
+                  data-tags="astro,islands,hydration,custom-elements,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Astro + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/htmx-meld/"
+                  aria-current="page"
+                  data-excerpt="Combine HTMX for server-driven HTML navigation with Meld.js for reactive client-side state. Covers hx-boost with Meld, wiring HTMX events to Meld components, and re-registration after partial page swaps."
+                  data-tags="htmx,custom-elements,server-driven,reactive,integration,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>HTMX + Meld Integration</span>
+                </a>
+              
+                <a
+                  href="/stacks/docker-postgres/"
+                  
+                  data-excerpt="Full docker-compose and podman-compose configuration for a local PostgreSQL development environment with a Node.js Meld application, pgAdmin, persistent volumes, and migration tooling."
+                  data-tags="docker,podman,postgresql,postgres,local-dev,docker-compose,stack"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Docker / Podman Local Development with PostgreSQL</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-bootcamp" >
+              <h2 id="nav-cat-bootcamp">
+                <a href="/bootcamp/">Bootcamp</a>
+              </h2>
+              
+                <a
+                  href="/bootcamp/part-1-setup-and-architecture/"
+                  
+                  data-excerpt="Part 1 of the Meld.js bootcamp — scaffold a project with Meld Artisan, configure global state with Meld Store, and set up client-side routing."
+                  data-tags="bootcamp,tutorial,setup,artisan,store,router,spa"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Bootcamp Part 1 - Setup &amp; Architecture</span>
+                </a>
+              
+                <a
+                  href="/bootcamp/part-2/"
+                  
+                  data-excerpt="Part 2 of the Meld.js bootcamp — build Kanban board components using meld.list for efficient list rendering and meld-time for relative timestamps."
+                  data-tags="bootcamp,tutorial,kanban,list-rendering,meld-time,components"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Bootcamp Part 2 - The Kanban Board</span>
+                </a>
+              
+                <a
+                  href="/bootcamp/part-3-forms-and-portals/"
+                  
+                  data-excerpt="Part 3 of the Meld.js bootcamp — implement a modal dialog with meld-portal and a validated task form using meld-forms."
+                  data-tags="bootcamp,tutorial,forms,portal,modal,validation,meld-forms"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Bootcamp Part 3 - Forms and Portals</span>
+                </a>
+              
+            </section>
+          
+            <section class="nav-category" aria-labelledby="nav-cat-tooling" >
+              <h2 id="nav-cat-tooling">
+                <a href="/tooling/">Tooling</a>
+              </h2>
+              
+                <a
+                  href="/tooling/cli/"
+                  
+                  data-excerpt="Reference for the Meld Artisan CLI — project scaffolding, component and plugin generation, local dev server, and build commands."
+                  data-tags="tooling,cli,artisan,scaffolding,build,dev-server"
+                >
+                  <i data-lucide="file-text"></i>
+                  <span>Meld Artisan CLI</span>
+                </a>
+              
+            </section>
+          
+        </nav>
+      </aside>
+
+      
+      <main class="docs-content" id="content" tabindex="-1">
+        <div class="content-topline">
+          <nav class="breadcrumbs" aria-label="Breadcrumb">
+            
+              
+                <a href="/">Docs</a>
+                <i data-lucide="chevron-right"></i>
+              
+            
+              
+                <a href="/stacks/">Stacks</a>
+                <i data-lucide="chevron-right"></i>
+              
+            
+              
+                <span aria-current="page">HTMX + Meld Integration</span>
+              
+            
+          </nav>
+          <a class="edit-link" href="https://github.com/meldjs/meld/edit/main/./docs/stacks/htmx-meld.md" target="_blank" rel="noopener">
+            <i data-lucide="pencil"></i>
+            Edit this page
+          </a>
+        </div>
+
+        <h1>HTMX + Meld Integration</h1>
+<p>HTMX and Meld.js operate at different layers of the stack and complement each other without conflict. HTMX handles server-driven navigation and partial page replacement by issuing HTTP requests and swapping server-rendered HTML into the DOM. Meld handles reactive client-side state within individual components. Used together, the server controls routing and data, while Meld components manage the interactive behaviour of individual UI elements within those server-rendered pages.</p>
+<hr>
+<h2>How They Differ</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Concern</th>
+<th style="text-align:left">HTMX</th>
+<th style="text-align:left">Meld.js</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left">Rendering model</td>
+<td style="text-align:left">Server renders HTML fragments</td>
+<td style="text-align:left">Client renders reactive DOM</td>
+</tr>
+<tr>
+<td style="text-align:left">Navigation</td>
+<td style="text-align:left"><code>hx-get</code>, <code>hx-push-url</code></td>
+<td style="text-align:left"><code>meld-router</code> plugin</td>
+</tr>
+<tr>
+<td style="text-align:left">State location</td>
+<td style="text-align:left">Server session / database</td>
+<td style="text-align:left">Client signals inside components</td>
+</tr>
+<tr>
+<td style="text-align:left">Data binding</td>
+<td style="text-align:left">None (static HTML)</td>
+<td style="text-align:left">Fine-grained reactive signals</td>
+</tr>
+<tr>
+<td style="text-align:left">Component definition</td>
+<td style="text-align:left">None</td>
+<td style="text-align:left"><code>defineMeld()</code> + Custom Elements</td>
+</tr>
+</tbody>
+</table>
+<hr>
+<h2>1. Basic Setup</h2>
+<p>Include HTMX via script tag and load Meld components as ES modules. Both can coexist in the same HTML page.</p>
+<pre class="language-html" tabindex="0"><code class="language-html"><span class="token doctype"><span class="token punctuation">&lt;!</span><span class="token doctype-tag">DOCTYPE</span> <span class="token name">html</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>html</span> <span class="token attr-name">lang</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>en<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>head</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meta</span> <span class="token attr-name">charset</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>UTF-8<span class="token punctuation">"</span></span> <span class="token punctuation">/></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>title</span><span class="token punctuation">></span></span>HTMX + Meld App<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>title</span><span class="token punctuation">></span></span>
+
+  <span class="token comment">&lt;!-- HTMX: handles server-driven requests and DOM swaps --></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">src</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>https://unpkg.com/htmx.org@1.9.12<span class="token punctuation">"</span></span> <span class="token attr-name">defer</span><span class="token punctuation">></span></span><span class="token script"></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>head</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>nav</span><span class="token punctuation">></span></span>
+    <span class="token comment">&lt;!-- HTMX drives navigation; Meld components inside #main are hydrated after swap --></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/dashboard<span class="token punctuation">"</span></span> <span class="token attr-name">hx-get</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/dashboard<span class="token punctuation">"</span></span> <span class="token attr-name">hx-target</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>#main<span class="token punctuation">"</span></span> <span class="token attr-name">hx-push-url</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Dashboard<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/settings<span class="token punctuation">"</span></span> <span class="token attr-name">hx-get</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/settings<span class="token punctuation">"</span></span> <span class="token attr-name">hx-target</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>#main<span class="token punctuation">"</span></span> <span class="token attr-name">hx-push-url</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Settings<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>nav</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>main</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>main<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+    <span class="token comment">&lt;!-- Server renders initial page content here --></span>
+    <span class="token comment">&lt;!-- Meld custom elements can live inside this swap target --></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meld-stat-panel</span> <span class="token punctuation">/></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>main</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>module<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+    <span class="token keyword">import</span> <span class="token string">'./meld/meld-stat-panel.js'</span><span class="token punctuation">;</span>
+  </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>html</span><span class="token punctuation">></span></span></code></pre>
+<hr>
+<h2>2. hx-boost with Meld</h2>
+<p><code>hx-boost=&quot;true&quot;</code> converts anchor links and forms to HTMX requests, replacing the <code>&lt;body&gt;</code> with the server response body. Meld components in the new body must be re-registered or re-imported if they are not already in the browser's <code>CustomElementRegistry</code>.</p>
+<p>Because <code>customElements.define()</code> persists for the lifetime of the page session, Meld components registered on the first load remain registered through all <code>hx-boost</code> navigations. The component definitions do not need to be re-imported.</p>
+<pre class="language-html" tabindex="0"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span> <span class="token attr-name">hx-boost</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>nav</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/reports<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Reports<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>a</span> <span class="token attr-name">href</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/users<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Users<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>a</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>nav</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>main</span><span class="token punctuation">></span></span>
+    <span class="token comment">&lt;!-- After hx-boost swap, new Meld elements in &lt;main> are already registered
+         and will self-hydrate when the browser parses the swapped HTML. --></span>
+    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meld-data-table</span> <span class="token punctuation">/></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>main</span><span class="token punctuation">></span></span>
+
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>module<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+    <span class="token comment">// Imported once on first page load; registration persists across hx-boost swaps.</span>
+    <span class="token keyword">import</span> <span class="token string">'./meld/meld-data-table.js'</span><span class="token punctuation">;</span>
+  </span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span></code></pre>
+<blockquote>
+<p><strong>Caveat:</strong> If HTMX swaps an entire <code>&lt;html&gt;</code> document (full-page swap), the JS runtime is reset and Meld definitions must be re-executed. Avoid full-document swaps when using Meld. Target <code>&lt;main&gt;</code> or a specific container instead.</p>
+</blockquote>
+<hr>
+<h2>3. Re-hydrating Meld Components After HTMX Swaps</h2>
+<p>When HTMX swaps server-rendered HTML into the DOM, any Meld custom elements in the new fragment are already registered (from the initial page load). The browser will call the element's <code>connectedCallback</code> automatically when HTMX appends the element to the live DOM.</p>
+<p>If a Meld component requires data from the server response (e.g., passed via an attribute), that attribute is present in the HTMX-swapped HTML:</p>
+<pre class="language-html" tabindex="0"><code class="language-html"><span class="token comment">&lt;!-- Server renders this HTML fragment in response to an HTMX request --></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>section</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>report-section<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>h2</span><span class="token punctuation">></span></span>Q3 Report<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>h2</span><span class="token punctuation">></span></span>
+  <span class="token comment">&lt;!-- Attribute value is rendered server-side --></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meld-bar-chart</span>
+    <span class="token attr-name">title</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>Q3 Revenue<span class="token punctuation">"</span></span>
+    <span class="token attr-name">currency</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>USD<span class="token punctuation">"</span></span>
+    <span class="token attr-name">data-endpoint</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>/api/report/q3<span class="token punctuation">"</span></span>
+  <span class="token punctuation">/></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>section</span><span class="token punctuation">></span></span></code></pre>
+<p>The Meld component reads <code>data-endpoint</code> after mount and fetches its own data:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// meld/meld-bar-chart.js</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span>
+
+<span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'meld-bar-chart'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> signal<span class="token punctuation">,</span> effect <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> chartData <span class="token operator">=</span> <span class="token function">signal</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> loading <span class="token operator">=</span> <span class="token function">signal</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token function">effect</span><span class="token punctuation">(</span><span class="token keyword">async</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> endpoint <span class="token operator">=</span> el<span class="token punctuation">.</span>dataset<span class="token punctuation">.</span>endpoint<span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>endpoint<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+
+    loading<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> res <span class="token operator">=</span> <span class="token keyword">await</span> <span class="token function">fetch</span><span class="token punctuation">(</span>endpoint<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">const</span> json <span class="token operator">=</span> <span class="token keyword">await</span> res<span class="token punctuation">.</span><span class="token function">json</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    chartData<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>json<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    loading<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+    &lt;div class="chart-wrapper">
+      &lt;h3></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>el<span class="token punctuation">.</span><span class="token function">getAttribute</span><span class="token punctuation">(</span><span class="token string">'title'</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">&lt;/h3>
+      </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> loading<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token string">'&lt;p>Loading...&lt;/p>'</span> <span class="token operator">:</span> <span class="token function">renderChart</span><span class="token punctuation">(</span>chartData<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">
+    &lt;/div>
+  </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<hr>
+<h2>4. Wiring HTMX Events to Meld Components</h2>
+<p>HTMX emits lifecycle events on the DOM (<code>htmx:afterSwap</code>, <code>htmx:beforeRequest</code>, <code>htmx:responseError</code>, etc.). Meld components can listen to these events to react to navigation and swap state.</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// meld/meld-loading-indicator.js</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span>
+
+<span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'meld-loading-indicator'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> signal <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> active <span class="token operator">=</span> <span class="token function">signal</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Listen for HTMX request lifecycle events on the document</span>
+  <span class="token keyword">const</span> <span class="token function-variable function">onRequest</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> active<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> <span class="token function-variable function">onSettle</span>  <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> active<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  document<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'htmx:beforeRequest'</span><span class="token punctuation">,</span> onRequest<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  document<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'htmx:afterSettle'</span><span class="token punctuation">,</span>   onSettle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Cleanup when the element is removed from the DOM</span>
+  el<span class="token punctuation">.</span><span class="token function">addEventListener</span><span class="token punctuation">(</span><span class="token string">'disconnected'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    document<span class="token punctuation">.</span><span class="token function">removeEventListener</span><span class="token punctuation">(</span><span class="token string">'htmx:beforeRequest'</span><span class="token punctuation">,</span> onRequest<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    document<span class="token punctuation">.</span><span class="token function">removeEventListener</span><span class="token punctuation">(</span><span class="token string">'htmx:afterSettle'</span><span class="token punctuation">,</span>   onSettle<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+    &lt;div class="indicator </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> active<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">?</span> <span class="token string">'indicator--active'</span> <span class="token operator">:</span> <span class="token string">''</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">">
+      Loading
+    &lt;/div>
+  </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>Place the indicator in the page layout, outside the HTMX swap target:</p>
+<pre class="language-html" tabindex="0"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>body</span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meld-loading-indicator</span> <span class="token punctuation">/></span></span>  <span class="token comment">&lt;!-- Outside #main; not replaced by swaps --></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>main</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>main<span class="token punctuation">"</span></span> <span class="token attr-name">hx-boost</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>true<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+    <span class="token comment">&lt;!-- Server-rendered content --></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>main</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>body</span><span class="token punctuation">></span></span></code></pre>
+<hr>
+<h2>5. Triggering HTMX Requests from Meld Components</h2>
+<p>Meld components can trigger HTMX requests programmatically by dispatching the <code>htmx:trigger</code> event or by calling <code>htmx.ajax()</code> directly.</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// meld/meld-filter-bar.js</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span>
+
+<span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'meld-filter-bar'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> signal <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> activeFilter <span class="token operator">=</span> <span class="token function">signal</span><span class="token punctuation">(</span><span class="token string">'all'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">function</span> <span class="token function">applyFilter</span><span class="token punctuation">(</span><span class="token parameter">filter</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    activeFilter<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>filter<span class="token punctuation">)</span><span class="token punctuation">;</span>
+
+    <span class="token comment">// Use htmx.ajax() to trigger a server request from inside a Meld component</span>
+    <span class="token comment">// htmx is available globally when loaded via &lt;script> tag</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">typeof</span> htmx <span class="token operator">!==</span> <span class="token string">'undefined'</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      htmx<span class="token punctuation">.</span><span class="token function">ajax</span><span class="token punctuation">(</span><span class="token string">'GET'</span><span class="token punctuation">,</span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">/api/items?filter=</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>filter<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+        <span class="token literal-property property">target</span><span class="token operator">:</span> <span class="token string">'#item-list'</span><span class="token punctuation">,</span>
+        <span class="token literal-property property">swap</span><span class="token operator">:</span> <span class="token string">'innerHTML'</span><span class="token punctuation">,</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span>
+
+  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+    &lt;div class="filter-bar">
+      &lt;button onclick=</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">applyFilter</span><span class="token punctuation">(</span><span class="token string">'all'</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">>All&lt;/button>
+      &lt;button onclick=</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">applyFilter</span><span class="token punctuation">(</span><span class="token string">'active'</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">>Active&lt;/button>
+      &lt;button onclick=</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">applyFilter</span><span class="token punctuation">(</span><span class="token string">'archived'</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">>Archived&lt;/button>
+      &lt;span>Current: </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>activeFilter<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">&lt;/span>
+    &lt;/div>
+  </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<p>The HTMX response replaces <code>#item-list</code> with server-rendered HTML. Meld manages the filter state client-side; HTMX manages the data fetch and DOM swap.</p>
+<hr>
+<h2>6. Shared State Between HTMX Navigation and Meld</h2>
+<p>State that must persist across HTMX page swaps (since the swap replaces DOM nodes) should be stored outside of Meld component instances. Use a module-level singleton:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// src/state/session.js</span>
+<span class="token comment">// Module singleton: persists for the lifetime of the JS session,</span>
+<span class="token comment">// surviving HTMX DOM swaps.</span>
+<span class="token keyword">export</span> <span class="token keyword">const</span> session <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token literal-property property">user</span><span class="token operator">:</span> <span class="token keyword">null</span><span class="token punctuation">,</span>
+  <span class="token literal-property property">theme</span><span class="token operator">:</span> <span class="token string">'light'</span><span class="token punctuation">,</span>
+  <span class="token function">set</span><span class="token punctuation">(</span>key<span class="token punctuation">,</span> value<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">this</span><span class="token punctuation">[</span>key<span class="token punctuation">]</span> <span class="token operator">=</span> value<span class="token punctuation">;</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token function">get</span><span class="token punctuation">(</span>key<span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token keyword">return</span> <span class="token keyword">this</span><span class="token punctuation">[</span>key<span class="token punctuation">]</span><span class="token punctuation">;</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+<p>Meld components import and read from this singleton:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> session <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'../state/session.js'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span>
+
+<span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'meld-user-avatar'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
+    &lt;div class="avatar">
+      </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>session<span class="token punctuation">.</span>user<span class="token operator">?.</span>username <span class="token operator">??</span> <span class="token string">'Guest'</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">
+    &lt;/div>
+  </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<hr>
+<h2>7. Project Structure Reference</h2>
+<pre class="language-text" tabindex="0"><code class="language-text">/my-htmx-meld-app
+├── server.js                   # Express / Fastify / any HTTP server
+├── views/                      # Server-rendered HTML templates (Nunjucks, EJS, etc.)
+│   ├── layout.html             # Contains Meld <script> imports and hx-boost
+│   ├── dashboard.html          # HTMX partial fragment
+│   └── reports.html            # HTMX partial fragment
+├── public/
+│   └── meld/                   # Meld component definitions (served as static files)
+│       ├── meld-stat-panel.js
+│       ├── meld-data-table.js
+│       ├── meld-filter-bar.js
+│       └── meld-loading-indicator.js
+└── package.json</code></pre>
+<hr>
+<h2>Event Reference</h2>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">HTMX Event</th>
+<th style="text-align:left">Fired when</th>
+<th style="text-align:left">Meld use case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>htmx:beforeRequest</code></td>
+<td style="text-align:left">Just before HTMX issues an HTTP request</td>
+<td style="text-align:left">Show loading state in Meld component</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>htmx:afterSwap</code></td>
+<td style="text-align:left">After new HTML is swapped into the DOM</td>
+<td style="text-align:left">Re-initialise Meld-driven data fetches</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>htmx:afterSettle</code></td>
+<td style="text-align:left">After swap and any transitions complete</td>
+<td style="text-align:left">Hide loading state</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>htmx:responseError</code></td>
+<td style="text-align:left">When the server returns a non-2xx status</td>
+<td style="text-align:left">Show error state in Meld component</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>htmx:historyRestore</code></td>
+<td style="text-align:left">When user navigates via browser back/forward</td>
+<td style="text-align:left">Restore Meld component state</td>
+</tr>
+</tbody>
+</table>
+
+
+        
+        
+        
+          <nav class="doc-pager" aria-label="Documentation pagination">
+            
+              <a href="/plugins/dx/" class="doc-pager-link" rel="prev">
+                <span>← Previous</span>
+                <strong>DX &amp; Quality</strong>
+              </a>
+            
+            
+              <a href="/plugins/diagnostics/" class="doc-pager-link doc-pager-link--next" rel="next">
+                <span>Next →</span>
+                <strong>Diagnostics Plugin</strong>
+              </a>
+            
+          </nav>
+        
+      </main>
+
+      
+      <aside class="page-toc" aria-label="On this page">
+        <div class="page-toc-title">
+          <i data-lucide="list"></i>
+          On This Page
+        </div>
+        <nav data-page-toc aria-label="Page sections"></nav>
+        
+      </aside>
+
+    </div>
+
+    
+    <div
+      id="search-modal"
+      class="search-modal"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Search documentation"
+      hidden
+    >
+      <div class="search-dialog" role="document">
+
+        
+        <div class="search-input-row">
+          <span class="search-input-icon"><i data-lucide="search"></i></span>
+          <input
+            id="search-modal-input"
+            type="search"
+            placeholder="Search docs…"
+            autocomplete="off"
+            spellcheck="false"
+            aria-label="Search documentation"
+          >
+          <span class="search-kbd">Esc</span>
+          <button class="search-close-btn" id="search-modal-close" type="button" aria-label="Close search">
+            <i data-lucide="x"></i>
+          </button>
+        </div>
+
+        
+        <div class="search-body">
+          <div class="search-col-categories" id="search-categories" aria-label="Categories"></div>
+          <div class="search-col-results"    id="search-results"    role="listbox" aria-label="Search results"></div>
+          <div class="search-col-preview"    id="search-preview"    aria-label="Result preview">
+            <div class="search-hint">
+              <i data-lucide="search"></i>
+              <span>Type to search across all docs, API references, and anchors</span>
+            </div>
+          </div>
+        </div>
+
+        
+        <div class="search-footer" aria-hidden="true">
+          <span class="search-footer-hint"><span class="search-kbd">↑↓</span> Navigate</span>
+          <span class="search-footer-hint"><span class="search-kbd">↵</span> Go</span>
+          <span class="search-footer-hint"><span class="search-kbd">Esc</span> Close</span>
+          <span class="search-footer-hint"><span class="search-kbd">⌘K</span> Toggle</span>
+        </div>
+
+      </div>
+    </div>
+
+    
+    <footer class="site-footer">
+      <div class="footer-grid">
+        <div class="footer-col">
+          <div class="footer-heading head-brand">Meld.js</div>
+          <p class="footer-brand-text">
+            A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration.
+          </p>
+          <div class="footer-social">
+            <a href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab" target="_blank" rel="noopener">
+              <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align: middle; margin-top: -2px;"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+            </a>
+            <a href="https://github.com/meldjs/meld" aria-label="GitHub" target="_blank" rel="noopener">
+              <i data-lucide="github"></i>
+            </a>
+            <a href="/releases/" aria-label="Releases changelog">
+              <i data-lucide="tag"></i>
+            </a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading head-docs">Resources</div>
+          <div class="footer-links">
+            <a href="/"           class="footer-link">Documentation</a>
+            <a href="/core-api/"  class="footer-link">Core API</a>
+            <a href="/plugins/"   class="footer-link">Plugin Library</a>
+            <a href="/testing/"   class="footer-link">Testing</a>
+            <a href="/releases/"  class="footer-link">Releases</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading head-social">Build Paths</div>
+          <div class="footer-links">
+            <a href="/installation/"          class="footer-link">Install</a>
+            <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
+            <a href="/integrations/frontend/" class="footer-link">Frontend Integration</a>
+            <a href="/integrations/backend/"  class="footer-link">Backend Integration</a>
+            <a href="/architecture-kmel/"     class="footer-link">KMEL Stack</a>
+          </div>
+        </div>
+
+        <div class="footer-col">
+          <div class="footer-heading head-sub">Local Development</div>
+          <p class="footer-brand-text">Run the Eleventy docs server with live reload from the repository root.</p>
+          <code class="footer-command">npm run docs:serve</code>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <span>© 2026 Meld.js. Released under the MIT License.</span>
+        <div class="footer-bottom-links">
+          <a href="/roadmap/">Roadmap</a>
+          <a href="/deployment/">Deployment</a>
+          <a href="/faq/">FAQ</a>
+        </div>
+      </div>
+    </footer>
+
+  </body>
+</html>

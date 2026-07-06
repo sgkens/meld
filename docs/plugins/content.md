@@ -2,6 +2,9 @@
 title: Content & Forms
 parent: Plugin Ecosystem
 nav_order: 4
+excerpt: Plugins for rendering content and handling user input, including meld-markdown, meld-time, and meld-forms.
+tags: [plugins, content, forms, markdown, validation, input]
+category: Plugin Ecosystem
 ---
 
 # Content & Formatting
