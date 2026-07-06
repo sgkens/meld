@@ -1,0 +1,51 @@
+name: Publish VS Code Extension
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      publish_to_marketplace:
+        description: 'Publish to VS Code Marketplace (Microsoft)'
+        type: boolean
+        required: true
+        default: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install Root Dependencies
+        run: npm ci
+
+      - name: Build LSP Server
+        run: |
+          cd meld-lsp
+          npm ci
+          npm run build
+
+      - name: Package VS Code Extension
+        run: |
+          cd meld-vscode
+          npm ci
+          npm run package
+
+      - name: Publish to Open VSX (Always on Tag/Release)
+        if: startsWith(github.ref, 'refs/tags/v') || github.event_name == 'workflow_dispatch'
+        run: |
+          npx ovsx publish meld-vscode/meld-vscode-*.vsix -p ${{ secrets.OPEN_VSX_TOKEN }}
+
+      - name: Publish to VS Code Marketplace (Manual Confirmation Only)
+        if: github.event.inputs.publish_to_marketplace == 'true'
+        run: |
+          npx vsce publish -i meld-vscode/meld-vscode-*.vsix -p ${{ secrets.VSCE_PAT }}
