@@ -1,0 +1,23 @@
+{% macro docPager(page, collections) %}
+{% set categoryItems = collections.all | categoryDocs(page.inputPath) %}
+{% set previousPage = categoryItems | previousDoc(page.inputPath) %}
+{% set nextPage    = categoryItems | nextDoc(page.inputPath) %}
+{% if previousPage or nextPage %}
+  <nav class="doc-pager" aria-label="Documentation pagination">
+    {% if previousPage %}
+      <a href="{{ previousPage.url }}" class="doc-pager-link" rel="prev">
+        <span>← Previous</span>
+        <strong>{{ previousPage.data.title or previousPage.fileSlug }}</strong>
+      </a>
+    {% else %}
+      <span></span>
+    {% endif %}
+    {% if nextPage %}
+      <a href="{{ nextPage.url }}" class="doc-pager-link doc-pager-link--next" rel="next">
+        <span>Next →</span>
+        <strong>{{ nextPage.data.title or nextPage.fileSlug }}</strong>
+      </a>
+    {% endif %}
+  </nav>
+{% endif %}
+{% endmacro %}

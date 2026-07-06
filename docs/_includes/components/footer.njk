@@ -1,0 +1,60 @@
+{% macro footer() %}
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <div class="footer-heading head-brand">Meld.js</div>
+      <p class="footer-brand-text">
+        A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration.
+      </p>
+      <div class="footer-social">
+        <a href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab" target="_blank" rel="noopener">
+          <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align: middle; margin-top: -2px;"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+        </a>
+        <a href="https://github.com/meldjs/meld" aria-label="GitHub" target="_blank" rel="noopener">
+          <i data-lucide="github"></i>
+        </a>
+        <a href="/releases/" aria-label="Releases changelog">
+          <i data-lucide="tag"></i>
+        </a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-heading head-docs">Resources</div>
+      <div class="footer-links">
+        <a href="/"           class="footer-link">Documentation</a>
+        <a href="/core-api/"  class="footer-link">Core API</a>
+        <a href="/plugins/"   class="footer-link">Plugin Library</a>
+        <a href="/testing/"   class="footer-link">Testing</a>
+        <a href="/releases/"  class="footer-link">Releases</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-heading head-social">Build Paths</div>
+      <div class="footer-links">
+        <a href="/installation/"          class="footer-link">Install</a>
+        <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
+        <a href="/integrations/frontend/" class="footer-link">Frontend Integration</a>
+        <a href="/integrations/backend/"  class="footer-link">Backend Integration</a>
+        <a href="/architecture-kmel/"     class="footer-link">KMEL Stack</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-heading head-sub">Local Development</div>
+      <p class="footer-brand-text">Run the Eleventy docs server with live reload from the repository root.</p>
+      <code class="footer-command">npm run docs:serve</code>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 Meld.js. Released under the MIT License.</span>
+    <div class="footer-bottom-links">
+      <a href="/roadmap/">Roadmap</a>
+      <a href="/deployment/">Deployment</a>
+      <a href="/faq/">FAQ</a>
+    </div>
+  </div>
+</footer>
+{% endmacro %}

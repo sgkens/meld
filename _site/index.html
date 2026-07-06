@@ -1,3 +1,7 @@
+
+
+
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -24,67 +28,86 @@
 
     <a class="skip-link" href="#content">Skip to content</a>
 
-    <aside
-      class="release-banner"
-      data-release-banner
-      data-release-id="meld-launch-2026-07"
-      aria-label="Release notice"
-    >
-      <div class="release-banner__inner">
-        <span class="release-banner__eyebrow">Release</span>
-        <p>Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.</p>
-        <a href="/releases/">View details</a>
-        <button type="button" class="release-banner__dismiss" data-release-banner-dismiss aria-label="Dismiss release notice">
-          <i data-lucide="x"></i>
-        </button>
-      </div>
-    </aside>
+    
+<aside
+  class="release-banner"
+  data-release-banner
+  data-release-id="meld-launch-2026-07"
+  aria-label="Release notice"
+>
+  <div class="release-banner__inner">
+    <span class="release-banner__eyebrow">Release</span>
+    <p>Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.</p>
+    <a href="/releases/">View details</a>
+    <button type="button" class="release-banner__dismiss" data-release-banner-dismiss aria-label="Dismiss release notice">
+      <i data-lucide="x"></i>
+    </button>
+  </div>
+</aside>
+
 
     
-    <header class="site-topbar site-topbar--landing">
-      <a class="brand" href="/">
-        <svg class="brand-mark" viewBox="0 0 120 120" width="36" height="36" xmlns="http://www.w3.org/2000/svg" aria-label="Meld.js logo" role="img">
-          <defs>
-            <mask id="seam-mask">
-              <rect x="0" y="0" width="120" height="120" fill="white" />
-              <line x1="60" y1="48" x2="60" y2="72" stroke="black" stroke-width="14" stroke-linecap="round"/>
-            </mask>
-          </defs>
-          <path d="M 22 92 L 22 28 L 60 60 L 98 28 L 98 92" fill="none" stroke="var(--logo-path-stroke)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" mask="url(#seam-mask)"/>
-          <circle cx="60" cy="48" r="5.5" fill="var(--logo-path-stroke)"/>
-          <circle cx="60" cy="72" r="5.5" fill="var(--logo-path-stroke)"/>
-        </svg>
-        <span class="brand-copy">
-          <span class="brand-name">Meld.js</span>
-          <span class="brand-kicker">Micro-frontend engine</span>
-        </span>
-      </a>
+<header class="site-topbar site-topbar--landing">
+  <a class="brand" href="/">
+    <svg class="brand-mark" viewBox="0 0 120 120" width="36" height="36" xmlns="http://www.w3.org/2000/svg" aria-label="Meld.js logo" role="img">
+      <defs>
+        <mask id="seam-mask">
+          <rect x="0" y="0" width="120" height="120" fill="white" />
+          <line x1="60" y1="48" x2="60" y2="72" stroke="black" stroke-width="14" stroke-linecap="round"/>
+        </mask>
+      </defs>
+      <path d="M 22 92 L 22 28 L 60 60 L 98 28 L 98 92" fill="none" stroke="var(--logo-path-stroke)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" mask="url(#seam-mask)"/>
+      <circle cx="60" cy="48" r="5.5" fill="var(--logo-path-stroke)"/>
+      <circle cx="60" cy="72" r="5.5" fill="var(--logo-path-stroke)"/>
+    </svg>
+    <span class="brand-copy">
+      <span class="brand-name">Meld.js</span>
+      <span class="brand-kicker">Micro-frontend engine</span>
+    </span>
+  </a>
 
-      <nav class="topbar-nav" aria-label="Primary navigation">
-        <a href="/installation/"><i data-lucide="terminal"></i>Install</a>
-        <a href="/architecture/"><i data-lucide="network"></i>Architecture</a>
-        <a href="/core-api/"><i data-lucide="braces"></i>API</a>
-        <a href="/plugins/"><i data-lucide="blocks"></i>Plugins</a>
-        <a href="/bootcamp/"><i data-lucide="graduation-cap"></i>Bootcamp</a>
-      </nav>
+  <nav class="topbar-nav" aria-label="Primary navigation">
+    <a href="/" aria-current="page">
+      <i data-lucide="book-open"></i>
+      Docs
+    </a>
+    <a href="/core-api/" >
+      <i data-lucide="braces"></i>
+      API
+    </a>
+    <a href="/plugins/" >
+      <i data-lucide="blocks"></i>
+      Plugins
+    </a>
+    <a href="/architecture/" >
+      <i data-lucide="network"></i>
+      Architecture
+    </a>
+    <a href="/bootcamp/" >
+      <i data-lucide="graduation-cap"></i>
+      Bootcamp
+    </a>
+  </nav>
 
-      <div class="topbar-tools">
-        <label class="header-search" aria-label="Search documentation">
-          <i data-lucide="search"></i>
-          <span class="sr-only">Search documentation</span>
-          <input type="search" placeholder="Search docs…" data-docs-filter aria-label="Search docs">
-        </label>
-        <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false">
-          <i data-lucide="sun"></i>
-        </button>
-        <a class="icon-button" href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab repository" target="_blank" rel="noopener">
-          <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
-        </a>
-        <a class="icon-button" href="https://github.com/meldjs/meld" aria-label="GitHub repository" target="_blank" rel="noopener">
-          <i data-lucide="github"></i>
-        </a>
-      </div>
-    </header>
+  <div class="topbar-tools">
+    <label class="header-search" aria-label="Search documentation">
+      <i data-lucide="search"></i>
+      <span class="sr-only">Search documentation</span>
+      <input type="search" placeholder="Search docs…" data-docs-filter aria-label="Search docs">
+    </label>
+    <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false">
+      <i data-lucide="sun"></i>
+    </button>
+    <a class="icon-button" href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab repository" target="_blank" rel="noopener">
+      <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+    </a>
+    <a class="icon-button" href="https://github.com/meldjs/meld" aria-label="GitHub repository" target="_blank" rel="noopener">
+      <i data-lucide="github"></i>
+    </a>
+    
+  </div>
+</header>
+
 
     <main id="content">
       
@@ -255,97 +278,117 @@ defineMeld('task-counter', () =&gt; {
     </main>
 
     
-    <div
-      id="search-modal"
-      class="search-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Search documentation"
-      hidden
-    >
-      <div class="search-dialog" role="document">
-        <div class="search-input-row">
-          <span class="search-input-icon"><i data-lucide="search"></i></span>
-          <input
-            id="search-modal-input"
-            type="search"
-            placeholder="Search docs…"
-            autocomplete="off"
-            spellcheck="false"
-            aria-label="Search documentation"
-          >
-          <span class="search-kbd">Esc</span>
-          <button class="search-close-btn" id="search-modal-close" type="button" aria-label="Close search">
-            <i data-lucide="x"></i>
-          </button>
-        </div>
-        <div class="search-body">
-          <div class="search-col-categories" id="search-categories" aria-label="Categories"></div>
-          <div class="search-col-results"    id="search-results"    role="listbox" aria-label="Search results"></div>
-          <div class="search-col-preview"    id="search-preview"    aria-label="Result preview">
-            <div class="search-hint">
-              <i data-lucide="search"></i>
-              <span>Type to search across all docs, API references, and anchors</span>
-            </div>
-          </div>
-        </div>
-        <div class="search-footer" aria-hidden="true">
-          <span class="search-footer-hint"><span class="search-kbd">↑↓</span> Navigate</span>
-          <span class="search-footer-hint"><span class="search-kbd">↵</span> Go</span>
-          <span class="search-footer-hint"><span class="search-kbd">Esc</span> Close</span>
-          <span class="search-footer-hint"><span class="search-kbd">⌘K</span> Toggle</span>
+<div
+  id="search-modal"
+  class="search-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Search documentation"
+  hidden
+>
+  <div class="search-dialog" role="document">
+
+    
+    <div class="search-input-row">
+      <span class="search-input-icon"><i data-lucide="search"></i></span>
+      <input
+        id="search-modal-input"
+        type="search"
+        placeholder="Search docs…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Search documentation"
+      >
+      <span class="search-kbd">Esc</span>
+      <button class="search-close-btn" id="search-modal-close" type="button" aria-label="Close search">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    
+    <div class="search-body">
+      <div class="search-col-categories" id="search-categories" aria-label="Categories"></div>
+      <div class="search-col-results"    id="search-results"    role="listbox" aria-label="Search results"></div>
+      <div class="search-col-preview"    id="search-preview"    aria-label="Result preview">
+        <div class="search-hint">
+          <i data-lucide="search"></i>
+          <span>Type to search across all docs, API references, and anchors</span>
         </div>
       </div>
     </div>
 
     
-    <footer class="site-footer">
-      <div class="footer-grid">
-        <div class="footer-col">
-          <div class="footer-heading head-brand">Meld.js</div>
-          <p class="footer-brand-text">Reactive state, native custom elements, and plugin-driven integration for browser UI modules.</p>
-          <div class="footer-social">
-            <a href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab" target="_blank" rel="noopener">
-              <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align: middle; margin-top: -2px;"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
-            </a>
-            <a href="https://github.com/meldjs/meld" aria-label="GitHub" target="_blank" rel="noopener"><i data-lucide="github"></i></a>
-            <a href="/releases/" aria-label="Changelog"><i data-lucide="tag"></i></a>
-          </div>
-        </div>
-        <div class="footer-col">
-          <div class="footer-heading head-docs">Documentation</div>
-          <div class="footer-links">
-            <a href="/installation/" class="footer-link">Installation</a>
-            <a href="/architecture/" class="footer-link">Architecture</a>
-            <a href="/core-api/"     class="footer-link">Core API</a>
-            <a href="/plugins/"      class="footer-link">Plugins</a>
-          </div>
-        </div>
-        <div class="footer-col">
-          <div class="footer-heading head-social">Guides</div>
-          <div class="footer-links">
-            <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
-            <a href="/integrations/frontend/" class="footer-link">Frontend</a>
-            <a href="/integrations/backend/"  class="footer-link">Backend</a>
-            <a href="/testing/"               class="footer-link">Testing</a>
-          </div>
-        </div>
-        <div class="footer-col">
-          <div class="footer-heading head-sub">Local Docs</div>
-          <p class="footer-brand-text">Start the Eleventy dev server from the project root.</p>
-          <code class="footer-command">npm run docs:serve</code>
-        </div>
-      </div>
+    <div class="search-footer" aria-hidden="true">
+      <span class="search-footer-hint"><span class="search-kbd">↑↓</span> Navigate</span>
+      <span class="search-footer-hint"><span class="search-kbd">↵</span> Go</span>
+      <span class="search-footer-hint"><span class="search-kbd">Esc</span> Close</span>
+      <span class="search-footer-hint"><span class="search-kbd">⌘K</span> Toggle</span>
+    </div>
 
-      <div class="footer-bottom">
-        <span>© 2026 Meld.js. MIT License.</span>
-        <div class="footer-bottom-links">
-          <a href="/roadmap/">Roadmap</a>
-          <a href="/releases/">Releases</a>
-          <a href="/faq/">FAQ</a>
-        </div>
+  </div>
+</div>
+
+
+    
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <div class="footer-heading head-brand">Meld.js</div>
+      <p class="footer-brand-text">
+        A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration.
+      </p>
+      <div class="footer-social">
+        <a href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab" target="_blank" rel="noopener">
+          <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align: middle; margin-top: -2px;"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+        </a>
+        <a href="https://github.com/meldjs/meld" aria-label="GitHub" target="_blank" rel="noopener">
+          <i data-lucide="github"></i>
+        </a>
+        <a href="/releases/" aria-label="Releases changelog">
+          <i data-lucide="tag"></i>
+        </a>
       </div>
-    </footer>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-heading head-docs">Resources</div>
+      <div class="footer-links">
+        <a href="/"           class="footer-link">Documentation</a>
+        <a href="/core-api/"  class="footer-link">Core API</a>
+        <a href="/plugins/"   class="footer-link">Plugin Library</a>
+        <a href="/testing/"   class="footer-link">Testing</a>
+        <a href="/releases/"  class="footer-link">Releases</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-heading head-social">Build Paths</div>
+      <div class="footer-links">
+        <a href="/installation/"          class="footer-link">Install</a>
+        <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
+        <a href="/integrations/frontend/" class="footer-link">Frontend Integration</a>
+        <a href="/integrations/backend/"  class="footer-link">Backend Integration</a>
+        <a href="/architecture-kmel/"     class="footer-link">KMEL Stack</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-heading head-sub">Local Development</div>
+      <p class="footer-brand-text">Run the Eleventy docs server with live reload from the repository root.</p>
+      <code class="footer-command">npm run docs:serve</code>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 Meld.js. Released under the MIT License.</span>
+    <div class="footer-bottom-links">
+      <a href="/roadmap/">Roadmap</a>
+      <a href="/deployment/">Deployment</a>
+      <a href="/faq/">FAQ</a>
+    </div>
+  </div>
+</footer>
+
 
   </body>
 </html>

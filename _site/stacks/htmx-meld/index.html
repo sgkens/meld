@@ -1,3 +1,11 @@
+
+
+
+
+
+
+
+
 <!doctype html>
 <html lang="en">
   <head>
@@ -23,539 +31,547 @@
     <div class="space-grid" aria-hidden="true"></div>
     <a class="skip-link" href="#content">Skip to content</a>
 
-    <aside
-      class="release-banner"
-      data-release-banner
-      data-release-id="meld-launch-2026-07"
-      aria-label="Release notice"
-    >
-      <div class="release-banner__inner">
-        <span class="release-banner__eyebrow">Release</span>
-        <p>Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.</p>
-        <a href="/releases/">View details</a>
-        <button type="button" class="release-banner__dismiss" data-release-banner-dismiss aria-label="Dismiss release notice">
-          <i data-lucide="x"></i>
-        </button>
-      </div>
-    </aside>
+    
+<aside
+  class="release-banner"
+  data-release-banner
+  data-release-id="meld-launch-2026-07"
+  aria-label="Release notice"
+>
+  <div class="release-banner__inner">
+    <span class="release-banner__eyebrow">Release</span>
+    <p>Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.</p>
+    <a href="/releases/">View details</a>
+    <button type="button" class="release-banner__dismiss" data-release-banner-dismiss aria-label="Dismiss release notice">
+      <i data-lucide="x"></i>
+    </button>
+  </div>
+</aside>
+
 
     
-    <header class="site-topbar">
-      <a class="brand" href="/">
-        <svg class="brand-mark" viewBox="0 0 120 120" width="36" height="36" xmlns="http://www.w3.org/2000/svg" aria-label="Meld.js logo" role="img">
-          <defs>
-            <mask id="seam-mask">
-              <rect x="0" y="0" width="120" height="120" fill="white" />
-              <line x1="60" y1="48" x2="60" y2="72" stroke="black" stroke-width="14" stroke-linecap="round"/>
-            </mask>
-          </defs>
-          <path d="M 22 92 L 22 28 L 60 60 L 98 28 L 98 92" fill="none" stroke="var(--logo-path-stroke)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" mask="url(#seam-mask)"/>
-          <circle cx="60" cy="48" r="5.5" fill="var(--logo-path-stroke)"/>
-          <circle cx="60" cy="72" r="5.5" fill="var(--logo-path-stroke)"/>
-        </svg>
-        <span class="brand-copy">
-          <span class="brand-name">Meldjs.dev</span>
-          <span class="brand-kicker">Micro-frontend engine</span>
-        </span>
-      </a>
+<header class="site-topbar">
+  <a class="brand" href="/">
+    <svg class="brand-mark" viewBox="0 0 120 120" width="36" height="36" xmlns="http://www.w3.org/2000/svg" aria-label="Meld.js logo" role="img">
+      <defs>
+        <mask id="seam-mask">
+          <rect x="0" y="0" width="120" height="120" fill="white" />
+          <line x1="60" y1="48" x2="60" y2="72" stroke="black" stroke-width="14" stroke-linecap="round"/>
+        </mask>
+      </defs>
+      <path d="M 22 92 L 22 28 L 60 60 L 98 28 L 98 92" fill="none" stroke="var(--logo-path-stroke)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" mask="url(#seam-mask)"/>
+      <circle cx="60" cy="48" r="5.5" fill="var(--logo-path-stroke)"/>
+      <circle cx="60" cy="72" r="5.5" fill="var(--logo-path-stroke)"/>
+    </svg>
+    <span class="brand-copy">
+      <span class="brand-name">Meldjs.dev</span>
+      <span class="brand-kicker">Micro-frontend engine</span>
+    </span>
+  </a>
 
-      <nav class="topbar-nav" aria-label="Primary navigation">
-        <a href="/" >
-          <i data-lucide="book-open"></i>
-          Docs
-        </a>
-        <a href="/core-api/" >
-          <i data-lucide="braces"></i>
-          API
-        </a>
-        <a href="/plugins/" >
-          <i data-lucide="blocks"></i>
-          Plugins
-        </a>
-        <a href="/architecture/" >
-          <i data-lucide="network"></i>
-          Architecture
-        </a>
-        <a href="/bootcamp/" >
-          <i data-lucide="graduation-cap"></i>
-          Bootcamp
-        </a>
-      </nav>
+  <nav class="topbar-nav" aria-label="Primary navigation">
+    <a href="/" >
+      <i data-lucide="book-open"></i>
+      Docs
+    </a>
+    <a href="/core-api/" >
+      <i data-lucide="braces"></i>
+      API
+    </a>
+    <a href="/plugins/" >
+      <i data-lucide="blocks"></i>
+      Plugins
+    </a>
+    <a href="/architecture/" >
+      <i data-lucide="network"></i>
+      Architecture
+    </a>
+    <a href="/bootcamp/" >
+      <i data-lucide="graduation-cap"></i>
+      Bootcamp
+    </a>
+  </nav>
 
-      <div class="topbar-tools">
-        <label class="header-search" aria-label="Search documentation">
-          <i data-lucide="search"></i>
-          <span class="sr-only">Search documentation</span>
-          <input type="search" placeholder="Search docs…" data-docs-filter aria-label="Search docs">
-        </label>
-        <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false">
-          <i data-lucide="sun"></i>
-        </button>
-        <a class="icon-button" href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab repository" target="_blank" rel="noopener">
-          <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
-        </a>
-        <a class="icon-button" href="https://github.com/meldjs/meld" aria-label="GitHub repository" target="_blank" rel="noopener">
-          <i data-lucide="github"></i>
-        </a>
-        <button class="icon-button mobile-menu-button" type="button" data-sidebar-toggle aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="docs-nav">
-          <i data-lucide="menu"></i>
-        </button>
-      </div>
-    </header>
+  <div class="topbar-tools">
+    <label class="header-search" aria-label="Search documentation">
+      <i data-lucide="search"></i>
+      <span class="sr-only">Search documentation</span>
+      <input type="search" placeholder="Search docs…" data-docs-filter aria-label="Search docs">
+    </label>
+    <button class="icon-button" type="button" data-theme-toggle aria-label="Toggle color theme" aria-pressed="false">
+      <i data-lucide="sun"></i>
+    </button>
+    <a class="icon-button" href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab repository" target="_blank" rel="noopener">
+      <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+    </a>
+    <a class="icon-button" href="https://github.com/meldjs/meld" aria-label="GitHub repository" target="_blank" rel="noopener">
+      <i data-lucide="github"></i>
+    </a>
+    
+    <button class="icon-button mobile-menu-button" type="button" data-sidebar-toggle aria-label="Toggle navigation menu" aria-expanded="false" aria-controls="docs-nav">
+      <i data-lucide="menu"></i>
+    </button>
+    
+  </div>
+</header>
+
 
     
     <div class="docs-shell">
 
       
-      <aside class="docs-nav" id="docs-nav" aria-label="Documentation navigation">
-        <div class="docs-nav-head">
-          <div class="docs-nav-title">
-            <i data-lucide="panel-left"></i>
-            Documentation
-          </div>
-        </div>
+<aside class="docs-nav" id="docs-nav" aria-label="Documentation navigation">
+  <div class="docs-nav-head">
+    <div class="docs-nav-title">
+      <i data-lucide="panel-left"></i>
+      Documentation
+    </div>
+  </div>
 
-        <nav class="category-nav" aria-label="Documentation sections">
-          
-            <section class="nav-category" aria-labelledby="nav-cat-foundations" >
-              <h2 id="nav-cat-foundations">
-                <a href="/foundations/">Foundations</a>
-              </h2>
-              
-                <a
-                  href="/architecture/"
-                  
-                  data-excerpt=""
-                  data-tags=""
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Meld Architecture</span>
-                </a>
-              
-                <a
-                  href="/core-concepts/"
-                  
-                  data-excerpt="Fundamental concepts behind Meld.js: proxy-based reactivity, Native Custom Elements, Shadow DOM encapsulation, and the no-build architecture."
-                  data-tags="core-concepts,reactivity,proxy,custom-elements,shadow-dom,no-build"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Core Concepts</span>
-                </a>
-              
-                <a
-                  href="/backend-integration/"
-                  
-                  data-excerpt="Connecting the Meld.js frontend to a Node.js backend using Knex for database access and Lucia for session-based authentication."
-                  data-tags="backend,knex,lucia,express,authentication,database,kmel"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Backend Integration (KMEL Stack)</span>
-                </a>
-              
-                <a
-                  href="/releases/"
-                  
-                  data-excerpt=""
-                  data-tags=""
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Releases and Changelog</span>
-                </a>
-              
-                <a
-                  href="/api-reference/"
-                  
-                  data-excerpt="Canonical technical reference for the Meld.js public runtime API, covering reactivity, DOM templating, lifecycle hooks, and context/dependency injection."
-                  data-tags="api,reference,defineMeld,meldState,meldHtml,lifecycle,context"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Strict API Reference</span>
-                </a>
-              
-                <a
-                  href="/release-audit/"
-                  
-                  data-excerpt=""
-                  data-tags=""
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Release Audit</span>
-                </a>
-              
-            </section>
-          
-            <section class="nav-category" aria-labelledby="nav-cat-getting-started" >
-              <h2 id="nav-cat-getting-started">
-                <a href="/getting-started/">Getting Started</a>
-              </h2>
-              
-                <a
-                  href="/getting-started/installation/"
-                  
-                  data-excerpt=""
-                  data-tags="installation,setup,artisan-cli,scaffolding"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Installation &amp; Scaffolding</span>
-                </a>
-              
-                <a
-                  href="/getting-started/editor-setup/"
-                  
-                  data-excerpt="A guide to configuring your code editor for optimal syntax highlighting and development experience with Meld.js."
-                  data-tags="editor,setup,syntax highlighting,configuration"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Editor Setup</span>
-                </a>
-              
-                <a
-                  href="/getting-started/nested-components/"
-                  
-                  data-excerpt="A guide to nesting components and enabling communication between parent and child components in Meld.js."
-                  data-tags="components,nesting,communication,props,events"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Component Nesting &amp; Communication</span>
-                </a>
-              
-                <a
-                  href="/getting-started/rendering/"
-                  
-                  data-excerpt="A guide to rendering templates and using the `meldHtml` tag for reactive UI updates in Meld.js."
-                  data-tags="rendering,templating,meldHtml,meld.list,meld.css"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Rendering &amp; Templating</span>
-                </a>
-              
-            </section>
-          
-            <section class="nav-category" aria-labelledby="nav-cat-architecture" >
-              <h2 id="nav-cat-architecture">
-                <a href="/architecture/">Architecture</a>
-              </h2>
-              
-                <a
-                  href="/architecture/architecture-deep-dive/"
-                  
-                  data-excerpt="An in-depth look at Meld.js core pillars: proxy-based reactivity, Shadow DOM encapsulation, and the no-build ESM architecture."
-                  data-tags="architecture,deep-dive,meld"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Architectural Deep Dive</span>
-                </a>
-              
-                <a
-                  href="/architecture/advanced-architecture/"
-                  
-                  data-excerpt="A deep dive into the recommended full-stack architecture for Meld, including Knex, Express, and Lucia."
-                  data-tags="architecture,kmel,full-stack,meld"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Advanced Architecture (KMEL)</span>
-                </a>
-              
-                <a
-                  href="/architecture/performance/"
-                  
-                  data-excerpt="Live browser benchmarks and technical analysis of Meld.js rendering performance — no Virtual DOM, no diffing, O(1) targeted DOM updates."
-                  data-tags="performance,benchmarks,rendering"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Performance &amp; Benchmarks</span>
-                </a>
-              
-                <a
-                  href="/architecture/architecture-kmel/"
-                  
-                  data-excerpt=""
-                  data-tags="architecture,kmel,full-stack,meld"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>The KMEL Stack</span>
-                </a>
-              
-                <a
-                  href="/architecture/plugins/"
-                  
-                  data-excerpt="Overview of Meld.js plugin architecture — a tiny core (&lt;2kb) extended by opt-in plugins for routing, state, forms, WebSocket, and developer tooling."
-                  data-tags="plugins,architecture,ecosystem"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>The Plugin Ecosystem</span>
-                </a>
-              
-            </section>
-          
-            <section class="nav-category" aria-labelledby="nav-cat-plugins" >
-              <h2 id="nav-cat-plugins">
-                <a href="/plugins/">Plugins</a>
-              </h2>
-              
-                <a
-                  href="/plugins/architecture/"
-                  
-                  data-excerpt="Plugins for structuring SPAs and managing global application state, including meld-router and meld-store."
-                  data-tags="plugins,architecture,state-management,router,store,spa"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Architecture &amp; State</span>
-                </a>
-              
-                <a
-                  href="/plugins/data/"
-                  
-                  data-excerpt="Plugins for API interaction and data persistence, including meld-query for reactive fetch and meld-local for localStorage management."
-                  data-tags="plugins,data,networking,fetch,api,local-storage,reactive"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Data &amp; Networking</span>
-                </a>
-              
-                <a
-                  href="/plugins/meld-socket/"
-                  
-                  data-excerpt="Official WebSocket plugin for Meld.js with auto-reconnect, heartbeat, structured message routing, presence tracking, and request-response support."
-                  data-tags="plugins,websocket,real-time,messaging,presence,meld-socket"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>meld-socket</span>
-                </a>
-              
-                <a
-                  href="/plugins/ui/"
-                  
-                  data-excerpt="UI pattern plugins for complex DOM rendering, including meld-portal for modals and tooltips and meld-animate for transitions."
-                  data-tags="plugins,ui,portal,modal,tooltip,animation,shadow-dom"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>UI Patterns</span>
-                </a>
-              
-                <a
-                  href="/plugins/content/"
-                  
-                  data-excerpt="Plugins for rendering content and handling user input, including meld-markdown, meld-time, and meld-forms."
-                  data-tags="plugins,content,forms,markdown,validation,input"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Content &amp; Forms</span>
-                </a>
-              
-                <a
-                  href="/plugins/dx/"
-                  
-                  data-excerpt="Developer experience and quality assurance plugins including meld-devtools for visual debugging, meld-logger, and meld-a11y for accessibility checks."
-                  data-tags="plugins,dx,developer-experience,devtools,logging,accessibility,testing"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>DX &amp; Quality</span>
-                </a>
-              
-                <a
-                  href="/plugins/diagnostics/"
-                  
-                  data-excerpt="The meld-diagnostics plugin installs a runtime diagnostics hook and reports initialization details to the browser console."
-                  data-tags="plugins,diagnostics,debugging,console,runtime"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Diagnostics Plugin</span>
-                </a>
-              
-            </section>
-          
-            <section class="nav-category" aria-labelledby="nav-cat-integrations" >
-              <h2 id="nav-cat-integrations">
-                <a href="/integrations/">Integrations</a>
-              </h2>
-              
-                <a
-                  href="/integrations/frontend/"
-                  
-                  data-excerpt="Using Meld.js Native Custom Elements inside React, Vue, Svelte, or any HTML-standards-compliant frontend framework."
-                  data-tags="integration,frontend,react,vue,svelte,custom-elements"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Frontend Frameworks</span>
-                </a>
-              
-                <a
-                  href="/integrations/backend/"
-                  
-                  data-excerpt="How to integrate Meld.js components into server-rendered MVC applications using Laravel Blade, Django, or EJS templates."
-                  data-tags="integration,backend,mvc,laravel,blade,server-rendered"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Backend &amp; MVC</span>
-                </a>
-              
-                <a
-                  href="/integrations/lagacy/"
-                  
-                  data-excerpt="Integrating Meld.js components into legacy codebases and vanilla JavaScript projects using Shadow DOM isolation."
-                  data-tags="integration,legacy,vanilla-js,shadow-dom,progressive-enhancement"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Legacy &amp; Vanilla JS</span>
-                </a>
-              
-                <a
-                  href="/integrations/inertia/"
-                  
-                  data-excerpt="How to use Meld.js as a client-side Inertia.js adapter for Laravel, replacing Vue or React in a monolith architecture."
-                  data-tags="integration,inertia,laravel,adapter,spa"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Laravel Inertia Adapter</span>
-                </a>
-              
-            </section>
-          
-            <section class="nav-category" aria-labelledby="nav-cat-stacks" >
-              <h2 id="nav-cat-stacks">
-                <a href="/stacks/">Stacks</a>
-              </h2>
-              
-                <a
-                  href="/stacks/KMEL Stack/"
-                  
-                  data-excerpt="A practical guide to the KMEL stack (Knex, Meld, Express, Lucia), covering directory structure, database migrations, auth, and API integration."
-                  data-tags="knex,meld,express,lucia,stack,kmel,full-stack"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>KMEL Stack</span>
-                </a>
-              
-                <a
-                  href="/stacks/vue-meld/"
-                  
-                  data-excerpt="Use Meld.js custom elements inside a Vue 3 application. Covers Vite compiler config, import patterns, property passing, and shared reactive state between Vue and Meld."
-                  data-tags="vue,vite,custom-elements,integration,stack"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Vue + Meld Integration</span>
-                </a>
-              
-                <a
-                  href="/stacks/react-meld/"
-                  
-                  data-excerpt="Embed Meld.js custom elements inside React components. Covers import patterns, useRef for element access, useEffect for imperative initialisation, and CustomEvent bridging."
-                  data-tags="react,custom-elements,useeffect,useref,integration,stack"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>React + Meld Integration</span>
-                </a>
-              
-                <a
-                  href="/stacks/astro-meld/"
-                  
-                  data-excerpt="Use Meld.js as a client-side island framework within Astro pages. Covers script imports, client-side hydration strategy, is:inline usage, and partial hydration patterns."
-                  data-tags="astro,islands,hydration,custom-elements,integration,stack"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Astro + Meld Integration</span>
-                </a>
-              
-                <a
-                  href="/stacks/htmx-meld/"
-                  aria-current="page"
-                  data-excerpt="Combine HTMX for server-driven HTML navigation with Meld.js for reactive client-side state. Covers hx-boost with Meld, wiring HTMX events to Meld components, and re-registration after partial page swaps."
-                  data-tags="htmx,custom-elements,server-driven,reactive,integration,stack"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>HTMX + Meld Integration</span>
-                </a>
-              
-                <a
-                  href="/stacks/docker-postgres/"
-                  
-                  data-excerpt="Full docker-compose and podman-compose configuration for a local PostgreSQL development environment with a Node.js Meld application, pgAdmin, persistent volumes, and migration tooling."
-                  data-tags="docker,podman,postgresql,postgres,local-dev,docker-compose,stack"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Docker / Podman Local Development with PostgreSQL</span>
-                </a>
-              
-            </section>
-          
-            <section class="nav-category" aria-labelledby="nav-cat-bootcamp" >
-              <h2 id="nav-cat-bootcamp">
-                <a href="/bootcamp/">Bootcamp</a>
-              </h2>
-              
-                <a
-                  href="/bootcamp/part-1-setup-and-architecture/"
-                  
-                  data-excerpt="Part 1 of the Meld.js bootcamp — scaffold a project with Meld Artisan, configure global state with Meld Store, and set up client-side routing."
-                  data-tags="bootcamp,tutorial,setup,artisan,store,router,spa"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Bootcamp Part 1 - Setup &amp; Architecture</span>
-                </a>
-              
-                <a
-                  href="/bootcamp/part-2/"
-                  
-                  data-excerpt="Part 2 of the Meld.js bootcamp — build Kanban board components using meld.list for efficient list rendering and meld-time for relative timestamps."
-                  data-tags="bootcamp,tutorial,kanban,list-rendering,meld-time,components"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Bootcamp Part 2 - The Kanban Board</span>
-                </a>
-              
-                <a
-                  href="/bootcamp/part-3-forms-and-portals/"
-                  
-                  data-excerpt="Part 3 of the Meld.js bootcamp — implement a modal dialog with meld-portal and a validated task form using meld-forms."
-                  data-tags="bootcamp,tutorial,forms,portal,modal,validation,meld-forms"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Bootcamp Part 3 - Forms and Portals</span>
-                </a>
-              
-            </section>
-          
-            <section class="nav-category" aria-labelledby="nav-cat-tooling" >
-              <h2 id="nav-cat-tooling">
-                <a href="/tooling/">Tooling</a>
-              </h2>
-              
-                <a
-                  href="/tooling/cli/"
-                  
-                  data-excerpt="Reference for the Meld Artisan CLI — project scaffolding, component and plugin generation, local dev server, and build commands."
-                  data-tags="tooling,cli,artisan,scaffolding,build,dev-server"
-                >
-                  <i data-lucide="file-text"></i>
-                  <span>Meld Artisan CLI</span>
-                </a>
-              
-            </section>
-          
-        </nav>
-      </aside>
+  <nav class="category-nav" aria-label="Documentation sections">
+    
+      <section class="nav-category" aria-labelledby="nav-cat-foundations" >
+        <h2 id="nav-cat-foundations">
+          <a href="/foundations/">Foundations</a>
+        </h2>
+        
+          <a
+            href="/architecture/"
+            
+            data-excerpt=""
+            data-tags=""
+          >
+            <i data-lucide="file-text"></i>
+            <span>Meld Architecture</span>
+          </a>
+        
+          <a
+            href="/core-concepts/"
+            
+            data-excerpt="Fundamental concepts behind Meld.js: proxy-based reactivity, Native Custom Elements, Shadow DOM encapsulation, and the no-build architecture."
+            data-tags="core-concepts,reactivity,proxy,custom-elements,shadow-dom,no-build"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Core Concepts</span>
+          </a>
+        
+          <a
+            href="/backend-integration/"
+            
+            data-excerpt="Connecting the Meld.js frontend to a Node.js backend using Knex for database access and Lucia for session-based authentication."
+            data-tags="backend,knex,lucia,express,authentication,database,kmel"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Backend Integration (KMEL Stack)</span>
+          </a>
+        
+          <a
+            href="/releases/"
+            
+            data-excerpt=""
+            data-tags=""
+          >
+            <i data-lucide="file-text"></i>
+            <span>Releases and Changelog</span>
+          </a>
+        
+          <a
+            href="/api-reference/"
+            
+            data-excerpt="Canonical technical reference for the Meld.js public runtime API, covering reactivity, DOM templating, lifecycle hooks, and context/dependency injection."
+            data-tags="api,reference,defineMeld,meldState,meldHtml,lifecycle,context"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Strict API Reference</span>
+          </a>
+        
+          <a
+            href="/release-audit/"
+            
+            data-excerpt=""
+            data-tags=""
+          >
+            <i data-lucide="file-text"></i>
+            <span>Release Audit</span>
+          </a>
+        
+      </section>
+    
+      <section class="nav-category" aria-labelledby="nav-cat-getting-started" >
+        <h2 id="nav-cat-getting-started">
+          <a href="/getting-started/">Getting Started</a>
+        </h2>
+        
+          <a
+            href="/getting-started/installation/"
+            
+            data-excerpt=""
+            data-tags="installation,setup,artisan-cli,scaffolding"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Installation &amp; Scaffolding</span>
+          </a>
+        
+          <a
+            href="/getting-started/editor-setup/"
+            
+            data-excerpt="A guide to configuring your code editor for optimal syntax highlighting and development experience with Meld.js."
+            data-tags="editor,setup,syntax highlighting,configuration"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Editor Setup</span>
+          </a>
+        
+          <a
+            href="/getting-started/nested-components/"
+            
+            data-excerpt="A guide to nesting components and enabling communication between parent and child components in Meld.js."
+            data-tags="components,nesting,communication,props,events"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Component Nesting &amp; Communication</span>
+          </a>
+        
+          <a
+            href="/getting-started/rendering/"
+            
+            data-excerpt="A guide to rendering templates and using the `meldHtml` tag for reactive UI updates in Meld.js."
+            data-tags="rendering,templating,meldHtml,meld.list,meld.css"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Rendering &amp; Templating</span>
+          </a>
+        
+      </section>
+    
+      <section class="nav-category" aria-labelledby="nav-cat-architecture" >
+        <h2 id="nav-cat-architecture">
+          <a href="/architecture/">Architecture</a>
+        </h2>
+        
+          <a
+            href="/architecture/architecture-deep-dive/"
+            
+            data-excerpt="An in-depth look at Meld.js core pillars: proxy-based reactivity, Shadow DOM encapsulation, and the no-build ESM architecture."
+            data-tags="architecture,deep-dive,meld"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Architectural Deep Dive</span>
+          </a>
+        
+          <a
+            href="/architecture/advanced-architecture/"
+            
+            data-excerpt="A deep dive into the recommended full-stack architecture for Meld, including Knex, Express, and Lucia."
+            data-tags="architecture,kmel,full-stack,meld"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Advanced Architecture (KMEL)</span>
+          </a>
+        
+          <a
+            href="/architecture/performance/"
+            
+            data-excerpt="Live browser benchmarks and technical analysis of Meld.js rendering performance — no Virtual DOM, no diffing, O(1) targeted DOM updates."
+            data-tags="performance,benchmarks,rendering"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Performance &amp; Benchmarks</span>
+          </a>
+        
+          <a
+            href="/architecture/architecture-kmel/"
+            
+            data-excerpt=""
+            data-tags="architecture,kmel,full-stack,meld"
+          >
+            <i data-lucide="file-text"></i>
+            <span>The KMEL Stack</span>
+          </a>
+        
+          <a
+            href="/architecture/plugins/"
+            
+            data-excerpt="Overview of Meld.js plugin architecture — a tiny core (&lt;2kb) extended by opt-in plugins for routing, state, forms, WebSocket, and developer tooling."
+            data-tags="plugins,architecture,ecosystem"
+          >
+            <i data-lucide="file-text"></i>
+            <span>The Plugin Ecosystem</span>
+          </a>
+        
+      </section>
+    
+      <section class="nav-category" aria-labelledby="nav-cat-plugins" >
+        <h2 id="nav-cat-plugins">
+          <a href="/plugins/">Plugins</a>
+        </h2>
+        
+          <a
+            href="/plugins/architecture/"
+            
+            data-excerpt="Plugins for structuring SPAs and managing global application state, including meld-router and meld-store."
+            data-tags="plugins,architecture,state-management,router,store,spa"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Architecture &amp; State</span>
+          </a>
+        
+          <a
+            href="/plugins/data/"
+            
+            data-excerpt="Plugins for API interaction and data persistence, including meld-query for reactive fetch and meld-local for localStorage management."
+            data-tags="plugins,data,networking,fetch,api,local-storage,reactive"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Data &amp; Networking</span>
+          </a>
+        
+          <a
+            href="/plugins/meld-socket/"
+            
+            data-excerpt="Official WebSocket plugin for Meld.js with auto-reconnect, heartbeat, structured message routing, presence tracking, and request-response support."
+            data-tags="plugins,websocket,real-time,messaging,presence,meld-socket"
+          >
+            <i data-lucide="file-text"></i>
+            <span>meld-socket</span>
+          </a>
+        
+          <a
+            href="/plugins/ui/"
+            
+            data-excerpt="UI pattern plugins for complex DOM rendering, including meld-portal for modals and tooltips and meld-animate for transitions."
+            data-tags="plugins,ui,portal,modal,tooltip,animation,shadow-dom"
+          >
+            <i data-lucide="file-text"></i>
+            <span>UI Patterns</span>
+          </a>
+        
+          <a
+            href="/plugins/content/"
+            
+            data-excerpt="Plugins for rendering content and handling user input, including meld-markdown, meld-time, and meld-forms."
+            data-tags="plugins,content,forms,markdown,validation,input"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Content &amp; Forms</span>
+          </a>
+        
+          <a
+            href="/plugins/dx/"
+            
+            data-excerpt="Developer experience and quality assurance plugins including meld-devtools for visual debugging, meld-logger, and meld-a11y for accessibility checks."
+            data-tags="plugins,dx,developer-experience,devtools,logging,accessibility,testing"
+          >
+            <i data-lucide="file-text"></i>
+            <span>DX &amp; Quality</span>
+          </a>
+        
+          <a
+            href="/plugins/diagnostics/"
+            
+            data-excerpt="The meld-diagnostics plugin installs a runtime diagnostics hook and reports initialization details to the browser console."
+            data-tags="plugins,diagnostics,debugging,console,runtime"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Diagnostics Plugin</span>
+          </a>
+        
+      </section>
+    
+      <section class="nav-category" aria-labelledby="nav-cat-integrations" >
+        <h2 id="nav-cat-integrations">
+          <a href="/integrations/">Integrations</a>
+        </h2>
+        
+          <a
+            href="/integrations/frontend/"
+            
+            data-excerpt="Using Meld.js Native Custom Elements inside React, Vue, Svelte, or any HTML-standards-compliant frontend framework."
+            data-tags="integration,frontend,react,vue,svelte,custom-elements"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Frontend Frameworks</span>
+          </a>
+        
+          <a
+            href="/integrations/backend/"
+            
+            data-excerpt="How to integrate Meld.js components into server-rendered MVC applications using Laravel Blade, Django, or EJS templates."
+            data-tags="integration,backend,mvc,laravel,blade,server-rendered"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Backend &amp; MVC</span>
+          </a>
+        
+          <a
+            href="/integrations/lagacy/"
+            
+            data-excerpt="Integrating Meld.js components into legacy codebases and vanilla JavaScript projects using Shadow DOM isolation."
+            data-tags="integration,legacy,vanilla-js,shadow-dom,progressive-enhancement"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Legacy &amp; Vanilla JS</span>
+          </a>
+        
+          <a
+            href="/integrations/inertia/"
+            
+            data-excerpt="How to use Meld.js as a client-side Inertia.js adapter for Laravel, replacing Vue or React in a monolith architecture."
+            data-tags="integration,inertia,laravel,adapter,spa"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Laravel Inertia Adapter</span>
+          </a>
+        
+      </section>
+    
+      <section class="nav-category" aria-labelledby="nav-cat-stacks" >
+        <h2 id="nav-cat-stacks">
+          <a href="/stacks/">Stacks</a>
+        </h2>
+        
+          <a
+            href="/stacks/KMEL Stack/"
+            
+            data-excerpt="A practical guide to the KMEL stack (Knex, Meld, Express, Lucia), covering directory structure, database migrations, auth, and API integration."
+            data-tags="knex,meld,express,lucia,stack,kmel,full-stack"
+          >
+            <i data-lucide="file-text"></i>
+            <span>KMEL Stack</span>
+          </a>
+        
+          <a
+            href="/stacks/vue-meld/"
+            
+            data-excerpt="Use Meld.js custom elements inside a Vue 3 application. Covers Vite compiler config, import patterns, property passing, and shared reactive state between Vue and Meld."
+            data-tags="vue,vite,custom-elements,integration,stack"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Vue + Meld Integration</span>
+          </a>
+        
+          <a
+            href="/stacks/react-meld/"
+            
+            data-excerpt="Embed Meld.js custom elements inside React components. Covers import patterns, useRef for element access, useEffect for imperative initialisation, and CustomEvent bridging."
+            data-tags="react,custom-elements,useeffect,useref,integration,stack"
+          >
+            <i data-lucide="file-text"></i>
+            <span>React + Meld Integration</span>
+          </a>
+        
+          <a
+            href="/stacks/astro-meld/"
+            
+            data-excerpt="Use Meld.js as a client-side island framework within Astro pages. Covers script imports, client-side hydration strategy, is:inline usage, and partial hydration patterns."
+            data-tags="astro,islands,hydration,custom-elements,integration,stack"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Astro + Meld Integration</span>
+          </a>
+        
+          <a
+            href="/stacks/htmx-meld/"
+            aria-current="page"
+            data-excerpt="Combine HTMX for server-driven HTML navigation with Meld.js for reactive client-side state. Covers hx-boost with Meld, wiring HTMX events to Meld components, and re-registration after partial page swaps."
+            data-tags="htmx,custom-elements,server-driven,reactive,integration,stack"
+          >
+            <i data-lucide="file-text"></i>
+            <span>HTMX + Meld Integration</span>
+          </a>
+        
+          <a
+            href="/stacks/docker-postgres/"
+            
+            data-excerpt="Full docker-compose and podman-compose configuration for a local PostgreSQL development environment with a Node.js Meld application, pgAdmin, persistent volumes, and migration tooling."
+            data-tags="docker,podman,postgresql,postgres,local-dev,docker-compose,stack"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Docker / Podman Local Development with PostgreSQL</span>
+          </a>
+        
+      </section>
+    
+      <section class="nav-category" aria-labelledby="nav-cat-bootcamp" >
+        <h2 id="nav-cat-bootcamp">
+          <a href="/bootcamp/">Bootcamp</a>
+        </h2>
+        
+          <a
+            href="/bootcamp/part-1-setup-and-architecture/"
+            
+            data-excerpt="Part 1 of the Meld.js bootcamp — scaffold a project with Meld Artisan, configure global state with Meld Store, and set up client-side routing."
+            data-tags="bootcamp,tutorial,setup,artisan,store,router,spa"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Bootcamp Part 1 - Setup &amp; Architecture</span>
+          </a>
+        
+          <a
+            href="/bootcamp/part-2/"
+            
+            data-excerpt="Part 2 of the Meld.js bootcamp — build Kanban board components using meld.list for efficient list rendering and meld-time for relative timestamps."
+            data-tags="bootcamp,tutorial,kanban,list-rendering,meld-time,components"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Bootcamp Part 2 - The Kanban Board</span>
+          </a>
+        
+          <a
+            href="/bootcamp/part-3-forms-and-portals/"
+            
+            data-excerpt="Part 3 of the Meld.js bootcamp — implement a modal dialog with meld-portal and a validated task form using meld-forms."
+            data-tags="bootcamp,tutorial,forms,portal,modal,validation,meld-forms"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Bootcamp Part 3 - Forms and Portals</span>
+          </a>
+        
+      </section>
+    
+      <section class="nav-category" aria-labelledby="nav-cat-tooling" >
+        <h2 id="nav-cat-tooling">
+          <a href="/tooling/">Tooling</a>
+        </h2>
+        
+          <a
+            href="/tooling/cli/"
+            
+            data-excerpt="Reference for the Meld Artisan CLI — project scaffolding, component and plugin generation, local dev server, and build commands."
+            data-tags="tooling,cli,artisan,scaffolding,build,dev-server"
+          >
+            <i data-lucide="file-text"></i>
+            <span>Meld Artisan CLI</span>
+          </a>
+        
+      </section>
+    
+  </nav>
+</aside>
+
 
       
       <main class="docs-content" id="content" tabindex="-1">
         <div class="content-topline">
-          <nav class="breadcrumbs" aria-label="Breadcrumb">
-            
-              
-                <a href="/">Docs</a>
-                <i data-lucide="chevron-right"></i>
-              
-            
-              
-                <a href="/stacks/">Stacks</a>
-                <i data-lucide="chevron-right"></i>
-              
-            
-              
-                <span aria-current="page">HTMX + Meld Integration</span>
-              
-            
-          </nav>
+          
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  
+    
+      <a href="/">Docs</a>
+      <i data-lucide="chevron-right"></i>
+    
+  
+    
+      <a href="/stacks/">Stacks</a>
+      <i data-lucide="chevron-right"></i>
+    
+  
+    
+      <span aria-current="page">HTMX + Meld Integration</span>
+    
+  
+</nav>
+
           <a class="edit-link" href="https://github.com/meldjs/meld/edit/main/./docs/stacks/htmx-meld.md" target="_blank" rel="noopener">
             <i data-lucide="pencil"></i>
             Edit this page
@@ -842,147 +858,152 @@
 
 
         
-        
-        
-          <nav class="doc-pager" aria-label="Documentation pagination">
-            
-              <a href="/plugins/dx/" class="doc-pager-link" rel="prev">
-                <span>← Previous</span>
-                <strong>DX &amp; Quality</strong>
-              </a>
-            
-            
-              <a href="/plugins/diagnostics/" class="doc-pager-link doc-pager-link--next" rel="next">
-                <span>Next →</span>
-                <strong>Diagnostics Plugin</strong>
-              </a>
-            
-          </nav>
-        
+
+
+
+
+  <nav class="doc-pager" aria-label="Documentation pagination">
+    
+      <a href="/stacks/astro-meld/" class="doc-pager-link" rel="prev">
+        <span>← Previous</span>
+        <strong>Astro + Meld Integration</strong>
+      </a>
+    
+    
+      <a href="/stacks/docker-postgres/" class="doc-pager-link doc-pager-link--next" rel="next">
+        <span>Next →</span>
+        <strong>Docker / Podman Local Development with PostgreSQL</strong>
+      </a>
+    
+  </nav>
+
+
       </main>
 
       
-      <aside class="page-toc" aria-label="On this page">
-        <div class="page-toc-title">
-          <i data-lucide="list"></i>
-          On This Page
-        </div>
-        <nav data-page-toc aria-label="Page sections"></nav>
-        
-      </aside>
+<aside class="page-toc" aria-label="On this page">
+  <div class="page-toc-title">
+    <i data-lucide="list"></i>
+    On This Page
+  </div>
+  <nav data-page-toc aria-label="Page sections"></nav>
+</aside>
+
 
     </div>
 
     
-    <div
-      id="search-modal"
-      class="search-modal"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Search documentation"
-      hidden
-    >
-      <div class="search-dialog" role="document">
+<div
+  id="search-modal"
+  class="search-modal"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Search documentation"
+  hidden
+>
+  <div class="search-dialog" role="document">
 
-        
-        <div class="search-input-row">
-          <span class="search-input-icon"><i data-lucide="search"></i></span>
-          <input
-            id="search-modal-input"
-            type="search"
-            placeholder="Search docs…"
-            autocomplete="off"
-            spellcheck="false"
-            aria-label="Search documentation"
-          >
-          <span class="search-kbd">Esc</span>
-          <button class="search-close-btn" id="search-modal-close" type="button" aria-label="Close search">
-            <i data-lucide="x"></i>
-          </button>
+    
+    <div class="search-input-row">
+      <span class="search-input-icon"><i data-lucide="search"></i></span>
+      <input
+        id="search-modal-input"
+        type="search"
+        placeholder="Search docs…"
+        autocomplete="off"
+        spellcheck="false"
+        aria-label="Search documentation"
+      >
+      <span class="search-kbd">Esc</span>
+      <button class="search-close-btn" id="search-modal-close" type="button" aria-label="Close search">
+        <i data-lucide="x"></i>
+      </button>
+    </div>
+
+    
+    <div class="search-body">
+      <div class="search-col-categories" id="search-categories" aria-label="Categories"></div>
+      <div class="search-col-results"    id="search-results"    role="listbox" aria-label="Search results"></div>
+      <div class="search-col-preview"    id="search-preview"    aria-label="Result preview">
+        <div class="search-hint">
+          <i data-lucide="search"></i>
+          <span>Type to search across all docs, API references, and anchors</span>
         </div>
-
-        
-        <div class="search-body">
-          <div class="search-col-categories" id="search-categories" aria-label="Categories"></div>
-          <div class="search-col-results"    id="search-results"    role="listbox" aria-label="Search results"></div>
-          <div class="search-col-preview"    id="search-preview"    aria-label="Result preview">
-            <div class="search-hint">
-              <i data-lucide="search"></i>
-              <span>Type to search across all docs, API references, and anchors</span>
-            </div>
-          </div>
-        </div>
-
-        
-        <div class="search-footer" aria-hidden="true">
-          <span class="search-footer-hint"><span class="search-kbd">↑↓</span> Navigate</span>
-          <span class="search-footer-hint"><span class="search-kbd">↵</span> Go</span>
-          <span class="search-footer-hint"><span class="search-kbd">Esc</span> Close</span>
-          <span class="search-footer-hint"><span class="search-kbd">⌘K</span> Toggle</span>
-        </div>
-
       </div>
     </div>
 
     
-    <footer class="site-footer">
-      <div class="footer-grid">
-        <div class="footer-col">
-          <div class="footer-heading head-brand">Meld.js</div>
-          <p class="footer-brand-text">
-            A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration.
-          </p>
-          <div class="footer-social">
-            <a href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab" target="_blank" rel="noopener">
-              <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align: middle; margin-top: -2px;"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
-            </a>
-            <a href="https://github.com/meldjs/meld" aria-label="GitHub" target="_blank" rel="noopener">
-              <i data-lucide="github"></i>
-            </a>
-            <a href="/releases/" aria-label="Releases changelog">
-              <i data-lucide="tag"></i>
-            </a>
-          </div>
-        </div>
+    <div class="search-footer" aria-hidden="true">
+      <span class="search-footer-hint"><span class="search-kbd">↑↓</span> Navigate</span>
+      <span class="search-footer-hint"><span class="search-kbd">↵</span> Go</span>
+      <span class="search-footer-hint"><span class="search-kbd">Esc</span> Close</span>
+      <span class="search-footer-hint"><span class="search-kbd">⌘K</span> Toggle</span>
+    </div>
 
-        <div class="footer-col">
-          <div class="footer-heading head-docs">Resources</div>
-          <div class="footer-links">
-            <a href="/"           class="footer-link">Documentation</a>
-            <a href="/core-api/"  class="footer-link">Core API</a>
-            <a href="/plugins/"   class="footer-link">Plugin Library</a>
-            <a href="/testing/"   class="footer-link">Testing</a>
-            <a href="/releases/"  class="footer-link">Releases</a>
-          </div>
-        </div>
+  </div>
+</div>
 
-        <div class="footer-col">
-          <div class="footer-heading head-social">Build Paths</div>
-          <div class="footer-links">
-            <a href="/installation/"          class="footer-link">Install</a>
-            <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
-            <a href="/integrations/frontend/" class="footer-link">Frontend Integration</a>
-            <a href="/integrations/backend/"  class="footer-link">Backend Integration</a>
-            <a href="/architecture-kmel/"     class="footer-link">KMEL Stack</a>
-          </div>
-        </div>
 
-        <div class="footer-col">
-          <div class="footer-heading head-sub">Local Development</div>
-          <p class="footer-brand-text">Run the Eleventy docs server with live reload from the repository root.</p>
-          <code class="footer-command">npm run docs:serve</code>
-        </div>
+    
+<footer class="site-footer">
+  <div class="footer-grid">
+    <div class="footer-col">
+      <div class="footer-heading head-brand">Meld.js</div>
+      <p class="footer-brand-text">
+        A 2kb browser runtime for reactive state, native custom elements, isolated widgets, and plugin-driven integration.
+      </p>
+      <div class="footer-social">
+        <a href="https://gitlab.com/sgkens/meldjs" aria-label="GitLab" target="_blank" rel="noopener">
+          <svg class="lucide" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true" style="vertical-align: middle; margin-top: -2px;"><path d="M4.845.904a.9.9 0 0 0-.87.665L.05 13.986a1.08 1.08 0 0 0 .387 1.191l11.562 8.403a.9.9 0 0 0 1.002 0l11.562-8.403a1.08 1.08 0 0 0 .386-1.191L21.025 1.57a.9.9 0 0 0-.87-.665.9.9 0 0 0-.864.642l-2.725 8.371H7.434L4.71 1.546A.9.9 0 0 0 4.845.904Z"/></svg>
+        </a>
+        <a href="https://github.com/meldjs/meld" aria-label="GitHub" target="_blank" rel="noopener">
+          <i data-lucide="github"></i>
+        </a>
+        <a href="/releases/" aria-label="Releases changelog">
+          <i data-lucide="tag"></i>
+        </a>
       </div>
+    </div>
 
-      <div class="footer-bottom">
-        <span>© 2026 Meld.js. Released under the MIT License.</span>
-        <div class="footer-bottom-links">
-          <a href="/roadmap/">Roadmap</a>
-          <a href="/deployment/">Deployment</a>
-          <a href="/faq/">FAQ</a>
-        </div>
+    <div class="footer-col">
+      <div class="footer-heading head-docs">Resources</div>
+      <div class="footer-links">
+        <a href="/"           class="footer-link">Documentation</a>
+        <a href="/core-api/"  class="footer-link">Core API</a>
+        <a href="/plugins/"   class="footer-link">Plugin Library</a>
+        <a href="/testing/"   class="footer-link">Testing</a>
+        <a href="/releases/"  class="footer-link">Releases</a>
       </div>
-    </footer>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-heading head-social">Build Paths</div>
+      <div class="footer-links">
+        <a href="/installation/"          class="footer-link">Install</a>
+        <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
+        <a href="/integrations/frontend/" class="footer-link">Frontend Integration</a>
+        <a href="/integrations/backend/"  class="footer-link">Backend Integration</a>
+        <a href="/architecture-kmel/"     class="footer-link">KMEL Stack</a>
+      </div>
+    </div>
+
+    <div class="footer-col">
+      <div class="footer-heading head-sub">Local Development</div>
+      <p class="footer-brand-text">Run the Eleventy docs server with live reload from the repository root.</p>
+      <code class="footer-command">npm run docs:serve</code>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <span>© 2026 Meld.js. Released under the MIT License.</span>
+    <div class="footer-bottom-links">
+      <a href="/roadmap/">Roadmap</a>
+      <a href="/deployment/">Deployment</a>
+      <a href="/faq/">FAQ</a>
+    </div>
+  </div>
+</footer>
+
 
   </body>
 </html>

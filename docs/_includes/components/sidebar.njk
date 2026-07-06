@@ -1,0 +1,31 @@
+{% macro sidebar(page, collections) %}
+<aside class="docs-nav" id="docs-nav" aria-label="Documentation navigation">
+  <div class="docs-nav-head">
+    <div class="docs-nav-title">
+      <i data-lucide="panel-left"></i>
+      Documentation
+    </div>
+  </div>
+
+  <nav class="category-nav" aria-label="Documentation sections">
+    {% for category in collections.docsCategories %}
+      <section class="nav-category" aria-labelledby="nav-cat-{{ category.id }}" {% if category.items | length == 0 %}hidden{% endif %}>
+        <h2 id="nav-cat-{{ category.id }}">
+          <a href="{{ category.indexUrl }}">{{ category.label }}</a>
+        </h2>
+        {% for item in category.items %}
+          <a
+            href="{{ item.url }}"
+            {% if page.inputPath == item.inputPath %}aria-current="page"{% endif %}
+            data-excerpt="{{ item.data.excerpt or item.data.description or '' }}"
+            data-tags="{{ item.data.tags | join(',') if item.data.tags else '' }}"
+          >
+            <i data-lucide="file-text"></i>
+            <span>{{ item.data.title or item.fileSlug }}</span>
+          </a>
+        {% endfor %}
+      </section>
+    {% endfor %}
+  </nav>
+</aside>
+{% endmacro %}

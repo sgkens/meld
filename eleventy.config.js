@@ -75,6 +75,12 @@ export default function eleventyConfig(config) {
   config.addFilter('categoryLabel', categoryLabel);
   config.addFilter('categoryId', categoryId);
 
+  config.addFilter('categoryDocs', (allPages, inputPath) => {
+    const label = categoryLabel(inputPath);
+    const categoryPages = allPages.filter((p) => categoryLabel(p.inputPath) === label);
+    return sortPages(categoryPages);
+  });
+
   const getDocsCategories = (pages) => {
     const groups = new Map();
     const rootIndexBySlug = new Map();

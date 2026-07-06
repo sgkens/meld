@@ -1,0 +1,17 @@
+{% macro releaseBanner(data) %}
+<aside
+  class="release-banner"
+  data-release-banner
+  data-release-id="{{ data.id or 'meld-launch-2026-07' }}"
+  aria-label="Release notice"
+>
+  <div class="release-banner__inner">
+    <span class="release-banner__eyebrow">{{ data.eyebrow or 'Release' }}</span>
+    <p>{{ data.message or 'Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.' }}</p>
+    <a href="{{ data.href or '/releases/' }}">{{ data.linkText or 'View details' }}</a>
+    <button type="button" class="release-banner__dismiss" data-release-banner-dismiss aria-label="Dismiss release notice">
+      <i data-lucide="x"></i>
+    </button>
+  </div>
+</aside>
+{% endmacro %}

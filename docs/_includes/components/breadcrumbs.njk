@@ -1,0 +1,12 @@
+{% macro breadcrumbs(page, title) %}
+<nav class="breadcrumbs" aria-label="Breadcrumb">
+  {% for crumb in page.url | breadcrumbs %}
+    {% if loop.last %}
+      <span aria-current="page">{{ title or crumb.label }}</span>
+    {% else %}
+      <a href="{{ crumb.url }}">{{ crumb.label }}</a>
+      <i data-lucide="chevron-right"></i>
+    {% endif %}
+  {% endfor %}
+</nav>
+{% endmacro %}
