@@ -8,6 +8,9 @@ Use this tracker as the local source of truth for release hardening, testing gap
 
 ### **Issues Remaining (priority-1)**
 
+- [ ] we are building our docs site in 11ty, should web using our own frame work to do this will this simplyfy or complicate, we are build a powerfull micro framework, so cross routes, recarch into this for me, pros and cons
+- [ ] update banner is abit quirky, flickers even after cose, lets tie this to local storage, permanly hite when use clicks close, and only show when new version is available, also add a link to the release notes for the new version.
+
 - [ ] 🔴🦀❓🔟 **Critical** - Fix local JavaScript toolchain availability: npm, npx, and node are not on PATH in this shell, blocking npm test, npm run lint, and npm run build verification.
 ### **Enhancements (priority-2)**
 
