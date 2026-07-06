@@ -51,10 +51,11 @@ export default function eleventyConfig(config) {
   };
 
   config.addPassthroughCopy({
-    'docs/**/*.svg': '.',
     'docs/assets': 'assets'
   });
+  config.addPassthroughCopy('logo.svg');
   config.ignores.add('docs/skipped/**');
+  config.ignores.add('docs/index.html');
 
   config.addFilter('categoryLabel', categoryLabel);
   config.addFilter('categoryId', categoryId);
