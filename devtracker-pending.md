@@ -7,8 +7,7 @@ Use this tracker as the local source of truth for release hardening, testing gap
 ## **Tasklist**
 
 ### **Issues Remaining (priority-1)**
-- [ ] lets auther and implement a new feature meld playground, this will be a playground for meld.
-- [ ] 
+- [ ] lets auther and implement a new feature meld playground, this will be a playground for meld, give me a review on the component library
 - [ ] have we missed something critical here the meld components, i complete forgotten about this, i think i was going to keep the components in a sperate repo and have the paid, but im thinking i should maybe include theme.
 - [ ] we are building our docs site in 11ty, should web using our own frame work to do this will this simplyfy or complicate, we are build a powerfull micro framework, so cross routes, recarch into this for me, pros and cons
 - [ ] update banner is abit quirky, flickers even after cose, lets tie this to local storage, permanly hite when use clicks close, and only show when new version is available, also add a link to the release notes for the new version.

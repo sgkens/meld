@@ -227,6 +227,26 @@ Generates a new component file (`.js`) with the necessary `defineMeld`, `meldSta
 npx meld-artisan make:component user-profile
 ```
 
+### `init-dev-env`
+
+Initializes a complete, isolated Docker development environment with a pre-configured PostgreSQL service and a web-accessible VS Code IDE container (running Node.js 22, Git, and npm).
+
+```bash
+npx meld-artisan init-dev-env
+```
+
+**What it does:**
+1. Generates `Dockerfile.dev` with development tools.
+2. Generates `docker-compose.dev.yml` configuring the Postgres database and Code Server.
+
+**How to use:**
+1. Start the container environment:
+   ```bash
+   docker compose -f docker-compose.dev.yml up --build -d
+   ```
+2. Open your browser and navigate to `http://localhost:8080`.
+3. Log in using the password `meldpass` to start coding.
+
 ### `serve`
 
 Starts a local static server to correctly load ES Modules during development.

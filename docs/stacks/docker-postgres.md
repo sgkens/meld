@@ -377,3 +377,20 @@ Add a new server in pgAdmin:
 | Password | value of `POSTGRES_PASSWORD`  |
 
 If connecting from a pgAdmin instance running outside Docker (on the host machine), use `localhost` as the host instead of the service name `postgres`.
+
+---
+
+## 10. Easy Scaffold via Artisan CLI
+
+Meld Artisan provides a one-command setup for an advanced local Docker development environment. It configures the PostgreSQL service alongside a browser-accessible VS Code Web IDE container (`code-server`) equipped with Node.js 22 and Git:
+
+```bash
+npx meld-artisan init-dev-env
+```
+
+This generates:
+* `Dockerfile.dev`: A development image configuration.
+* `docker-compose.dev.yml`: A Compose configuration file orchestration Postgres and the IDE container.
+
+Run `docker compose -f docker-compose.dev.yml up --build -d` and visit `http://localhost:8080` (password: `meldpass`) to instantly code in the container.
+

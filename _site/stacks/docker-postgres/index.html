@@ -921,6 +921,16 @@ dnf <span class="token function">install</span> <span class="token function">pod
 </tbody>
 </table>
 <p>If connecting from a pgAdmin instance running outside Docker (on the host machine), use <code>localhost</code> as the host instead of the service name <code>postgres</code>.</p>
+<hr>
+<h2>10. Easy Scaffold via Artisan CLI</h2>
+<p>Meld Artisan provides a one-command setup for an advanced local Docker development environment. It configures the PostgreSQL service alongside a browser-accessible VS Code Web IDE container (<code>code-server</code>) equipped with Node.js 22 and Git:</p>
+<pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan init-dev-env</code></pre>
+<p>This generates:</p>
+<ul>
+<li><code>Dockerfile.dev</code>: A development image configuration.</li>
+<li><code>docker-compose.dev.yml</code>: A Compose configuration file orchestration Postgres and the IDE container.</li>
+</ul>
+<p>Run <code>docker compose -f docker-compose.dev.yml up --build -d</code> and visit <code>http://localhost:8080</code> (password: <code>meldpass</code>) to instantly code in the container.</p>
 
 
         

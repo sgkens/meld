@@ -748,6 +748,21 @@ nav_order: 6</h2>
 <p>Generates a new component file (<code>.js</code>) with the necessary <code><a href="/api-reference/#defineMeld">defineMeld</a></code>, <code><a href="/api-reference/#meldState">meldState</a></code>, and <code><a href="/api-reference/#onMount">onMount</a></code> boilerplate.</p>
 <pre class="language-bash" tabindex="0"><code class="language-bash"><span class="token comment"># Creates components/user-profile.js</span>
 npx meld-artisan make:component user-profile</code></pre>
+<h3><code>init-dev-env</code></h3>
+<p>Initializes a complete, isolated Docker development environment with a pre-configured PostgreSQL service and a web-accessible VS Code IDE container (running Node.js 22, Git, and npm).</p>
+<pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan init-dev-env</code></pre>
+<p><strong>What it does:</strong></p>
+<ol>
+<li>Generates <code>Dockerfile.dev</code> with development tools.</li>
+<li>Generates <code>docker-compose.dev.yml</code> configuring the Postgres database and Code Server.</li>
+</ol>
+<p><strong>How to use:</strong></p>
+<ol>
+<li>Start the container environment:<pre class="language-bash" tabindex="0"><code class="language-bash"><span class="token function">docker</span> compose <span class="token parameter variable">-f</span> docker-compose.dev.yml up <span class="token parameter variable">--build</span> <span class="token parameter variable">-d</span></code></pre>
+</li>
+<li>Open your browser and navigate to <code>http://localhost:8080</code>.</li>
+<li>Log in using the password <code>meldpass</code> to start coding.</li>
+</ol>
 <h3><code>serve</code></h3>
 <p>Starts a local static server to correctly load ES Modules during development.</p>
 <pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan serve</code></pre>
