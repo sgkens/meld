@@ -8,8 +8,21 @@ export interface MeldHtml {
   (strings: TemplateStringsArray, ...values: any[]): DocumentFragment;
 }
 
+export interface SocketHandle {
+  status: 'connecting' | 'open' | 'closing' | 'closed' | 'reconnecting';
+  latency: number;
+  error: Error | null;
+  presence: string[];
+  send: (type: string, data?: any) => void;
+  subscribe: (channel: string, callback: (data: any) => void) => () => void;
+  request: (type: string, data?: any) => Promise<any>;
+  connect: () => void;
+  disconnect: () => void;
+}
+
 export interface MeldOptions {
   emit: (event: string, detail?: any) => void;
+  useSocket?: (urlOrOptions?: string | object) => SocketHandle;
   [key: string]: any;
 }
 

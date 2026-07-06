@@ -1,16 +1,38 @@
 {
   "name": "meld-vscode",
   "displayName": "Meld.js Support",
-  "description": "Syntax highlighting and snippets for Meld.js",
+  "description": "Rich developer tooling for Meld.js, including syntax highlighting, snippets, and typescript-plugin LSP completions.",
   "version": "1.0.0",
   "publisher": "meld-js",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/meldjs/meld.git"
+  },
+  "bugs": {
+    "url": "https://github.com/meldjs/meld/issues"
+  },
+  "homepage": "https://github.com/meldjs/meld/tree/main/meld-vscode#readme",
   "engines": {
     "vscode": "^1.70.0"
   },
   "categories": [
     "Programming Languages",
-    "Snippets"
+    "Snippets",
+    "Linters"
   ],
+  "scripts": {
+    "package": "npm run copy-lsp && vsce package",
+    "copy-lsp": "rm -rf node_modules/meld-lsp && mkdir -p node_modules/meld-lsp/out && cp ../meld-lsp/package.json node_modules/meld-lsp/ && cp ../meld-lsp/out/index.js node_modules/meld-lsp/out/"
+  },
+  "devDependencies": {
+    "@vscode/vsce": "^2.19.0"
+  },
+  "dependencies": {
+    "typescript-template-language-service-decorator": "^2.3.1",
+    "vscode-html-languageservice": "^5.1.0",
+    "vscode-languageserver-types": "^3.17.0"
+  },
   "contributes": {
     "grammars": [
       {

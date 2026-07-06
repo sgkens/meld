@@ -17,21 +17,21 @@ Use this tracker as the local source of truth for release hardening, testing gap
 - [ ] 🔴🌟⏳🔟 **Feature** - Epic: Build core framework test matrix covering meldState dependency tracking, computed cleanup, nested effects, no-op same-value sets, attribute bindings, event bindings, raw HTML rendering, Node replacement, list keyed reuse, lifecycle cleanup, provide/inject bubbling, theme adoption, and custom element duplicate-definition handling.
 - [ ] 🔴🌟⏳🔟 **Feature** - Epic: Build plugin test matrix for all src/plugins modules with isolated jsdom and mocked browser APIs for fetch, localStorage, cookies, BroadcastChannel, IntersectionObserver, WebAssembly, history/hash routing, document head mutations, file upload/download, and portal cleanup.
 
-- [ ] 🟠🌟⏳8️⃣ **Feature** - Finish meld-lsp TypeScript server plugin: install dependencies, make tsc build pass, implement real meldHtml template completions, diagnostics, hover data, and plugin/custom-element metadata loading.
-- [ ] 🟠🌟⏳8️⃣ **Feature** - Finish meld-vscode extension packaging: bundle or depend on meld-lsp, add VS Code package scripts, README, marketplace metadata, icon, license, vsce packaging, and extension smoke tests.
-- [ ] 🟠🌟❓8️⃣ **Feature** - Finish meld-socket WebSocket plugin integration: runtime hardening, package exports, type declarations, smoke tests, and merge readiness with develop.
+- [x] 🟠🌟⏳8️⃣ **Feature** - Finish meld-lsp TypeScript server plugin: install dependencies, make tsc build pass, implement real meldHtml template completions, diagnostics, hover data, and plugin/custom-element metadata loading.
+- [x] 🟠🌟⏳8️⃣ **Feature** - Finish meld-vscode extension packaging: bundle or depend on meld-lsp, add VS Code package scripts, README, marketplace metadata, icon, license, vsce packaging, and extension smoke tests.
+- [x] 🟠🌟❓8️⃣ **Feature** - Finish meld-socket WebSocket plugin integration: runtime hardening, package exports, type declarations, smoke tests, and merge readiness with develop.
   - Runtime/export/docs integration is in place; final verification is blocked until node/npm/npx are available for lint, tests, and docs build.
-- [ ] 🟠🌟❓8️⃣ **Feature** - Consolidate Meld docs UI: smaller H1 scale, site-wide API reference styling, Mermaid theme alignment, dismissible release banner, and benchmark harness for Meld/Vue/React/HTMX.
+- [x] 🟠🌟❓8️⃣ **Feature** - Consolidate Meld docs UI: smaller H1 scale, site-wide API reference styling, Mermaid theme alignment, dismissible release banner, and benchmark harness for Meld/Vue/React/HTMX.
   - Implementation is in place across docs templates, CSS, docs JS, benchmark harness, and performance docs; build/runtime verification is blocked until node/npm/npx are available.
 ### **Bug Fixes (priority-4)**
 
-- [ ] 🟠🦀❓7️⃣ **BugFix** - Fix meld-vscode TypeScript server plugin contribution: current package references meld-lsp by name but does not ship the plugin inside the extension package.
+- [x] 🟠🦀❓7️⃣ **BugFix** - Fix meld-vscode TypeScript server plugin contribution: current package references meld-lsp by name but does not ship the plugin inside the extension package.
 ### **Documentation (priority-5)**
 
 - [x] 🟠🌟✅7️⃣ **Docs** - Add docs collection index pages, fix collection breadcrumbs, and complete API reference links/highlighting
 ### **Refactoring (priority-6)**
 
-- [ ] 🟠🌟⏳7️⃣ **Refactoring** - Convert all 11ty theme templates (`default.njk`, `landing.njk`) into modular Nunjucks macro components. Extract: topbar, sidebar, TOC, footer, search-modal, breadcrumbs, doc-pager into `_includes/components/*.njk` macros so the theme is easy to develop, extend, and test in isolation. Follow skill fluent-ui-v1 SOT component approach.
+- [x] 🟠🌟⏳7️⃣ **Refactoring** - Convert all 11ty theme templates (`default.njk`, `landing.njk`) into modular Nunjucks macro components. Extract: topbar, sidebar, TOC, footer, search-modal, breadcrumbs, doc-pager into `_includes/components/*.njk` macros so the theme is easy to develop, extend, and test in isolation. Follow skill fluent-ui-v1 SOT component approach.
 
 ### **Refine Features (priority-7)**
 
@@ -44,4 +44,9 @@ Use this tracker as the local source of truth for release hardening, testing gap
  - [x] improve the collection index to instead of showing the file, show the Excerpt and the catagory and tags, this will make it easier to find the right page.
  - [x] gitlab/github icons are collections need reversing 
  - [x] the splash page has lost some of its color please have a loog see where we lost it and re-add it.
+ - [ ] meld artisan cli docs page has a double up remnants of the recents change consolidate it
+ - [ ] shoud we use the api layout of the strict-api-reference for the api pages to display api related data.
+ - [ ] Styling parameteter table first column needs let padding to make it easier to read.
+ - [ ] lets add solidjs, svelte, and react examples to the rendering page, we should also add a comparison of the different frameworks and how meld compares to them., also sveltkit, angular, nextjs, astro, and remix, we should also add a comparison of the different frameworks and how meld compares to them or hw meld is used with theme, remember we are comparing not to complete to define where meld sits what it can do what it cant. profrossional and open i dont like hiddent caviats, prefre straight up heres the pros and cons no builshit, if you want to build this, use this instead of.
+ - [ ] the splash code block sytax highlighting is not working, please fix it
 ### **Backlog**
