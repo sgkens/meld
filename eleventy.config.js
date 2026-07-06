@@ -9,6 +9,7 @@ const CATEGORY_ORDER = [
   'Core Concepts',
   'Plugins',
   'Plugin Ecosystem',
+  'Components',
   'Integrations',
   'Stacks',
   'Bootcamp',
@@ -36,6 +37,11 @@ export default function eleventyConfig(config) {
 
     const parts = inputPath.replace(/^\.?\/?docs\//, '').split('/');
     if (parts.length === 1) {
+      const slug = parts[0].replace(/\.(md|njk)$/, '');
+      const knownCategories = ['architecture', 'bootcamp', 'components', 'integrations', 'plugins', 'stacks', 'tooling'];
+      if (knownCategories.includes(slug)) {
+        return toTitleCase(slug);
+      }
       return 'Foundations';
     }
 

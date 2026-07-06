@@ -26,6 +26,10 @@
       "default": "./dist/meld.core.esm.js"
     },
     "./plugins/*": "./src/plugins/meld-*.js",
+    "./components": {
+      "import": "./src/components/index.js",
+      "default": "./src/components/index.js"
+    },
     "./components/*": "./src/components/*",
     "./bin/*": "./bin/*",
     "./package.json": "./package.json"
