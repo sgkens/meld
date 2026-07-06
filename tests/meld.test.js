@@ -6,6 +6,7 @@ import { MeldPortal } from '../src/plugins/meld-portal.js';
 import { MeldQuery } from '../src/plugins/meld-query.js';
 import { MeldQuiver } from '../src/plugins/meld-quiver.js';
 import { MeldWasm } from '../src/plugins/meld-wasm.js';
+import { MeldRouter } from '../src/plugins/meld-router.js';
 
 const tick = () => new Promise(resolve => setTimeout(resolve, 0));
 
@@ -75,6 +76,63 @@ describe('Meld Core Rendering', () => {
     defineMeld(tagName, () => meldHtml`<span>one</span>`);
 
     expect(() => defineMeld(tagName, () => meldHtml`<span>two</span>`)).not.toThrow();
+  });
+
+  it('updates reactive attributes dynamically', async () => {
+    const tagName = `m-test-attrs-${Date.now()}`;
+    defineMeld(tagName, (el, { attrs }) => {
+      return meldHtml`<div>Label: <span>${() => attrs.label || 'none'}</span></div>`;
+    }, { observedAttributes: ['label'] });
+
+    const element = document.createElement(tagName);
+    document.body.appendChild(element);
+
+    expect(element.shadowRoot.textContent).toContain('Label: none');
+
+    element.setAttribute('label', 'hello');
+    await tick();
+    expect(element.shadowRoot.textContent).toContain('Label: hello');
+
+    element.setAttribute('label', 'world');
+    await tick();
+    expect(element.shadowRoot.textContent).toContain('Label: world');
+  });
+
+  it('hydrates pre-rendered Declarative Shadow DOM non-destructively', async () => {
+    const tagName = `m-test-hydrate-${Date.now()}`;
+    
+    // 1. Create element BEFORE defining it (so it is not upgraded yet)
+    const element = document.createElement(tagName);
+    element.setAttribute('label', 'Pre-rendered Label');
+    
+    // 2. Attach shadow root manually to simulate Declarative Shadow DOM
+    const shadow = element.attachShadow({ mode: 'open' });
+    shadow.innerHTML = '<div>Label: <span>Pre-rendered Label</span></div>';
+
+    const preSpan = shadow.querySelector('span');
+    expect(shadow.innerHTML).toBe('<div>Label: <span>Pre-rendered Label</span></div>');
+
+    // 3. Define the component now
+    defineMeld(tagName, (el, { attrs }) => {
+      return meldHtml`<div>Label: <span>${() => attrs.label || 'none'}</span></div>`;
+    }, { observedAttributes: ['label'] });
+
+    // 4. Upgrade the element
+    customElements.upgrade(element);
+
+    // 5. Connect to DOM
+    document.body.appendChild(element);
+
+    // Should NOT wipe out the shadowRoot, maintaining DOM node identity!
+    const postSpan = shadow.querySelector('span');
+    expect(postSpan).toBe(preSpan);
+    expect(shadow.innerHTML).toBe('<div>Label: <span>Pre-rendered Label</span></div>');
+
+    // Should bind reactivity and update the same node in-place
+    element.setAttribute('label', 'hydrated-and-updated');
+    await tick();
+    expect(shadow.querySelector('span')).toBe(preSpan);
+    expect(shadow.innerHTML).toBe('<div>Label: <span>hydrated-and-updated</span></div>');
   });
 });
 
@@ -163,5 +221,38 @@ describe('Meld Plugins', () => {
 
     expect(wasm.loading).toBe(false);
     expect(wasm.error).toBe('Missing');
+  });
+
+  it('navigates between client-side routes and extracts parameters', async () => {
+    defineMeld('m-home', () => meldHtml`<div id="home">Welcome Home</div>`);
+    defineMeld('m-user', (el) => {
+      const userId = el.params ? el.params.id : 'unknown';
+      return meldHtml`<div id="user">User Profile: <span>${userId}</span></div>`;
+    });
+
+    const api = { defineMeld, meldState, meldHtml, computed, provide: () => {} };
+    MeldRouter.install(api, {
+      routes: [
+        { path: '/', component: 'm-home' },
+        { path: '/user/:id', component: 'm-user' }
+      ]
+    });
+
+    const view = document.createElement('meld-view');
+    document.body.appendChild(view);
+
+    window.location.hash = '#/';
+    await tick();
+    const homeEl = view.shadowRoot.querySelector('m-home');
+    expect(homeEl).not.toBeNull();
+    expect(homeEl.shadowRoot.querySelector('#home')).not.toBeNull();
+    expect(homeEl.shadowRoot.querySelector('#home').textContent).toBe('Welcome Home');
+
+    window.location.hash = '#/user/42';
+    await tick();
+    const userEl = view.shadowRoot.querySelector('m-user');
+    expect(userEl).not.toBeNull();
+    expect(userEl.shadowRoot.querySelector('#user')).not.toBeNull();
+    expect(userEl.shadowRoot.querySelector('#user').textContent).toBe('User Profile: 42');
   });
 });

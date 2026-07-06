@@ -152,7 +152,11 @@ export function meldHtml(strings, ...values) {
   template.innerHTML = htmlString;
   const fragment = template.content.cloneNode(true);
 
-  const walk = (node) => {
+  const hydrationNode = currentComponent && currentComponent._isHydrating ? currentComponent._hydrationTarget : null;
+
+  const walk = (node, hydNode) => {
+    const targetNode = hydNode || node;
+
     if (node.nodeType === 1) { 
       [...node.attributes].forEach(attr => {
         if (attr.value.startsWith("__meld_")) {
@@ -160,23 +164,23 @@ export function meldHtml(strings, ...values) {
           const value = values[idx];
 
           if (attr.name === "ref") {
-            if (typeof value === "function") value(node);
-            node.removeAttribute("ref");
+            if (typeof value === "function") value(targetNode);
+            targetNode.removeAttribute("ref");
           } else if (attr.name.startsWith("on")) {
             const evt = attr.name.slice(2).toLowerCase();
-            node.removeEventListener(evt, value);
-            node.addEventListener(evt, value);
-            node.removeAttribute(attr.name);
+            targetNode.removeEventListener(evt, value);
+            targetNode.addEventListener(evt, value);
+            targetNode.removeAttribute(attr.name);
           } else {
             if (typeof value === "function") {
               createEffect(() => {
                  const res = value();
-                 if (res === false || res === null || res === undefined) node.removeAttribute(attr.name);
-                 else if (res === true) node.setAttribute(attr.name, "");
-                 else node.setAttribute(attr.name, res);
+                 if (res === false || res === null || res === undefined) targetNode.removeAttribute(attr.name);
+                 else if (res === true) targetNode.setAttribute(attr.name, "");
+                 else targetNode.setAttribute(attr.name, res);
               });
             } else {
-              node.setAttribute(attr.name, value);
+              targetNode.setAttribute(attr.name, value);
             }
           }
         }
@@ -186,12 +190,12 @@ export function meldHtml(strings, ...values) {
     if (node.nodeType === 3 && node.nodeValue.includes("__meld_")) {
       const idx = parseInt(node.nodeValue.replace("__meld_", "").replace("__", ""));
       const value = values[idx];
-      const parent = node.parentNode;
+      const parent = targetNode.parentNode;
 
       if (typeof value === "function") {
         const start = document.createTextNode("");
         const end = document.createTextNode("");
-        parent.replaceChild(end, node);
+        parent.replaceChild(end, targetNode);
         parent.insertBefore(start, end);
 
         const clearDynamicNodes = () => {
@@ -219,25 +223,33 @@ export function meldHtml(strings, ...values) {
           }
         });
       } else {
-        node.nodeValue = value;
+        targetNode.nodeValue = value;
       }
     }
     let child = node.firstChild;
+    let hydChild = hydNode ? hydNode.firstChild : null;
     while (child) {
       const next = child.nextSibling;
-      walk(child);
+      const hydNext = hydChild ? hydChild.nextSibling : null;
+      walk(child, hydChild);
       child = next;
+      hydChild = hydNext;
     }
   };
-  walk(fragment);
+  walk(fragment, hydrationNode);
   return fragment;
 }
 
 // 6. COMPONENT DEFINITION (Updated for v1.4 Hydration)
 // --------------------------------------------------------
-export function defineMeld(tagName, setupFn) {
+export function defineMeld(tagName, setupFn, options = {}) {
   if (customElements.get(tagName)) return;
+  const observed = options.observedAttributes || [];
   customElements.define(tagName, class extends HTMLElement {
+    static get observedAttributes() {
+      return observed;
+    }
+
     constructor() {
       super();
       // v1.4 Change: Check if Declarative Shadow DOM exists
@@ -250,6 +262,18 @@ export function defineMeld(tagName, setupFn) {
       this.mountHooks = [];
       this.destroyHooks = [];
       this.effects = [];
+
+      const attrsObj = {};
+      observed.forEach(attr => {
+        attrsObj[attr] = this.getAttribute(attr);
+      });
+      this._meldAttrs = meldState(attrsObj);
+    }
+
+    attributeChangedCallback(name, oldValue, newValue) {
+      if (oldValue !== newValue && this._meldAttrs) {
+        this._meldAttrs[name] = newValue;
+      }
     }
 
     connectedCallback() {
@@ -270,14 +294,15 @@ export function defineMeld(tagName, setupFn) {
       };
 
       try {
-        const template = setupFn(this, { emit, ...extensionContext });
-        if (template) {
-          if (this._isHydrating) {
-            this.shadowRoot.innerHTML = ''; 
-            this._isHydrating = false;
-          }
+        if (this._isHydrating) {
+          this._hydrationTarget = this.shadowRoot;
+        }
+        const template = setupFn(this, { emit, attrs: this._meldAttrs, ...extensionContext });
+        if (template && !this._isHydrating) {
           this.shadowRoot.appendChild(template);
         }
+        this._isHydrating = false;
+        this._hydrationTarget = null;
         this.mountHooks.forEach(fn => fn());
       } finally {
         currentComponent = previousComponent;

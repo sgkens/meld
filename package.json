@@ -43,6 +43,7 @@
     "lint": "eslint src/**/*.js",
     "lint:fix": "eslint src/**/*.js --fix",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
+    "lsp:generate": "node tools/generate-custom-data.js",
     "serve": "vite --host 0.0.0.0",
     "docs": "npm run docs:serve",
     "docs:build": "eleventy --config=eleventy.config.js --input=docs --output=_site",

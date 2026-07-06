@@ -1,0 +1,290 @@
+{
+  "version": 1.1,
+  "tags": [
+    {
+      "name": "m-alert",
+      "description": "Meld UI Alert banner notice.",
+      "attributes": [
+        {
+          "name": "variant",
+          "description": "Theme variant: 'info', 'success', 'warning', 'danger'."
+        }
+      ]
+    },
+    {
+      "name": "m-avatar",
+      "description": "Meld custom component <m-avatar>.",
+      "attributes": [
+        {
+          "name": "src",
+          "description": "Attribute 'src' on <m-avatar>."
+        },
+        {
+          "name": "name",
+          "description": "Attribute 'name' on <m-avatar>."
+        }
+      ]
+    },
+    {
+      "name": "m-badge",
+      "description": "Meld UI Category or Status Badge.",
+      "attributes": [
+        {
+          "name": "variant",
+          "description": "Theme variant: 'info', 'success', 'warning', 'danger'."
+        }
+      ]
+    },
+    {
+      "name": "m-table",
+      "description": "Meld custom component <m-table>.",
+      "attributes": [
+        {
+          "name": "columns",
+          "description": "Attribute 'columns' on <m-table>."
+        },
+        {
+          "name": "data",
+          "description": "Attribute 'data' on <m-table>."
+        }
+      ]
+    },
+    {
+      "name": "m-toast-provider",
+      "description": "Meld custom component <m-toast-provider>.",
+      "attributes": []
+    },
+    {
+      "name": "m-button",
+      "description": "Meld UI Button component.",
+      "attributes": [
+        {
+          "name": "variant",
+          "description": "Visual variant: 'primary', 'secondary', 'danger', or 'ghost'."
+        },
+        {
+          "name": "size",
+          "description": "Button sizing: 'sm', 'md', 'lg'."
+        },
+        {
+          "name": "loading",
+          "description": "Displays a loading spinner and disables interaction."
+        }
+      ]
+    },
+    {
+      "name": "m-input",
+      "description": "Meld UI Text Input component.",
+      "attributes": [
+        {
+          "name": "label",
+          "description": "Heading label text."
+        },
+        {
+          "name": "error",
+          "description": "Attribute 'error' on <m-input>."
+        },
+        {
+          "name": "type",
+          "description": "Input element type (e.g. 'text', 'password', 'email')."
+        },
+        {
+          "name": "value",
+          "description": "Current text value."
+        },
+        {
+          "name": "placeholder",
+          "description": "Placeholder helper text."
+        }
+      ]
+    },
+    {
+      "name": "m-select",
+      "description": "Meld UI Dropdown Select component.",
+      "attributes": [
+        {
+          "name": "options",
+          "description": "Attribute 'options' on <m-select>."
+        },
+        {
+          "name": "value",
+          "description": "Currently selected option value."
+        }
+      ]
+    },
+    {
+      "name": "m-switch",
+      "description": "Meld UI Toggle Switch component.",
+      "attributes": [
+        {
+          "name": "checked",
+          "description": "Boolean state."
+        }
+      ]
+    },
+    {
+      "name": "m-card",
+      "description": "Meld custom component <m-card>.",
+      "attributes": []
+    },
+    {
+      "name": "m-divider",
+      "description": "Meld custom component <m-divider>.",
+      "attributes": []
+    },
+    {
+      "name": "m-drawer",
+      "description": "Meld UI Slide-out Side Drawer component.",
+      "attributes": [
+        {
+          "name": "open",
+          "description": "Visual open state."
+        },
+        {
+          "name": "side",
+          "description": "Attribute 'side' on <m-drawer>."
+        }
+      ]
+    },
+    {
+      "name": "m-group",
+      "description": "Meld UI Horizontal Group Layout component.",
+      "attributes": []
+    },
+    {
+      "name": "m-modal",
+      "description": "Meld custom component <m-modal>.",
+      "attributes": [
+        {
+          "name": "open",
+          "description": "Attribute 'open' on <m-modal>."
+        }
+      ]
+    },
+    {
+      "name": "m-stack",
+      "description": "Meld UI Vertical Stack Layout component.",
+      "attributes": [
+        {
+          "name": "gap",
+          "description": "Vertical spacing gap size: 'sm', 'md', 'lg'."
+        },
+        {
+          "name": "vertical",
+          "description": "Attribute 'vertical' on <m-stack>."
+        },
+        {
+          "name": "align",
+          "description": "Attribute 'align' on <m-stack>."
+        }
+      ]
+    },
+    {
+      "name": "m-breadcrumb",
+      "description": "Meld custom component <m-breadcrumb>.",
+      "attributes": []
+    },
+    {
+      "name": "m-dropdown",
+      "description": "Meld custom component <m-dropdown>.",
+      "attributes": []
+    },
+    {
+      "name": "m-tabs",
+      "description": "Meld custom component <m-tabs>.",
+      "attributes": []
+    },
+    {
+      "name": "inertia-root",
+      "description": "Meld custom component <inertia-root>.",
+      "attributes": []
+    },
+    {
+      "name": "meld-lazy",
+      "description": "Meld custom component <meld-lazy>.",
+      "attributes": [
+        {
+          "name": "src",
+          "description": "Attribute 'src' on <meld-lazy>."
+        },
+        {
+          "name": "tag",
+          "description": "Attribute 'tag' on <meld-lazy>."
+        }
+      ]
+    },
+    {
+      "name": "meld-markdown",
+      "description": "Meld custom component <meld-markdown>.",
+      "attributes": [
+        {
+          "name": "content",
+          "description": "Attribute 'content' on <meld-markdown>."
+        }
+      ]
+    },
+    {
+      "name": "meld-portal",
+      "description": "Meld custom component <meld-portal>.",
+      "attributes": []
+    },
+    {
+      "name": "meld-view",
+      "description": "Meld custom component <meld-view>.",
+      "attributes": []
+    },
+    {
+      "name": "meld-skeleton",
+      "description": "Meld custom component <meld-skeleton>.",
+      "attributes": [
+        {
+          "name": "width",
+          "description": "Attribute 'width' on <meld-skeleton>."
+        },
+        {
+          "name": "height",
+          "description": "Attribute 'height' on <meld-skeleton>."
+        },
+        {
+          "name": "circle",
+          "description": "Attribute 'circle' on <meld-skeleton>."
+        }
+      ]
+    },
+    {
+      "name": "meld-terminal",
+      "description": "Meld custom component <meld-terminal>.",
+      "attributes": []
+    },
+    {
+      "name": "meld-time",
+      "description": "Meld custom component <meld-time>.",
+      "attributes": [
+        {
+          "name": "date",
+          "description": "Attribute 'date' on <meld-time>."
+        },
+        {
+          "name": "format",
+          "description": "Attribute 'format' on <meld-time>."
+        }
+      ]
+    },
+    {
+      "name": "meld-upload",
+      "description": "Meld custom component <meld-upload>.",
+      "attributes": []
+    },
+    {
+      "name": "meld-slot",
+      "description": "Slot projection target for Shadow DOM composition.",
+      "attributes": []
+    }
+  ],
+  "globalAttributes": [
+    {
+      "name": "ref",
+      "description": "Get a direct reference to the DOM element."
+    }
+  ]
+}

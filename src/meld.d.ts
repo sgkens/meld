@@ -22,14 +22,21 @@ export interface SocketHandle {
 
 export interface MeldOptions {
   emit: (event: string, detail?: any) => void;
+  attrs: Record<string, any>;
   useSocket?: (urlOrOptions?: string | object) => SocketHandle;
+  [key: string]: any;
+}
+
+export interface DefineMeldOptions {
+  observedAttributes?: string[];
   [key: string]: any;
 }
 
 /** Registers a new Meld component */
 export function defineMeld(
   tagName: string, 
-  setupFn: (el: HTMLElement, context: MeldOptions) => DocumentFragment | void
+  setupFn: (el: HTMLElement, context: MeldOptions) => DocumentFragment | void,
+  options?: DefineMeldOptions
 ): void;
 
 /** Creates a deep reactive proxy state */

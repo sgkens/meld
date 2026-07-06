@@ -83,3 +83,98 @@ meld.theme(`
   * { box-sizing: border-box; }
 `);
 ```
+
+---
+
+## 🆚 Framework Comparisons & Code Parity
+
+To understand where **Meld.js** fits in the modern web landscape, it helps to see how the same reactive component (a simple Counter button) is written in different libraries.
+
+### Code Comparison
+
+```carousel
+```javascript
+// --- MELD.js (2kb, Native Web Component, Zero Build) ---
+import { defineMeld, meldState, meldHtml } from 'meld';
+
+defineMeld('reactive-counter', () => {
+  const state = meldState({ count: 0 });
+  return meldHtml`
+    <button onclick="${() => state.count++}">
+      Count is: ${() => state.count}
+    </button>
+  `;
+});
+```
+<!-- slide -->
+```javascript
+// --- SOLIDJS (6kb, Reactive JSX, Needs Build Step) ---
+import { createSignal } from 'solid-js';
+
+function Counter() {
+  const [count, setCount] = createSignal(0);
+  return (
+    <button onClick={() => setCount(count() + 1)}>
+      Count is: {count()}
+    </button>
+  );
+}
+```
+<!-- slide -->
+```html
+<!-- --- SVELTE (4kb, Compiled Templates, Needs Build Step) --- -->
+<script>
+  let count = 0;
+</script>
+
+<button on:click={() => count++}>
+  Count is: {count}
+</button>
+```
+<!-- slide -->
+```javascript
+// --- REACT (40kb+, Virtual DOM Hooks, Needs Build Step) ---
+import React, { useState } from 'react';
+
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      Count is: {count}
+    </button>
+  );
+}
+```
+````
+
+### No-Bullshit Framework Guide
+
+When deciding whether to use Meld or another framework, here is an honest assessment of the pros, cons, and appropriate use cases:
+
+#### 1. React vs. Meld
+*   **Use React if:** You are building an expansive single-page app (SPA) with a massive developer team, complex client-side state, or need access to a huge ecosystem of pre-existing packages (UI component libraries, charts, forms).
+*   **Avoid React (and use Meld) if:** You are embedding interactive widgets inside a CMS (WordPress, Drupal) or server-rendered site, or building micro-frontends. React's heavy runtime overhead, Virtual DOM reconciliation, and hooks lifecycle are overkill for isolated widgets.
+
+#### 2. SolidJS vs. Meld
+*   **Use SolidJS if:** You love reactive state (proxies/signals) but want to build a complete, large-scale application using JSX and have a bundler-based build pipeline (Vite, Rollup) in place.
+*   **Use Meld if:** You want the same fine-grained reactivity but require **zero build tools**. Meld runs natively in any browser via ES Modules, making it ideal for rapid prototyping or drop-in scripts.
+
+#### 3. Svelte vs. Meld
+*   **Use Svelte if:** You prefer compiler-guaranteed optimal performance and a clean, HTML-like single-file-component (SFC) style for your standalone applications.
+*   **Use Meld if:** You do not want a compilation step. Svelte is useless without its compiler; Meld works natively directly in standard HTML/JS files.
+
+#### 4. Angular vs. Meld
+*   **Use Angular if:** You are building massive enterprise-level portals with strict modular architectures, built-in dependency injection, and strict TypeScript patterns.
+*   **Use Meld if:** You want a lightweight element that doesn't drag a multi-megabyte framework along with it.
+
+---
+
+## 🌐 Next.js, SvelteKit, Remix, and Astro Integration
+
+Meld does not compete with full-stack meta-frameworks. Instead, it serves as an **isolated client-side widget provider**.
+
+| Meta-Framework | Role of Meld.js | How to use |
+| :--- | :--- | :--- |
+| **Astro** | Perfect for interactive "islands" | Embed Meld elements inside Astro templates; use Declarative Shadow DOM (DSD) for hydration. |
+| **Next.js** | Client-side micro-widget | Import Meld components inside client components (`"use client"`) using dynamic imports to bypass Node SSR environment errors. |
+| **SvelteKit / Remix** | Isolated dashboard widget | Embed as custom elements, leveraging Meld's context-isolation to prevent style/state pollution. |

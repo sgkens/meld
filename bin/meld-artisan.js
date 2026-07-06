@@ -8,6 +8,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { execSync } from 'node:child_process';
+import { generateCustomData } from '../tools/generate-custom-data.js';
 
 // --- 🎨 GEMINI.MD PALETTE & UI ---
 const Palette = {
@@ -82,6 +83,13 @@ const COMMANDS = {
   'types': {
     desc: 'Generate IntelliSense types.',
     run: () => generateTypes()
+  },
+  'lsp:generate': {
+    desc: 'Generate VS Code HTML Custom Data completions JSON.',
+    run: () => {
+      UI.header("Generating LSP Custom HTML Data");
+      generateCustomData();
+    }
   }
 };
 
@@ -101,7 +109,7 @@ function launchDashboard() {
     UI.divider();
     UI.h3("Quick Actions");
     console.log("  [s] Start Dev Server");
-    console.log("  [t] Generate Types");
+    console.log("  [t] Generate Types & LSP Custom Data");
     console.log("  [q] Exit Dashboard");
     UI.divider();
     process.stdout.write(`${Palette.primary}artisan > ${Palette.reset}`);
@@ -124,7 +132,8 @@ function launchDashboard() {
     }
     if (key === 't') {
       generateTypes();
-      setTimeout(draw, 1500);
+      generateCustomData();
+      setTimeout(draw, 2500);
     }
   });
 }
