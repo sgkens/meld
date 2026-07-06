@@ -241,6 +241,61 @@ publish:jsr:auto:
     name: JSR
     url: https://jsr.io/@meldjs/meld
 
+# ------------------------------------------------------
+# Deploy meld-lsp language server to npm
+# ------------------------------------------------------
+deploy:lsp:
+  stage: deploy
+  needs:
+    - job: build
+      artifacts: true
+  before_script:
+    - cd meld-lsp
+    - PACKAGE_NAME=$(node -p "require('./package.json').name")
+    - PACKAGE_VERSION=$(node -p "require('./package.json').version")
+    - echo "🔎 Checking registry for ${PACKAGE_NAME}@${PACKAGE_VERSION}..."
+    - |
+      if [[ $(npm view "${PACKAGE_NAME}@${PACKAGE_VERSION}" version 2>/dev/null) ]]; then
+        echo "🛑 Version ${PACKAGE_VERSION} is already published to npm. Skipping."
+        exit 0
+      else
+        echo "🟢 Version ${PACKAGE_VERSION} is new. Publishing..."
+      fi
+  script:
+    - npm install -g npm@latest
+    - npm publish --access public
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+.*$/
+      when: always
+
+# ------------------------------------------------------
+# Deploy meld-vscode extension to VS Code Marketplace
+# ------------------------------------------------------
+deploy:vscode:
+  stage: deploy
+  needs:
+    - job: build
+      artifacts: true
+  before_script:
+    - cd meld-vscode
+    - PACKAGE_VERSION=$(node -p "require('./package.json').version")
+    - echo "🔎 Checking VS Code Marketplace for meld-js.meld-vscode@${PACKAGE_VERSION}..."
+    - |
+      PUBLISHED_VERSION=$(npx -y @vscode/vsce show meld-js.meld-vscode --json 2>/dev/null | jq -r '.version' || echo "none")
+      if [ "$PUBLISHED_VERSION" = "$PACKAGE_VERSION" ]; then
+        echo "🛑 Version ${PACKAGE_VERSION} is already published to VS Code Marketplace. Skipping."
+        exit 0
+      else
+        echo "🟢 Version ${PACKAGE_VERSION} is new. Publishing..."
+      fi
+  script:
+    - npm install
+    - npx -y @vscode/vsce publish -p ${VSCE_TOKEN}
+  rules:
+    - if: $CI_COMMIT_TAG =~ /^v?\d+\.\d+\.\d+.*$/
+      when: always
+
+
 # # ------------------------------------------------------
 # # Generate release notes
 # # ------------------------------------------------------

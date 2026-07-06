@@ -62,6 +62,10 @@ const COMMANDS = {
     args: '<name>',
     run: (name) => scaffold(name)
   },
+  'init-dev-env': {
+    desc: 'Initialize the local Docker development environment with all stack tools & VS Code Web.',
+    run: () => initDevEnv()
+  },
   'make:component': {
     desc: 'Create a UI component.',
     args: '<tag>',
@@ -170,6 +174,80 @@ function createComp(tag) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir);
   fs.writeFileSync(path.join(dir, `${tag}.js`), `// ${tag} component`);
   UI.log(Icons.success, `Component ${tag} created in ${dir}/`);
+}
+
+function initDevEnv() {
+  UI.header("Initializing Docker Development Environment");
+
+  const dockerfileContent = `FROM codercom/code-server:latest
+
+USER root
+
+# Install Node.js, npm, git, build-essential, and postgresql-client
+RUN apt-get update && apt-get install -y \\
+    curl \\
+    git \\
+    build-essential \\
+    postgresql-client \\
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \\
+    && apt-get install -y nodejs \\
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+USER coder
+WORKDIR /home/coder/project
+`;
+
+  const composeContent = `version: '3.8'
+
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: meldjs-workspace
+    ports:
+      - "8080:8080"   # VS Code Web Interface
+      - "5173:5173"   # Vite Dev Server / Frontend Stack
+      - "3000:3000"   # Backend API / Express / Next.js
+    volumes:
+      - .:/home/coder/project
+    environment:
+      - PASSWORD=meldpass  # Login password for VS Code Web (port 8080)
+      - DATABASE_URL=postgresql://melduser:meldpass@postgres:5432/melddb
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: meldjs-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=melduser
+      - POSTGRES_PASSWORD=meldpass
+      - POSTGRES_DB=melddb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
+`;
+
+  try {
+    fs.writeFileSync('Dockerfile.dev', dockerfileContent);
+    UI.log(Icons.step, "Created Dockerfile.dev");
+
+    fs.writeFileSync('docker-compose.dev.yml', composeContent);
+    UI.log(Icons.step, "Created docker-compose.dev.yml");
+
+    UI.log(Icons.success, `${Palette.success}Docker environment files created successfully!${Palette.reset}`);
+    console.log(`\nTo launch the development environment, run:`);
+    console.log(`  ${Palette.primary}docker compose -f docker-compose.dev.yml up --build -d${Palette.reset}`);
+    console.log(`\nOnce started, access your VS Code Web workspace at:`);
+    console.log(`  ${Palette.success}http://localhost:8080${Palette.reset} (password: ${Palette.primary}meldpass${Palette.reset})\n`);
+  } catch (e) {
+    UI.log(Icons.error, `${Palette.danger}Failed to write docker files: ${e.message}${Palette.reset}`);
+  }
 }
 
 // --- 🚀 ENTRY ---

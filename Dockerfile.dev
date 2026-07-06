@@ -1,0 +1,16 @@
+FROM codercom/code-server:latest
+
+USER root
+
+# Install Node.js, npm, git, build-essential, and postgresql-client
+RUN apt-get update && apt-get install -y \
+    curl \
+    git \
+    build-essential \
+    postgresql-client \
+    && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+    && apt-get install -y nodejs \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+USER coder
+WORKDIR /home/coder/project

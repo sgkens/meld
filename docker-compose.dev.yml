@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  workspace:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: meldjs-workspace
+    ports:
+      - "8080:8080"   # VS Code Web Interface
+      - "5173:5173"   # Vite Dev Server / Frontend Stack
+      - "3000:3000"   # Backend API / Express / Next.js
+    volumes:
+      - .:/home/coder/project
+    environment:
+      - PASSWORD=meldpass  # Login password for VS Code Web (port 8080)
+      - DATABASE_URL=postgresql://melduser:meldpass@postgres:5432/melddb
+    depends_on:
+      - postgres
+
+  postgres:
+    image: postgres:16-alpine
+    container_name: meldjs-postgres
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=melduser
+      - POSTGRES_PASSWORD=meldpass
+      - POSTGRES_DB=melddb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
