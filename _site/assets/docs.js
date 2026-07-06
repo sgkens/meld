@@ -312,8 +312,18 @@ const scrollSidebarToActive = () => {
   if (!sidebar) return;
   const active = $('[aria-current="page"]', sidebar);
   if (!active) return;
-  // Smooth scroll within the aside
-  active.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+
+  const activeRect = active.getBoundingClientRect();
+  const sidebarRect = sidebar.getBoundingClientRect();
+  const relativeTop = activeRect.top - sidebarRect.top;
+  
+  // Position the active item 15% of sidebar height from the top
+  const targetScrollTop = sidebar.scrollTop + relativeTop - (sidebar.clientHeight * 0.15);
+
+  sidebar.scrollTo({
+    top: Math.max(0, targetScrollTop),
+    behavior: 'smooth'
+  });
 };
 
 /* --------------------------------------------------------------------------
@@ -764,6 +774,7 @@ const bindReleaseBanner = () => {
   const storageKey = `meld-docs-release-dismissed:${id}`;
   const hideBanner = () => {
     banner.hidden = true;
+    banner.style.display = 'none';
     delete document.body.dataset.releaseBanner;
   };
 

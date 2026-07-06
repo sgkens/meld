@@ -32,12 +32,25 @@
     <a class="skip-link" href="#content">Skip to content</a>
 
     
+
 <aside
   class="release-banner"
   data-release-banner
   data-release-id="meld-launch-2026-07"
   aria-label="Release notice"
 >
+  <script>
+    (function() {
+      var id = "meld-launch-2026-07";
+      try {
+        if (localStorage.getItem('meld-docs-release-dismissed:' + id) === 'true') {
+          document.currentScript.parentElement.style.display = 'none';
+        } else {
+          document.body.dataset.releaseBanner = 'visible';
+        }
+      } catch (e) {}
+    })();
+  </script>
   <div class="release-banner__inner">
     <span class="release-banner__eyebrow">Release</span>
     <p>Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.</p>
@@ -537,7 +550,7 @@
           <a
             href="/tooling/cli/"
             aria-current="page"
-            data-excerpt="Reference for the Meld Artisan CLI — project scaffolding, component and plugin generation, local dev server, and build commands."
+            data-excerpt="Reference for the Meld Artisan CLI — project scaffolding, component and plugin generation, local dev server, and build dev environments."
             data-tags="tooling,cli,artisan,scaffolding,build,dev-server"
           >
             <i data-lucide="file-text"></i>
@@ -579,151 +592,6 @@
         </div>
 
         <h1>Meld Artisan CLI</h1>
-<p><strong>Meld Artisan</strong> is a command-line interface (CLI) designed to streamline your development workflow. Inspired by Laravel's Artisan, it eliminates boilerplate and manages project structure.</p>
-<pre>
-__  __     _     _   
- |  \/  |___| | __| |  The 2kb Micro-Frontend Engine
- | |\/| / -_) |/ _` |  Artisan CLI v2.0
- |_|  |_\___|_|\__,_|  
-
-Available commands:
-
-  init                 <name>
-  └─ Create a new client-side Meld project.
-
-  init:stack           <name>
-  └─ Scaffold the full KMEL Stack (Knex, Meld, Express, Lucia).
-
-  make:component       <tag-name>
-  └─ Create a new UI component file.
-
-  make:plugin          <PluginName>
-  └─ Create a boilerplate for a custom plugin.
-
-  install:plugin       <plugin-name>
-  └─ Install an official plugin (router, query, store).
-
-  serve                
-  └─ Start the development server.
-</pre>
-<h3>Getting Started</h3>
-<p>You do not need to install Artisan globally. It is designed to be run on-demand using <code>npx</code>.</p>
-<p><strong>Prerequisites:</strong></p>
-<ul>
-<li><strong>Node.js</strong> (v14+)</li>
-<li><strong>npm</strong> (comes with Node)</li>
-</ul>
-<hr>
-<h3>Command Reference</h3>
-<h4>1. <code>init</code></h4>
-<p>Initializes a new Meld project in a specific directory. It sets up the standard folder structure and creates the entry points.</p>
-<p><strong>Usage:</strong></p>
-<pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan init <span class="token operator">&lt;</span>project-name<span class="token operator">></span></code></pre>
-<p><strong>What it does:</strong></p>
-<ol>
-<li>Creates a directory named <code>&lt;project-name&gt;</code>.</li>
-<li>Generates <code>index.html</code> with the correct ES Module imports.</li>
-<li>Creates <code>src/</code> (for the core engine) and <code>components/</code> (for your UI).</li>
-<li>Generates a starter <code>&lt;app-root&gt;</code> component.</li>
-</ol>
-<p><strong>Example Output:</strong></p>
-<pre class="language-text" tabindex="0"><code class="language-text">/my-app
-├── index.html
-├── src/
-│   └── meld.core.js (Placeholder)
-└── components/
-    └── app-root.js</code></pre>
-<hr>
-<h4>2. <code>make:component</code></h4>
-<p>Generates a new component file with the necessary imports, state setup, and lifecycle hooks pre-filled.</p>
-<p><strong>Usage:</strong></p>
-<pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan make:component <span class="token operator">&lt;</span>tag-name<span class="token operator">></span></code></pre>
-<p><strong>Rules:</strong></p>
-<ul>
-<li><code>&lt;tag-name&gt;</code> <strong>must</strong> contain a hyphen (e.g., <code>nav-bar</code>, <code>user-card</code>) to comply with the Custom Elements spec.</li>
-</ul>
-<p><strong>Example:</strong></p>
-<pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan make:component user-card</code></pre>
-<p><strong>Result (<code>components/user-card.js</code>):</strong></p>
-<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml<span class="token punctuation">,</span> meldState<span class="token punctuation">,</span> onMount <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'../src/meld.core.js'</span><span class="token punctuation">;</span>
-
-<span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'user-card'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> emit <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
-  <span class="token keyword">const</span> state <span class="token operator">=</span> <span class="token function">meldState</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
-    <span class="token comment">// Reactive state goes here</span>
-  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token function">onMount</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'user-card mounted'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
-    &lt;style>
-      :host { display: block; }
-    &lt;/style>
-    
-    &lt;div>
-      &lt;h3>User Card&lt;/h3>
-    &lt;/div>
-  </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
-<hr>
-<h4>3. <code>serve</code></h4>
-<p>Starts a lightweight, static development server.</p>
-<p><strong>Why do I need this?</strong> Meld uses native ES Modules (<code>import ... from ...</code>). Browsers block these imports when opening a file directly from the file system (<code>file://</code>) for security reasons. You must serve your app via HTTP (<code>http://localhost...</code>).</p>
-<p><strong>Usage:</strong></p>
-<pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan serve</code></pre>
-<ul>
-<li><strong>Port:</strong> Default is usually <code>3000</code> or <code>5000</code> (depending on the environment).</li>
-<li><strong>Live Reload:</strong> (Optional feature depending on implementation).</li>
-</ul>
-<hr>
-<h3>Workflow Example</h3>
-<p>Here is a typical workflow for starting a new Meld application:</p>
-<ol>
-<li>
-<p><strong>Create the project:</strong></p>
-<pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan init my-dashboard
-<span class="token builtin class-name">cd</span> my-dashboard</code></pre>
-</li>
-<li>
-<p><strong>Create your first components:</strong></p>
-<pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan make:component side-bar
-npx meld-artisan make:component data-chart</code></pre>
-</li>
-<li>
-<p><strong>Start the server:</strong></p>
-<pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan serve</code></pre>
-</li>
-<li>
-<p><strong>Open Browser:</strong>     Go to <code>http://localhost:3000</code> to see your app running.</p>
-</li>
-</ol>
-<hr>
-<h3>Configuration</h3>
-<p>Meld Artisan is &quot;Zero Configuration&quot; by default. It assumes the following standard directory structure:</p>
-<ul>
-<li><strong>Core:</strong> <code>../src/meld.core.js</code> (relative to the components folder)</li>
-<li><strong>Components:</strong> <code>./components/</code></li>
-</ul>
-<p>If you change your folder structure manually, you may need to update the import paths in your generated components.</p>
-<p>==========================================</p>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<blockquote>
-<p>V2</p>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-</blockquote>
-<hr>
-<h2>title: Artisan CLI
-nav_order: 6</h2>
-<h1>Meld Artisan CLI</h1>
 <p>Artisan is your command-line companion, automating setup and component generation.</p>
 <h2>1. Global Usage</h2>
 <p>Artisan is run via <code>npx</code> (Node Package Execute), meaning you don't need to install it globally.</p>
@@ -739,7 +607,6 @@ nav_order: 6</h2>
 <li>Generates <code>knexfile.js</code> and database migrations.</li>
 <li>Includes <code>package.json</code> with required dependencies.</li>
 </ul>
-<!-- end list -->
 <pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan init:stack my-startup</code></pre>
 <blockquote>
 <p><strong>Action:</strong> After running, you must execute <code>npm install</code> and <code>npm run db:migrate</code>.</p>

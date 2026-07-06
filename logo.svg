@@ -1,11 +1,140 @@
-<svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Meld.js logo">
-  <defs>
-    <mask id="seam-mask">
-      <rect x="0" y="0" width="120" height="120" fill="white" />
-      <line x1="60" y1="48" x2="60" y2="72" stroke="black" stroke-width="14" stroke-linecap="round"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   viewBox="0 0 512 512"
+   role="img"
+   aria-label="Meld.js logo"
+   version="1.1"
+   id="svg2"
+   sodipodi:docname="logo.svg"
+   width="512"
+   height="512"
+   inkscape:version="1.4 (e7c3feb100, 2024-10-09)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview2"
+     pagecolor="#ffffff"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:zoom="0.89384753"
+     inkscape:cx="271.29906"
+     inkscape:cy="299.26804"
+     inkscape:window-width="1440"
+     inkscape:window-height="899"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg2" />
+  <defs
+     id="defs1">
+    <clipPath
+       clipPathUnits="userSpaceOnUse"
+       id="clipPath5">
+      <rect
+         style="fill:#000000;stroke:#000000;stroke-width:0;stroke-linejoin:bevel;paint-order:stroke markers fill;stop-color:#000000"
+         id="rect5-4"
+         width="20"
+         height="200"
+         x="530"
+         y="595" />
+    </clipPath>
+    <mask
+       id="seam-mask">
+      <rect
+         x="0"
+         y="0"
+         width="120"
+         height="120"
+         fill="#ffffff"
+         id="rect1" />
+      <line
+         x1="60"
+         y1="48"
+         x2="60"
+         y2="72"
+         stroke="#000000"
+         stroke-width="14"
+         stroke-linecap="round"
+         id="line1" />
+    </mask>
+    <mask
+       id="seam-mask-6">
+      <rect
+         x="0"
+         y="0"
+         width="120"
+         height="120"
+         fill="#ffffff"
+         id="rect1-7" />
+      <line
+         x1="60"
+         y1="48"
+         x2="60"
+         y2="72"
+         stroke="#000000"
+         stroke-width="14"
+         stroke-linecap="round"
+         id="line1-5" />
+    </mask>
+    <mask
+       id="seam-mask-62">
+      <rect
+         x="0"
+         y="0"
+         width="120"
+         height="120"
+         fill="#ffffff"
+         id="rect1-9" />
+      <line
+         x1="60"
+         y1="48"
+         x2="60"
+         y2="72"
+         stroke="#000000"
+         stroke-width="14"
+         stroke-linecap="round"
+         id="line1-1" />
     </mask>
   </defs>
-  <path d="M 22 92 L 22 28 L 60 60 L 98 28 L 98 92" fill="none" stroke="#dc2626" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" mask="url(#seam-mask)"/>
-  <circle cx="60" cy="48" r="5.5" fill="#dc2626"/>
-  <circle cx="60" cy="72" r="5.5" fill="#dc2626"/>
+  <path
+     d="M 22,92 V 28 L 60,60 98,28 v 64"
+     fill="none"
+     stroke="#dc2626"
+     stroke-width="13"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     mask="url(#seam-mask)"
+     id="path1"
+     transform="matrix(4.973151,0,0,5.3594632,-42.327985,-67.930426)" />
+  <path
+     d="M 22,92 V 28 L 60,60 98,28 v 64"
+     fill="none"
+     stroke="#dc2626"
+     stroke-width="13"
+     stroke-linecap="round"
+     stroke-linejoin="round"
+     mask="url(#seam-mask-62)"
+     id="path1-2"
+     transform="matrix(4.973151,0,0,5.3594632,-42.341715,-67.294507)"
+     style="fill:none;stroke:none" />
+  <circle
+     cx="255.78804"
+     cy="187.91159"
+     fill="#dc2626"
+     id="circle1"
+     r="27.5"
+     style="stroke-width:5" />
+  <circle
+     cx="255.78804"
+     cy="307.91156"
+     fill="#dc2626"
+     id="circle2"
+     r="27.5"
+     style="stroke-width:5" />
 </svg>

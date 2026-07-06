@@ -29,12 +29,25 @@
     <a class="skip-link" href="#content">Skip to content</a>
 
     
+
 <aside
   class="release-banner"
   data-release-banner
   data-release-id="meld-launch-2026-07"
   aria-label="Release notice"
 >
+  <script>
+    (function() {
+      var id = "meld-launch-2026-07";
+      try {
+        if (localStorage.getItem('meld-docs-release-dismissed:' + id) === 'true') {
+          document.currentScript.parentElement.style.display = 'none';
+        } else {
+          document.body.dataset.releaseBanner = 'visible';
+        }
+      } catch (e) {}
+    })();
+  </script>
   <div class="release-banner__inner">
     <span class="release-banner__eyebrow">Release</span>
     <p>Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.</p>

@@ -32,12 +32,25 @@
     <a class="skip-link" href="#content">Skip to content</a>
 
     
+
 <aside
   class="release-banner"
   data-release-banner
   data-release-id="meld-launch-2026-07"
   aria-label="Release notice"
 >
+  <script>
+    (function() {
+      var id = "meld-launch-2026-07";
+      try {
+        if (localStorage.getItem('meld-docs-release-dismissed:' + id) === 'true') {
+          document.currentScript.parentElement.style.display = 'none';
+        } else {
+          document.body.dataset.releaseBanner = 'visible';
+        }
+      } catch (e) {}
+    })();
+  </script>
   <div class="release-banner__inner">
     <span class="release-banner__eyebrow">Release</span>
     <p>Meld.js launch notes, benchmark harness updates, and websocket plugin status are available in the release notes.</p>
@@ -537,7 +550,7 @@
           <a
             href="/tooling/cli/"
             
-            data-excerpt="Reference for the Meld Artisan CLI — project scaffolding, component and plugin generation, local dev server, and build commands."
+            data-excerpt="Reference for the Meld Artisan CLI — project scaffolding, component and plugin generation, local dev server, and build dev environments."
             data-tags="tooling,cli,artisan,scaffolding,build,dev-server"
           >
             <i data-lucide="file-text"></i>
@@ -583,9 +596,21 @@
 <h2>1. Meld Query (<code>meld-query</code>)</h2>
 <p><strong>Purpose:</strong> A reactive wrapper for <code>fetch</code> that handles loading/error states automatically.</p>
 <h3>API Reference</h3>
-<ul>
-<li><code>useQuery(url | function)</code>: Returns <code>{ data, loading, error, refetch }</code>.</li>
-</ul>
+<section class="api-entry" id="useQuery" data-category="data">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-core-soft); color:var(--c-core);">data</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-core);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-core);">useQuery</span><span class="fn-punct">(</span><span class="fn-param">urlOrUrlFn</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">-></span>{ data, loading, error, refetch }</div>
+  </div>
+  <p class="api-entry-desc">A reactive fetch wrapper that resolves data asynchronously and manages loading and error states automatically. If the argument is a function that returns a URL, it will re-fetch automatically when any reactive dependencies accessed by the function change.</p>
+  <div class="api-subhead">Parameters</div>
+  <table class="api-params"><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+    <tr><td class="pname">urlOrUrlFn</td><td class="ptype">string | Function</td><td class="pdesc">The target URL string, or a reactive getter function returning the URL.</td></tr>
+  </tbody></table>
+</section>
 <h3>Example</h3>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'user-list'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> useQuery <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
   <span class="token comment">// If the URL is a function, it re-fetches when dependencies change</span>
@@ -604,9 +629,23 @@
 <h2>2. Meld Persist (<code>meld-persist</code>)</h2>
 <p><strong>Purpose:</strong> Automatically saves state to <code>localStorage</code> (or <code>sessionStorage</code>).</p>
 <h3>API Reference</h3>
-<ul>
-<li><code>persist(stateProxy, storageKey, [storageEngine])</code></li>
-</ul>
+<section class="api-entry" id="persist" data-category="data">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-core-soft); color:var(--c-core);">data</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-core);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-core);">persist</span><span class="fn-punct">(</span><span class="fn-param">stateProxy, storageKey, storageEngine?</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">-></span>Proxy</div>
+  </div>
+  <p class="api-entry-desc">Configures automatic state persistence. Any changes made to the reactive state proxy are automatically serialised and stored in the specified storage engine.</p>
+  <div class="api-subhead">Parameters</div>
+  <table class="api-params"><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+    <tr><td class="pname">stateProxy</td><td class="ptype">Proxy</td><td class="pdesc">A reactive state proxy created via <code>meldState()</code>.</td></tr>
+    <tr><td class="pname">storageKey</td><td class="ptype">string</td><td class="pdesc">The unique key to store state under.</td></tr>
+    <tr><td class="pname">storageEngine</td><td class="ptype">Storage</td><td class="pdesc">Optional. Browser storage interface (defaults to <code>localStorage</code>).</td></tr>
+  </tbody></table>
+</section>
 <h3>Example</h3>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// This state persists even if the user refreshes the browser</span>
 <span class="token keyword">const</span> preferences <span class="token operator">=</span> <span class="token function">persist</span><span class="token punctuation">(</span>
@@ -618,7 +657,7 @@
 <p><strong>Purpose:</strong> Integration with the Quiver API client (or Axios) via dependency injection.</p>
 <h3>Usage</h3>
 <p><strong>Setup (main.js):</strong></p>
-<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">use</span><span class="token punctuation">(</span>MeldQuiver<span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token literal-property property">baseURL</span><span class="token operator">:</span> <span class="token string">'[https://api.example.com](https://api.example.com)'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">use</span><span class="token punctuation">(</span>MeldQuiver<span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token literal-property property">baseURL</span><span class="token operator">:</span> <span class="token string">'https://api.example.com'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 <p><strong>Component:</strong></p>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'dashboard-widget'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> useQuiver <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
   <span class="token keyword">const</span> api <span class="token operator">=</span> <span class="token function">useQuiver</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Get the configured client instance</span>
@@ -632,9 +671,17 @@
 <h2>4. Meld Socket (<code>meld-socket</code>)</h2>
 <p><strong>Purpose:</strong> Managed WebSocket connections with reactive status, reconnects, heartbeat, queued sends, message channels, and request-response correlation.</p>
 <h3>API Reference</h3>
-<ul>
-<li><code>useSocket(url | options)</code>: Returns a socket handle with <code>{ state, send, subscribe, request, connect, disconnect, on }</code>.</li>
-</ul>
+<section class="api-entry" id="useSocket-data" data-category="data">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-core-soft); color:var(--c-core);">data</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-core);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-core);">useSocket</span><span class="fn-punct">(</span><span class="fn-param">url | options</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">-></span>SocketHandle</div>
+  </div>
+  <p class="api-entry-desc">Managed WebSocket helper. See the full <a href="/plugins/meld-socket/">meld-socket API Reference</a> for complete details.</p>
+</section>
 <h3>Example</h3>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">use</span><span class="token punctuation">(</span>MeldSocket<span class="token punctuation">,</span> <span class="token punctuation">{</span> <span class="token literal-property property">reconnect</span><span class="token operator">:</span> <span class="token boolean">true</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
@@ -643,26 +690,9 @@
   <span class="token keyword">const</span> state <span class="token operator">=</span> <span class="token function">meldState</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">messages</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 
   socket<span class="token punctuation">.</span><span class="token function">subscribe</span><span class="token punctuation">(</span><span class="token string">'chat:message'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">msg</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
-    state<span class="token punctuation">.</span>messages <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token operator">...</span>state<span class="token punctuation">.</span>messages<span class="token punctuation">,</span> msg<span class="token punctuation">]</span><span class="token punctuation">;</span>
-  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-
-  <span class="token keyword">const</span> <span class="token function-variable function">sendMessage</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> socket<span class="token punctuation">.</span><span class="token function">send</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
-    <span class="token literal-property property">type</span><span class="token operator">:</span> <span class="token string">'chat:message'</span><span class="token punctuation">,</span>
-    <span class="token literal-property property">text</span><span class="token operator">:</span> <span class="token string">'Hello'</span>
+    state<span class="token punctuation">.</span>messages <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token operator">...</span>state<span class="token punctuation">.</span>messages<span class="token punctuation">,</span> msg<span class="token punctuation">.</span>data<span class="token punctuation">]</span><span class="token punctuation">;</span>
   <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
-<hr>
-<h2>5. Meld Cookie (<code>meld-cookie</code>)</h2>
-<p><strong>Purpose:</strong> Simple utility to read/write browser cookies.</p>
-<h3>API Reference</h3>
-<ul>
-<li><code>cookie.get(name)</code>: Returns string value.</li>
-<li><code>cookie.set(name, value, days)</code>: Sets a cookie.</li>
-<li><code>cookie.remove(name)</code>: Deletes a cookie.</li>
-</ul>
-<h3>Example</h3>
-<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> token <span class="token operator">=</span> cookie<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span><span class="token string">'auth_token'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>token<span class="token punctuation">)</span> window<span class="token punctuation">.</span>location<span class="token punctuation">.</span>hash <span class="token operator">=</span> <span class="token string">'/login'</span><span class="token punctuation">;</span></code></pre>
 
 
         

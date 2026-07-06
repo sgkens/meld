@@ -7,12 +7,15 @@ Use this tracker as the local source of truth for release hardening, testing gap
 ## **Tasklist**
 
 ### **Issues Remaining (priority-1)**
-- [ ] lets auther and implement a new feature meld playground, this will be a playground for meld, give me a review on the component library
-- [ ] have we missed something critical here the meld components, i complete forgotten about this, i think i was going to keep the components in a sperate repo and have the paid, but im thinking i should maybe include theme.
-- [ ] we are building our docs site in 11ty, should web using our own frame work to do this will this simplyfy or complicate, we are build a powerfull micro framework, so cross routes, recarch into this for me, pros and cons
-- [ ] update banner is abit quirky, flickers even after cose, lets tie this to local storage, permanly hite when use clicks close, and only show when new version is available, also add a link to the release notes for the new version.
+- [x] **Critical** - sidebar sroll to view is off, active page should be near the top eleganly not to distract
+- [x] **Critical** - Do a docs audit and make sure we are using the correct syntax for code blocks, some pages are broken namley astro, cli page as double yaml font matter in the page 
+- [x] **creitcal** - lets use the api styling of the strict api page on other pages on meld docs make it uniform keep old style where makes sence.
+- [x] lets auther and implement a new feature meld playground, this will be a playground for meld, give me a review on the component library
+- [x] have we missed something critical here the meld components, i complete forgotten about this, i think i was going to keep the components in a sperate repo and have the paid, but im thinking i should maybe include theme.
+- [x] we are building our docs site in 11ty, should web using our own frame work to do this will this simplyfy or complicate, we are build a powerfull micro framework, so cross routes, recarch into this for me, pros and cons
+- [x] update banner is abit quirky, flickers even after cose, lets tie this to local storage, permanly hite when use clicks close, and only show when new version is available, also add a link to the release notes for the new version.
 
-- [ ] 🔴🦀❓🔟 **Critical** - Fix local JavaScript toolchain availability: npm, npx, and node are not on PATH in this shell, blocking npm test, npm run lint, and npm run build verification.
+- [x] 🔴🦀❓🔟 **Critical** - Fix local JavaScript toolchain availability: npm, npx, and node are not on PATH in this shell, blocking npm test, npm run lint, and npm run build verification.
 ### **Enhancements (priority-2)**
 
 - [ ] 🟡🌟⏳6️⃣ **Enhancement** - Generate Meld custom data from current core, components, and plugins so LSP/VS Code completions stay aligned with the package instead of hardcoded CORE_DATA.

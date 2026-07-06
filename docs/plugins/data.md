@@ -12,12 +12,29 @@ category: Plugin Ecosystem
 Tools for API interaction, data persistence, and storage management.
 
 ## 1. Meld Query (`meld-query`)
+
 **Purpose:** A reactive wrapper for `fetch` that handles loading/error states automatically.
 
 ### API Reference
-* `useQuery(url | function)`: Returns `{ data, loading, error, refetch }`.
+
+<section class="api-entry" id="useQuery" data-category="data">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-core-soft); color:var(--c-core);">data</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-core);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-core);">useQuery</span><span class="fn-punct">(</span><span class="fn-param">urlOrUrlFn</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">-></span>{ data, loading, error, refetch }</div>
+  </div>
+  <p class="api-entry-desc">A reactive fetch wrapper that resolves data asynchronously and manages loading and error states automatically. If the argument is a function that returns a URL, it will re-fetch automatically when any reactive dependencies accessed by the function change.</p>
+  <div class="api-subhead">Parameters</div>
+  <table class="api-params"><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+    <tr><td class="pname">urlOrUrlFn</td><td class="ptype">string | Function</td><td class="pdesc">The target URL string, or a reactive getter function returning the URL.</td></tr>
+  </tbody></table>
+</section>
 
 ### Example
+
 ```javascript
 defineMeld('user-list', (el, { useQuery }) => {
   // If the URL is a function, it re-fetches when dependencies change
@@ -32,17 +49,33 @@ defineMeld('user-list', (el, { useQuery }) => {
     </ul>
   `;
 });
-````
+```
 
------
+---
 
-## 2\. Meld Persist (`meld-persist`)
+## 2. Meld Persist (`meld-persist`)
 
 **Purpose:** Automatically saves state to `localStorage` (or `sessionStorage`).
 
 ### API Reference
 
-  * `persist(stateProxy, storageKey, [storageEngine])`
+<section class="api-entry" id="persist" data-category="data">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-core-soft); color:var(--c-core);">data</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-core);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-core);">persist</span><span class="fn-punct">(</span><span class="fn-param">stateProxy, storageKey, storageEngine?</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">-></span>Proxy</div>
+  </div>
+  <p class="api-entry-desc">Configures automatic state persistence. Any changes made to the reactive state proxy are automatically serialised and stored in the specified storage engine.</p>
+  <div class="api-subhead">Parameters</div>
+  <table class="api-params"><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
+    <tr><td class="pname">stateProxy</td><td class="ptype">Proxy</td><td class="pdesc">A reactive state proxy created via <code>meldState()</code>.</td></tr>
+    <tr><td class="pname">storageKey</td><td class="ptype">string</td><td class="pdesc">The unique key to store state under.</td></tr>
+    <tr><td class="pname">storageEngine</td><td class="ptype">Storage</td><td class="pdesc">Optional. Browser storage interface (defaults to <code>localStorage</code>).</td></tr>
+  </tbody></table>
+</section>
 
 ### Example
 
@@ -54,20 +87,22 @@ const preferences = persist(
 );
 ```
 
------
+---
 
-## 3\. Meld Quiver (`meld-quiver`)
+## 3. Meld Quiver (`meld-quiver`)
 
 **Purpose:** Integration with the Quiver API client (or Axios) via dependency injection.
 
 ### Usage
 
 **Setup (main.js):** 
+
 ```javascript
-use(MeldQuiver, { baseURL: '[https://api.example.com](https://api.example.com)' });
+use(MeldQuiver, { baseURL: 'https://api.example.com' });
 ```
 
 **Component:** 
+
 ```javascript
 defineMeld('dashboard-widget', (el, { useQuiver }) => {
   const api = useQuiver(); // Get the configured client instance
@@ -79,15 +114,25 @@ defineMeld('dashboard-widget', (el, { useQuiver }) => {
 });
 ```
 
------
+---
 
-## 4\. Meld Socket (`meld-socket`)
+## 4. Meld Socket (`meld-socket`)
 
 **Purpose:** Managed WebSocket connections with reactive status, reconnects, heartbeat, queued sends, message channels, and request-response correlation.
 
 ### API Reference
 
-  * `useSocket(url | options)`: Returns a socket handle with `{ state, send, subscribe, request, connect, disconnect, on }`.
+<section class="api-entry" id="useSocket-data" data-category="data">
+  <div class="api-entry-tags">
+    <span class="api-tag-pill" style="background:var(--c-core-soft); color:var(--c-core);">data</span>
+    <span class="api-since">since v1.0.0</span>
+  </div>
+  <div class="api-signature" style="border-left: 4px solid var(--c-core);">
+    <div class="api-signature-call"><span class="fn-name" style="color:var(--c-core);">useSocket</span><span class="fn-punct">(</span><span class="fn-param">url | options</span><span class="fn-punct">)</span></div>
+    <div class="api-return-pill"><span class="arrow">-></span>SocketHandle</div>
+  </div>
+  <p class="api-entry-desc">Managed WebSocket helper. See the full <a href="/plugins/meld-socket/">meld-socket API Reference</a> for complete details.</p>
+</section>
 
 ### Example
 
@@ -99,31 +144,7 @@ defineMeld('live-feed', (el, { useSocket }) => {
   const state = meldState({ messages: [] });
 
   socket.subscribe('chat:message', (msg) => {
-    state.messages = [...state.messages, msg];
-  });
-
-  const sendMessage = () => socket.send({
-    type: 'chat:message',
-    text: 'Hello'
+    state.messages = [...state.messages, msg.data];
   });
 });
-```
-
------
-
-## 5\. Meld Cookie (`meld-cookie`)
-
-**Purpose:** Simple utility to read/write browser cookies.
-
-### API Reference
-
-  * `cookie.get(name)`: Returns string value.
-  * `cookie.set(name, value, days)`: Sets a cookie.
-  * `cookie.remove(name)`: Deletes a cookie.
-
-### Example
-
-```javascript
-const token = cookie.get('auth_token');
-if (!token) window.location.hash = '/login';
 ```
