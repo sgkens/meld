@@ -43,7 +43,12 @@
       }
     ],
     "snippets": [
-      { "language": "javascript", "path": "./snippets/javascript.json" }
+      { "language": "javascript", "path": "./snippets/javascript.json" },
+      { "language": "javascript", "path": "./snippets/html.json" },
+      { "language": "typescript", "path": "./snippets/html.json" },
+      { "language": "javascriptreact", "path": "./snippets/html.json" },
+      { "language": "typescriptreact", "path": "./snippets/html.json" },
+      { "language": "html", "path": "./snippets/html.json" }
     ],
     "typescriptServerPlugins": [
       { "name": "meld-lsp", "enableForWorkspaceTypeScriptVersions": true }

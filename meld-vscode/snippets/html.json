@@ -1,0 +1,114 @@
+{
+  "Meld Button": {
+    "prefix": "m-button",
+    "body": [
+      "<m-button variant=\"${1|primary,secondary,danger,ghost|}\">${2:Button Text}</m-button>"
+    ],
+    "description": "Meld UI Button component"
+  },
+  "Meld Input": {
+    "prefix": "m-input",
+    "body": [
+      "<m-input label=\"${1:Label}\" placeholder=\"${2:Placeholder}\" value=\"${3:\\${() => state.value\\}}\"></m-input>"
+    ],
+    "description": "Meld UI Text Input component"
+  },
+  "Meld Select": {
+    "prefix": "m-select",
+    "body": [
+      "<m-select label=\"${1:Label}\" value=\"${2:\\${() => state.value\\}}\">",
+      "\t<option value=\"${3:val}\">${4:Option Text}</option>",
+      "</m-select>"
+    ],
+    "description": "Meld UI Dropdown Select component"
+  },
+  "Meld Switch": {
+    "prefix": "m-switch",
+    "body": [
+      "<m-switch label=\"${1:Label}\" ?checked=\"${2:\\${() => state.checked\\}}\"></m-switch>"
+    ],
+    "description": "Meld UI Toggle Switch component"
+  },
+  "Meld Tabs": {
+    "prefix": "m-tabs",
+    "body": [
+      "<m-tabs>",
+      "\t<div slot=\"tab\" data-target=\"${1:panel-id}\">${2:Tab Name}</div>",
+      "\t<div slot=\"panel\" data-id=\"${1:panel-id}\">",
+      "\t\t${3:Panel Content}",
+      "\t</div>",
+      "</m-tabs>"
+    ],
+    "description": "Meld UI Tabbed Layout component"
+  },
+  "Meld Stack": {
+    "prefix": "m-stack",
+    "body": [
+      "<m-stack gap=\"${1|sm,md,lg|}\">",
+      "\t$0",
+      "</m-stack>"
+    ],
+    "description": "Meld UI Vertical Stack Layout"
+  },
+  "Meld Group": {
+    "prefix": "m-group",
+    "body": [
+      "<m-group gap=\"${1|sm,md,lg|}\">",
+      "\t$0",
+      "</m-group>"
+    ],
+    "description": "Meld UI Horizontal Group Layout"
+  },
+  "Meld Card": {
+    "prefix": "m-card",
+    "body": [
+      "<m-card>",
+      "\t<span slot=\"header\">${1:Card Title}</span>",
+      "\t${2:Card Content}",
+      "</m-card>"
+    ],
+    "description": "Meld UI Card component"
+  },
+  "Meld Modal": {
+    "prefix": "m-modal",
+    "body": [
+      "<m-modal id=\"${1:modal-id}\">",
+      "\t<h3>${2:Modal Title}</h3>",
+      "\t${3:Modal Content}",
+      "</m-modal>"
+    ],
+    "description": "Meld UI Modal dialog overlay"
+  },
+  "Meld Drawer": {
+    "prefix": "m-drawer",
+    "body": [
+      "<m-drawer id=\"${1:drawer-id}\" position=\"${2|right,left|}\">",
+      "\t${3:Drawer Content}",
+      "</m-drawer>"
+    ],
+    "description": "Meld UI Slide-out Drawer component"
+  },
+  "Meld Badge": {
+    "prefix": "m-badge",
+    "body": [
+      "<m-badge variant=\"${1|info,success,warning,danger|}\">${2:Badge Text}</m-badge>"
+    ],
+    "description": "Meld UI Status Badge"
+  },
+  "Meld Alert": {
+    "prefix": "m-alert",
+    "body": [
+      "<m-alert variant=\"${1|info,success,warning,danger|}\">",
+      "\t${2:Alert Message}",
+      "</m-alert>"
+    ],
+    "description": "Meld UI Alert banner"
+  },
+  "Meld Table": {
+    "prefix": "m-table",
+    "body": [
+      "<m-table id=\"${1:table-id}\"></m-table>"
+    ],
+    "description": "Meld UI Data Table component"
+  }
+}

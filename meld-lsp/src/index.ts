@@ -8,7 +8,116 @@ const CORE_DATA = {
   version: 1.1 as const,
   tags: [
     { name: "meld-slot", description: "Slot projection target for Shadow DOM composition.", attributes: [] },
-    { name: "meld-portal", description: "Teleports content to the document body.", attributes: [] }
+    { name: "meld-portal", description: "Teleports content to the document body.", attributes: [] },
+    {
+      name: "m-button",
+      description: "Meld UI Button component.",
+      attributes: [
+        { name: "variant", description: "Visual variant: 'primary', 'secondary', 'danger', or 'ghost'." },
+        { name: "disabled", description: "Disables user interaction." },
+        { name: "loading", description: "Displays a loading spinner and disables interaction." },
+        { name: "size", description: "Button sizing: 'sm', 'md', 'lg'." }
+      ]
+    },
+    {
+      name: "m-input",
+      description: "Meld UI Text Input component.",
+      attributes: [
+        { name: "label", description: "Heading label text." },
+        { name: "placeholder", description: "Placeholder helper text." },
+        { name: "value", description: "Current text value." },
+        { name: "type", description: "Input element type (e.g. 'text', 'password', 'email')." }
+      ]
+    },
+    {
+      name: "m-select",
+      description: "Meld UI Dropdown Select component.",
+      attributes: [
+        { name: "label", description: "Heading label text." },
+        { name: "value", description: "Currently selected option value." }
+      ]
+    },
+    {
+      name: "m-switch",
+      description: "Meld UI Toggle Switch component.",
+      attributes: [
+        { name: "label", description: "Beside-switch label text." },
+        { name: "checked", description: "Boolean state." }
+      ]
+    },
+    {
+      name: "m-tabs",
+      description: "Meld UI Tabbed Layout component.",
+      attributes: []
+    },
+    {
+      name: "m-breadcrumb",
+      description: "Meld UI Hierarchical Breadcrumb Navigation component.",
+      attributes: []
+    },
+    {
+      name: "m-dropdown",
+      description: "Meld UI Action Popover Dropdown component.",
+      attributes: [
+        { name: "label", description: "Dropdown trigger button text label." }
+      ]
+    },
+    {
+      name: "m-stack",
+      description: "Meld UI Vertical Stack Layout component.",
+      attributes: [
+        { name: "gap", description: "Vertical spacing gap size: 'sm', 'md', 'lg'." }
+      ]
+    },
+    {
+      name: "m-group",
+      description: "Meld UI Horizontal Group Layout component.",
+      attributes: [
+        { name: "gap", description: "Horizontal spacing gap size: 'sm', 'md', 'lg'." }
+      ]
+    },
+    {
+      name: "m-card",
+      description: "Meld UI Card panel component.",
+      attributes: []
+    },
+    {
+      name: "m-modal",
+      description: "Meld UI Dialog Modal dialog component.",
+      attributes: []
+    },
+    {
+      name: "m-drawer",
+      description: "Meld UI Slide-out Side Drawer component.",
+      attributes: [
+        { name: "position", description: "Edge slide direction: 'left' or 'right'." },
+        { name: "open", description: "Visual open state." }
+      ]
+    },
+    {
+      name: "m-badge",
+      description: "Meld UI Category or Status Badge.",
+      attributes: [
+        { name: "variant", description: "Theme variant: 'info', 'success', 'warning', 'danger'." }
+      ]
+    },
+    {
+      name: "m-alert",
+      description: "Meld UI Alert banner notice.",
+      attributes: [
+        { name: "variant", description: "Theme variant: 'info', 'success', 'warning', 'danger'." }
+      ]
+    },
+    {
+      name: "m-table",
+      description: "Meld UI Data Table component.",
+      attributes: []
+    },
+    {
+      name: "m-toast",
+      description: "Meld UI Toast Notification overlay manager.",
+      attributes: []
+    }
   ],
   globalAttributes: [
     { name: "ref", description: "Get a direct reference to the DOM element." }
