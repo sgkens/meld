@@ -96,7 +96,6 @@ const DEFAULT_OPTIONS = {
 let _idSeq = 0;
 const uid = () => `meld_${++_idSeq}_${Math.random().toString(36).slice(2, 7)}`;
 
-const clamp = (v, lo, hi) => Math.min(Math.max(v, lo), hi);
 const jitter = (base) => base * (0.8 + Math.random() * 0.4);
 
 function deepMerge(target, source) {
@@ -559,7 +558,7 @@ export const MeldSocket = {
     };
   },
 
-  setupHelpers(api, options) {
+  setupHelpers(api, _options) {
     return { useSocket: api.useSocket };
   },
 };
