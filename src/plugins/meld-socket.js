@@ -34,6 +34,10 @@
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
+/**
+ * Connection status states for the WebSocket connection.
+ * @type {Object<string, string>}
+ */
 const SOCKET_STATUS = {
   CONNECTING:   'connecting',
   OPEN:         'open',
@@ -42,6 +46,10 @@ const SOCKET_STATUS = {
   RECONNECTING: 'reconnecting',
 };
 
+/**
+ * Default configurations for MeldSocket options.
+ * @type {object}
+ */
 const DEFAULT_OPTIONS = {
   // Connection
   url:              null,       // string | () => string  — required
@@ -118,6 +126,16 @@ function deepMerge(target, source) {
 
 // ─── Core Socket Manager ──────────────────────────────────────────────────────
 
+/**
+ * Creates a reactive WebSocket manager that handles connection lifecycle,
+ * heartbeat pings, message queuing, channels subscription, request-response correlation,
+ * and middleware pipelines.
+ * 
+ * @param {function} meldState - The API reactive state creator function.
+ * @param {function} onDestroyHook - The API onDestroy lifecycle hook registry function.
+ * @param {object} opts - Configuration options.
+ * @returns {object} The created socket manager.
+ */
 function createSocketManager(meldState, onDestroyHook, opts) {
   const cfg = deepMerge(DEFAULT_OPTIONS, opts);
 
@@ -173,7 +191,9 @@ function createSocketManager(meldState, onDestroyHook, opts) {
    * Run message through a pipeline of middleware fns.
    * Each fn receives (message, next) where next() calls the next middleware.
    * If any middleware returns false the message is dropped.
-   * @returns {object|null} transformed message, or null if dropped
+   * @param {Array<function>} pipeline - Array of middleware functions.
+   * @param {object|any} message - The message payload to pass through the pipeline.
+   * @returns {Promise<object|null>} transformed message, or null if dropped
    */
   const runPipeline = async (pipeline, message) => {
     let idx = 0;
@@ -323,6 +343,10 @@ function createSocketManager(meldState, onDestroyHook, opts) {
   };
 
   // ── WebSocket lifecycle ──────────────────────────────────────────────────
+  /**
+   * Establishes the WebSocket connection using exponential backoff and jitter on failure.
+   * @returns {void}
+   */
   const connect = () => {
     if (_destroyed) return;
     if (typeof WebSocket === 'undefined') {
@@ -397,6 +421,13 @@ function createSocketManager(meldState, onDestroyHook, opts) {
     _reconnectTimer = setTimeout(connect, delay);
   };
 
+  /**
+   * Closes the active WebSocket connection.
+   * 
+   * @param {number} [code=1000] - Close status code.
+   * @param {string} [reason='client_close'] - Close reason string.
+   * @returns {void}
+   */
   const disconnect = (code = 1000, reason = 'client_close') => {
     clearTimeout(_reconnectTimer);
     stopHeartbeat();
@@ -413,6 +444,11 @@ function createSocketManager(meldState, onDestroyHook, opts) {
    * Send a message through the middleware pipeline.
    * If the socket is closed and `queue` option truthy, buffers until reconnect.
    * Returns a Promise that resolves when the message is actually sent.
+   * 
+   * @param {any} payload - The message payload to serialize and send.
+   * @param {object} [options={}] - Options for sending.
+   * @param {boolean} [options.queue=true] - Whether to queue the message if disconnected.
+   * @returns {Promise<void>} Resolves when sent or queued.
    */
   const send = async (payload, { queue = true } = {}) => {
     const processed = await runPipeline(_outMiddleware, payload);
@@ -435,6 +471,10 @@ function createSocketManager(meldState, onDestroyHook, opts) {
   /**
    * Subscribe to a named message type/channel.
    * Returns an unsubscribe function.
+   * 
+   * @param {string} type - Message type or channel to subscribe to.
+   * @param {function(any): void} fn - Callback when matching message arrives.
+   * @returns {function(): boolean} Unsubscribe function.
    */
   const subscribe = (type, fn) => {
     if (!_channels.has(type)) _channels.set(type, new Set());
@@ -445,6 +485,11 @@ function createSocketManager(meldState, onDestroyHook, opts) {
   /**
    * Send a message and await a correlated response.
    * Automatically injects an `id` field; server must echo the same `id`.
+   * 
+   * @param {object} payload - Message payload.
+   * @param {object} [options={}] - Request options.
+   * @param {number} [options.timeout=cfg.requestTimeout] - Request timeout in milliseconds.
+   * @returns {Promise<any>} Resolves with the correlated response object.
    */
   const request = (payload, { timeout = cfg.requestTimeout } = {}) => {
     const id = uid();
@@ -462,6 +507,9 @@ function createSocketManager(meldState, onDestroyHook, opts) {
    * Register inbound middleware.
    * fn(message, next) — call next() or next(transformed) to continue pipeline.
    * Return false to drop the message.
+   * 
+   * @param {function(any, function): any} fn - Inbound middleware callback.
+   * @returns {void}
    */
   const useInbound = (fn) => { _inMiddleware.push(fn); };
 
@@ -469,6 +517,9 @@ function createSocketManager(meldState, onDestroyHook, opts) {
    * Register outbound middleware.
    * fn(message, next) — call next() or next(transformed) to continue.
    * Return false to drop.
+   * 
+   * @param {function(any, function): any} fn - Outbound middleware callback.
+   * @returns {void}
    */
   const useOutbound = (fn) => { _outMiddleware.push(fn); };
 
@@ -540,14 +591,30 @@ function createSocketManager(meldState, onDestroyHook, opts) {
 
 // ─── Plugin Definition ────────────────────────────────────────────────────────
 
+/**
+ * MeldSocket plugin object.
+ * Integrates full-featured WebSockets with reconnection, presence, heartbeats, and middleware.
+ * 
+ * @type {object}
+ * @property {function} install - Installs WebSocket helper on the Meld API.
+ * @property {function} setupHelpers - Sets up helpers for use in components.
+ */
 export const MeldSocket = {
+  /**
+   * Installs the WebSocket custom loader on the API object.
+   * Registers the `api.useSocket` helper method.
+   * 
+   * @param {object} api - The Meld API instance.
+   * @param {object} [options={}] - Default WebSocket options to be merged.
+   * @returns {void}
+   */
   install(api, options = {}) {
     /**
      * Create a WebSocket connection scoped to the calling component.
      * Automatically disconnects when the component is destroyed.
      *
-     * @param {object|string} urlOrOptions  URL string or full options object
-     * @returns {SocketHandle}
+     * @param {object|string} [urlOrOptions={}] - URL string or full options object.
+     * @returns {object} The SocketManager instance.
      */
     api.useSocket = (urlOrOptions = {}) => {
       const opts = typeof urlOrOptions === 'string'
@@ -558,6 +625,14 @@ export const MeldSocket = {
     };
   },
 
+  /**
+   * Sets up helpers for components by returning an object containing `useSocket`.
+   * 
+   * @param {object} api - The Meld API instance.
+   * @param {object} _options - Plugin options.
+   * @returns {object} Object containing the socket helper.
+   * @returns {function} returns.useSocket - The useSocket helper function.
+   */
   setupHelpers(api, _options) {
     return { useSocket: api.useSocket };
   },

@@ -20,7 +20,7 @@ Astro ships zero JavaScript by default and hydrates only the components that exp
 - Meld.js installed
 
 ```bash
-npm install meldjs
+npm install @meldjs/meld
 ```
 
 ---

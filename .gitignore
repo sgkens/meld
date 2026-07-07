@@ -56,3 +56,6 @@ coverage/
 
 # raw randome notes
 /**/raw*notes*.md
+
+# Elenvnty Excludes
+docs/_site/*

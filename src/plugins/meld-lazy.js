@@ -1,6 +1,21 @@
+/**
+ * MeldLazy plugin object.
+ * Provides lazy-loading component capabilities using the Intersection Observer API.
+ * 
+ * @type {object}
+ * @property {function} install - Installs `<meld-lazy>` custom element wrappers on the Meld instance.
+ */
 export const MeldLazy = {
+  /**
+   * Installs the lazy-loading component container.
+   * Defines `<meld-lazy>` custom element that dynamically loads modules when they intersect the viewport.
+   * 
+   * @param {object} api - The Meld API instance.
+   * @returns {void}
+   */
   install(api) {
     const { defineMeld, meldHtml, meldState, onMount, onDestroy } = api;
+
     defineMeld('meld-lazy', (el) => {
       const state = meldState({ loaded: false });
       let observer;

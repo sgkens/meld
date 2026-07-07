@@ -50,3 +50,9 @@ To maintain a smooth developer experience (DX), always use the `serve` command t
 ```bash
 npx meld-artisan serve
 ```
+
+## Next Steps
+
+To get the most out of your development environment, configure your code editor (e.g. VS Code, Neovim, Zed, or IntelliJ) for syntax highlighting and LSP integration:
+
+- Proceed to the [Editor Setup & Syntax Highlighting](/getting-started/editor-setup/) guide.

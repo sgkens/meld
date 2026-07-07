@@ -1,6 +1,22 @@
+/**
+ * MeldInertia plugin object.
+ * Integrates Inertia.js client-side page routing and rendering by dynamically resolving page components.
+ * 
+ * @type {object}
+ * @property {function} install - Installs Inertia components and app setup routines.
+ */
 export const MeldInertia = {
+  /**
+   * Installs the Inertia page wrapper component.
+   * Defines `<inertia-root>` custom element to hook into `@inertiajs/core`.
+   * 
+   * @param {object} api - The Meld API instance.
+   * @param {object} _options - Plugin configuration options.
+   * @returns {void}
+   */
   install(api, _options) {
     const { defineMeld, meldHtml, meldState, onMount } = api;
+
     defineMeld('inertia-root', (_el) => {
       const state = meldState({ componentTag: null, props: {} });
       onMount(async () => {

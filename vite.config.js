@@ -17,6 +17,9 @@ const bannertext = `/**
 */`;
 
 export default defineConfig({
+  optimizeDeps: {
+    entries: ['index.html', 'demo-taskmanager/index.html']
+  },
   build: {
     outDir: 'dist',
     emptyOutDir: true,

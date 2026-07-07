@@ -92,7 +92,7 @@ To understand where **Meld.js** fits in the modern web landscape, it helps to se
 
 ### Code Comparison
 
-```carousel
+````carousel
 ```javascript
 // --- MELD.js (2kb, Native Web Component, Zero Build) ---
 import { defineMeld, meldState, meldHtml } from 'meld';

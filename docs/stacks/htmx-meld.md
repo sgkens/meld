@@ -114,7 +114,7 @@ The Meld component reads `data-endpoint` after mount and fetches its own data:
 
 ```javascript
 // meld/meld-bar-chart.js
-import { defineMeld, meldHtml } from 'meldjs';
+import { defineMeld, meldHtml } from '@meldjs/meld';
 
 defineMeld('meld-bar-chart', (el, { signal, effect }) => {
   const chartData = signal(null);
@@ -148,7 +148,7 @@ HTMX emits lifecycle events on the DOM (`htmx:afterSwap`, `htmx:beforeRequest`, 
 
 ```javascript
 // meld/meld-loading-indicator.js
-import { defineMeld, meldHtml } from 'meldjs';
+import { defineMeld, meldHtml } from '@meldjs/meld';
 
 defineMeld('meld-loading-indicator', (el, { signal }) => {
   const active = signal(false);
@@ -193,7 +193,7 @@ Meld components can trigger HTMX requests programmatically by dispatching the `h
 
 ```javascript
 // meld/meld-filter-bar.js
-import { defineMeld, meldHtml } from 'meldjs';
+import { defineMeld, meldHtml } from '@meldjs/meld';
 
 defineMeld('meld-filter-bar', (el, { signal }) => {
   const activeFilter = signal('all');
@@ -246,7 +246,7 @@ Meld components import and read from this singleton:
 
 ```javascript
 import { session } from '../state/session.js';
-import { defineMeld, meldHtml } from 'meldjs';
+import { defineMeld, meldHtml } from '@meldjs/meld';
 
 defineMeld('meld-user-avatar', (el) => {
   return meldHtml`

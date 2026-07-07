@@ -87,7 +87,7 @@
       <i data-lucide="book-open"></i>
       Docs
     </a>
-    <a href="/core-api/" >
+    <a href="/api-reference/" >
       <i data-lucide="braces"></i>
       API
     </a>
@@ -733,73 +733,98 @@ defineMeld('reactive-counter', () => {
       Count is: ${() => state.count}
     </button>
   `;
-});</code></pre>
+});
+```
 <!-- slide -->
-<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// --- SOLIDJS (6kb, Reactive JSX, Needs Build Step) ---</span>
-<span class="token keyword">import</span> <span class="token punctuation">{</span> createSignal <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'solid-js'</span><span class="token punctuation">;</span>
+```javascript
+// --- SOLIDJS (6kb, Reactive JSX, Needs Build Step) ---
+import { createSignal } from 'solid-js';
 
-<span class="token keyword">function</span> <span class="token function">Counter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token keyword">const</span> <span class="token punctuation">[</span>count<span class="token punctuation">,</span> setCount<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">createSignal</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">return</span> <span class="token punctuation">(</span>
-    <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setCount</span><span class="token punctuation">(</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token operator">></span>
-      Count is<span class="token operator">:</span> <span class="token punctuation">{</span><span class="token function">count</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">}</span>
-    <span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
-  <span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span></code></pre>
+function Counter() {
+  const [count, setCount] = createSignal(0);
+  return (
+    <button onClick={() => setCount(count() + 1)}>
+      Count is: {count()}
+    </button>
+  );
+}
+```
 <!-- slide -->
-<pre class="language-html" tabindex="0"><code class="language-html"><span class="token comment">&lt;!-- --- SVELTE (4kb, Compiled Templates, Needs Build Step) --- --></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
-  <span class="token keyword">let</span> count <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+```html
+<!-- --- SVELTE (4kb, Compiled Templates, Needs Build Step) --- -->
+<script>
+  let count = 0;
+</script>
 
-&lt;button on:click={() => count++}>
+<button on:click={() => count++}>
   Count is: {count}
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>button</span><span class="token punctuation">></span></span></code></pre>
+</button>
+```
 <!-- slide -->
-<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// --- REACT (40kb+, Virtual DOM Hooks, Needs Build Step) ---</span>
-<span class="token keyword">import</span> React<span class="token punctuation">,</span> <span class="token punctuation">{</span> useState <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'react'</span><span class="token punctuation">;</span>
+```javascript
+// --- REACT (40kb+, Virtual DOM Hooks, Needs Build Step) ---
+import React, { useState } from 'react';
 
-<span class="token keyword">function</span> <span class="token function">Counter</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-  <span class="token keyword">const</span> <span class="token punctuation">[</span>count<span class="token punctuation">,</span> setCount<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token function">useState</span><span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-  <span class="token keyword">return</span> <span class="token punctuation">(</span>
-    <span class="token operator">&lt;</span>button onClick<span class="token operator">=</span><span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">setCount</span><span class="token punctuation">(</span>count <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">}</span><span class="token operator">></span>
-      Count is<span class="token operator">:</span> <span class="token punctuation">{</span>count<span class="token punctuation">}</span>
-    <span class="token operator">&lt;</span><span class="token operator">/</span>button<span class="token operator">></span>
-  <span class="token punctuation">)</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span></code></pre>
-<pre><code>
-### No-Bullshit Framework Guide
-
-When deciding whether to use Meld or another framework, here is an honest assessment of the pros, cons, and appropriate use cases:
-
-#### 1. React vs. Meld
-*   **Use React if:** You are building an expansive single-page app (SPA) with a massive developer team, complex client-side state, or need access to a huge ecosystem of pre-existing packages (UI component libraries, charts, forms).
-*   **Avoid React (and use Meld) if:** You are embedding interactive widgets inside a CMS (WordPress, Drupal) or server-rendered site, or building micro-frontends. React's heavy runtime overhead, Virtual DOM reconciliation, and hooks lifecycle are overkill for isolated widgets.
-
-#### 2. SolidJS vs. Meld
-*   **Use SolidJS if:** You love reactive state (proxies/signals) but want to build a complete, large-scale application using JSX and have a bundler-based build pipeline (Vite, Rollup) in place.
-*   **Use Meld if:** You want the same fine-grained reactivity but require **zero build tools**. Meld runs natively in any browser via ES Modules, making it ideal for rapid prototyping or drop-in scripts.
-
-#### 3. Svelte vs. Meld
-*   **Use Svelte if:** You prefer compiler-guaranteed optimal performance and a clean, HTML-like single-file-component (SFC) style for your standalone applications.
-*   **Use Meld if:** You do not want a compilation step. Svelte is useless without its compiler; Meld works natively directly in standard HTML/JS files.
-
-#### 4. Angular vs. Meld
-*   **Use Angular if:** You are building massive enterprise-level portals with strict modular architectures, built-in dependency injection, and strict TypeScript patterns.
-*   **Use Meld if:** You want a lightweight element that doesn't drag a multi-megabyte framework along with it.
-
----
-
-## 🌐 Next.js, SvelteKit, Remix, and Astro Integration
-
-Meld does not compete with full-stack meta-frameworks. Instead, it serves as an **isolated client-side widget provider**.
-
-| Meta-Framework | Role of Meld.js | How to use |
-| :--- | :--- | :--- |
-| **Astro** | Perfect for interactive &quot;islands&quot; | Embed Meld elements inside Astro templates; use Declarative Shadow DOM (DSD) for hydration. |
-| **Next.js** | Client-side micro-widget | Import Meld components inside client components (`&quot;use client&quot;`) using dynamic imports to bypass Node SSR environment errors. |
-| **SvelteKit / Remix** | Isolated dashboard widget | Embed as custom elements, leveraging Meld's context-isolation to prevent style/state pollution. |
-</code></pre>
+function Counter() {
+  const [count, setCount] = useState(0);
+  return (
+    <button onClick={() => setCount(count + 1)}>
+      Count is: {count}
+    </button>
+  );
+}
+```</code></pre>
+<h3>No-Bullshit Framework Guide</h3>
+<p>When deciding whether to use Meld or another framework, here is an honest assessment of the pros, cons, and appropriate use cases:</p>
+<h4>1. React vs. Meld</h4>
+<ul>
+<li><strong>Use React if:</strong> You are building an expansive single-page app (SPA) with a massive developer team, complex client-side state, or need access to a huge ecosystem of pre-existing packages (UI component libraries, charts, forms).</li>
+<li><strong>Avoid React (and use Meld) if:</strong> You are embedding interactive widgets inside a CMS (WordPress, Drupal) or server-rendered site, or building micro-frontends. React's heavy runtime overhead, Virtual DOM reconciliation, and hooks lifecycle are overkill for isolated widgets.</li>
+</ul>
+<h4>2. SolidJS vs. Meld</h4>
+<ul>
+<li><strong>Use SolidJS if:</strong> You love reactive state (proxies/signals) but want to build a complete, large-scale application using JSX and have a bundler-based build pipeline (Vite, Rollup) in place.</li>
+<li><strong>Use Meld if:</strong> You want the same fine-grained reactivity but require <strong>zero build tools</strong>. Meld runs natively in any browser via ES Modules, making it ideal for rapid prototyping or drop-in scripts.</li>
+</ul>
+<h4>3. Svelte vs. Meld</h4>
+<ul>
+<li><strong>Use Svelte if:</strong> You prefer compiler-guaranteed optimal performance and a clean, HTML-like single-file-component (SFC) style for your standalone applications.</li>
+<li><strong>Use Meld if:</strong> You do not want a compilation step. Svelte is useless without its compiler; Meld works natively directly in standard HTML/JS files.</li>
+</ul>
+<h4>4. Angular vs. Meld</h4>
+<ul>
+<li><strong>Use Angular if:</strong> You are building massive enterprise-level portals with strict modular architectures, built-in dependency injection, and strict TypeScript patterns.</li>
+<li><strong>Use Meld if:</strong> You want a lightweight element that doesn't drag a multi-megabyte framework along with it.</li>
+</ul>
+<hr>
+<h2>🌐 Next.js, SvelteKit, Remix, and Astro Integration</h2>
+<p>Meld does not compete with full-stack meta-frameworks. Instead, it serves as an <strong>isolated client-side widget provider</strong>.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Meta-Framework</th>
+<th style="text-align:left">Role of Meld.js</th>
+<th style="text-align:left">How to use</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><strong>Astro</strong></td>
+<td style="text-align:left">Perfect for interactive &quot;islands&quot;</td>
+<td style="text-align:left">Embed Meld elements inside Astro templates; use Declarative Shadow DOM (DSD) for hydration.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>Next.js</strong></td>
+<td style="text-align:left">Client-side micro-widget</td>
+<td style="text-align:left">Import Meld components inside client components (<code>&quot;use client&quot;</code>) using dynamic imports to bypass Node SSR environment errors.</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>SvelteKit / Remix</strong></td>
+<td style="text-align:left">Isolated dashboard widget</td>
+<td style="text-align:left">Embed as custom elements, leveraging Meld's context-isolation to prevent style/state pollution.</td>
+</tr>
+</tbody>
+</table>
 
 
         
@@ -908,22 +933,22 @@ Meld does not compete with full-stack meta-frameworks. Instead, it serves as an 
     <div class="footer-col">
       <div class="footer-heading head-docs">Resources</div>
       <div class="footer-links">
-        <a href="/"           class="footer-link">Documentation</a>
-        <a href="/core-api/"  class="footer-link">Core API</a>
-        <a href="/plugins/"   class="footer-link">Plugin Library</a>
-        <a href="/testing/"   class="footer-link">Testing</a>
-        <a href="/releases/"  class="footer-link">Releases</a>
+        <a href="/"                class="footer-link">Documentation</a>
+        <a href="/api-reference/"  class="footer-link">API Reference</a>
+        <a href="/plugins/"        class="footer-link">Plugin Library</a>
+        <a href="/releases/"       class="footer-link">Releases</a>
       </div>
     </div>
 
     <div class="footer-col">
       <div class="footer-heading head-social">Build Paths</div>
       <div class="footer-links">
-        <a href="/installation/"          class="footer-link">Install</a>
-        <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
-        <a href="/integrations/frontend/" class="footer-link">Frontend Integration</a>
-        <a href="/integrations/backend/"  class="footer-link">Backend Integration</a>
-        <a href="/architecture-kmel/"     class="footer-link">KMEL Stack</a>
+        <a href="/getting-started/installation/" class="footer-link">Install</a>
+        <a href="/getting-started/editor-setup/" class="footer-link">Editor &amp; VS Code</a>
+        <a href="/bootcamp/"                    class="footer-link">Bootcamp</a>
+        <a href="/integrations/frontend/"       class="footer-link">Frontend Integration</a>
+        <a href="/integrations/backend/"        class="footer-link">Backend Integration</a>
+        <a href="/architecture/architecture-kmel/" class="footer-link">KMEL Stack</a>
       </div>
     </div>
 

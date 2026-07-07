@@ -3,7 +3,25 @@
  * @plugin MeldRouter
  * @version 1.4.0
  */
+
+/**
+ * MeldRouter plugin object.
+ * Implements client-side hash routing, reactive active route views, route parameters parsing,
+ * global routing context provision, and support for the View Transitions API.
+ * 
+ * @type {object}
+ * @property {function} install - Installs routing capabilities and <meld-view> custom element.
+ */
 export const MeldRouter = {
+  /**
+   * Installs hash routing and configures routes on the API object.
+   * Defines `<meld-view>` and provides `router` globally.
+   * 
+   * @param {object} api - The Meld API instance.
+   * @param {object} options - Configuration options.
+   * @param {Array<{path: string, component: string}>} [options.routes=[]] - List of route configurations.
+   * @returns {void}
+   */
   install(api, options) {
     const { defineMeld, meldState, meldHtml, computed, provide } = api;
     const routes = options.routes || [];
@@ -12,6 +30,12 @@ export const MeldRouter = {
       currentPath: window.location.hash.slice(1) || '/'
     });
 
+    /**
+     * Internal listener to update routing state on hash change.
+     * Integrates View Transitions API if supported by the browser.
+     * 
+     * @returns {void}
+     */
     const updateRoute = () => {
       const newPath = window.location.hash.slice(1) || '/';
       
@@ -77,16 +101,31 @@ export const MeldRouter = {
 
     // Provide globally if needed, or to document.body, but for now we'll just mock it if it's meant to be global.
     // Expose router state globally or via context
+    
+    /**
+     * Global router API controller.
+     * 
+     * @type {object}
+     * @property {string} currentPath - Gets the active location hash path.
+     * @property {object} params - Gets parsed dynamic route parameters.
+     * @property {function(string): void} push - Navigates to a new hash path.
+     */
     const routerApi = { 
       get currentPath() { return routerState.currentPath; },
       get params() { return params(); },
+      /**
+       * Updates the window location hash to trigger routing.
+       * 
+       * @param {string} path - The target route path (e.g. `/home`).
+       * @returns {void}
+       */
       push: (path) => { window.location.hash = path; }
     };
 
     // Inject a special global provider if we are at root
     if (!document.querySelector('meld-view')) {
        // Naive global mock
-    }
+     }
 
     provide('router', routerApi);
     

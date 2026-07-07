@@ -17,7 +17,7 @@ We provide an official extension that handles syntax highlighting and provides s
 
 ### Option A: Install Official Extension
 
-Search for **"Meld.js Support"** in the VS Code Marketplace and install it. The extension provides:
+Search for **"Meld.js Support"** (`meld-js.meld-vscode`) in the VS Code Marketplace and install it. The extension provides:
 
 - Syntax highlighting for `meldHtml`, `meld.raw`, and `meld.theme` template literals.
 - Snippet library for common Meld component patterns.
@@ -55,7 +55,7 @@ Meld ships type definitions that work with VS Code's built-in TypeScript checker
     "allowJs": true,
     "noEmit": true,
     "paths": {
-      "meldjs": ["./node_modules/meldjs/dist/index.d.ts"]
+      "@meldjs/meld": ["./node_modules/@meldjs/meld/src/meld.d.ts"]
     }
   },
   "include": ["src/**/*", "components/**/*"]
@@ -66,7 +66,7 @@ Enable per-file type checking with a JSDoc comment at the top of any `.js` file:
 
 ```js
 // @ts-check
-import { meldHtml } from 'meldjs';
+import { meldHtml } from '@meldjs/meld';
 ```
 
 ### .vscode/settings.json — Formatting
@@ -106,7 +106,7 @@ Commit this file to share recommended extensions with your team:
     "esbenp.prettier-vscode",
     "dbaeumer.vscode-eslint",
     "Tobermory.es6-string-html",
-    "meldjs.meldjs-support",
+    "meld-js.meld-vscode",
     "ms-vscode.vscode-typescript-next",
     "mtxr.sqltools",
     "mtxr.sqltools-driver-pg"
@@ -138,7 +138,7 @@ npm install --save-dev meld-lsp
 }
 ```
 
-The LSP server starts automatically when VS Code opens a workspace containing a `meldjs` dependency.
+The LSP server starts automatically when VS Code opens a workspace containing a `@meldjs/meld` dependency.
 
 -----
 
@@ -283,7 +283,7 @@ Live Templates in WebStorm let you expand short abbreviations into full Meld com
 - **Template text:**
 
 ```javascript
-import { meldHtml, meld } from 'meldjs';
+import { meldHtml, meld } from '@meldjs/meld';
 
 export function $NAME$($PROPS$) {
   return meldHtml`

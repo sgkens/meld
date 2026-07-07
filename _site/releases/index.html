@@ -87,7 +87,7 @@
       <i data-lucide="book-open"></i>
       Docs
     </a>
-    <a href="/core-api/" >
+    <a href="/api-reference/" >
       <i data-lucide="braces"></i>
       API
     </a>
@@ -645,10 +645,17 @@
 
         <h1>Releases and Changelog</h1>
 <p>This page tracks the evolution of the Meld framework, including major features and patch fixes.</p>
-<h2>Meld v1.3 (Current - Battle Tested)</h2>
+<h2>Meld v1.4 (Current - Battle Tested)</h2>
 <ul>
-<li><strong>Status:</strong> Release Candidate (RC)</li>
-<li><strong>Date:</strong> [Insert Current Date]</li>
+<li><strong>Status:</strong> Stable</li>
+<li><strong>Date:</strong> July 2026</li>
+<li><strong>Key Features:</strong> Bypasses premature element lifecycle teardowns on DOM moves, hardens list rendering reconciliation against non-array values, and improves shadow root initialization safety.</li>
+<li><strong>Breaking Changes:</strong> None.</li>
+</ul>
+<h2>Meld v1.3 (Previous Stable)</h2>
+<ul>
+<li><strong>Status:</strong> Stable</li>
+<li><strong>Date:</strong> June 2026</li>
 <li><strong>Key Features:</strong> Introduced the full Testing and Quality Assurance layer. Implemented <code>meld-devtools</code> and finalized core patches for stability.</li>
 <li><strong>Breaking Changes:</strong> None.</li>
 </ul>
@@ -672,6 +679,21 @@
 </tr>
 </thead>
 <tbody>
+<tr>
+<td style="text-align:left"><strong>1.4.0</strong></td>
+<td style="text-align:left">ADDED: Component move keep-alive in <code>connectedCallback</code>.</td>
+<td style="text-align:left">Core</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>1.4.0</strong></td>
+<td style="text-align:left">FIX: Hardened <code><a href="/api-reference/#meldList">meld.list</a></code> fallback iteration.</td>
+<td style="text-align:left">Utility (<code><a href="/api-reference/#meldList">meld.list</a></code>)</td>
+</tr>
+<tr>
+<td style="text-align:left"><strong>1.4.0</strong></td>
+<td style="text-align:left">FIX: Dynamic node insertion parent safety checks.</td>
+<td style="text-align:left">Core</td>
+</tr>
 <tr>
 <td style="text-align:left"><strong>1.3.0</strong></td>
 <td style="text-align:left">ADDED: <code>meld-microbus</code> for decoupled messaging.</td>
@@ -807,22 +829,22 @@
     <div class="footer-col">
       <div class="footer-heading head-docs">Resources</div>
       <div class="footer-links">
-        <a href="/"           class="footer-link">Documentation</a>
-        <a href="/core-api/"  class="footer-link">Core API</a>
-        <a href="/plugins/"   class="footer-link">Plugin Library</a>
-        <a href="/testing/"   class="footer-link">Testing</a>
-        <a href="/releases/"  class="footer-link">Releases</a>
+        <a href="/"                class="footer-link">Documentation</a>
+        <a href="/api-reference/"  class="footer-link">API Reference</a>
+        <a href="/plugins/"        class="footer-link">Plugin Library</a>
+        <a href="/releases/"       class="footer-link">Releases</a>
       </div>
     </div>
 
     <div class="footer-col">
       <div class="footer-heading head-social">Build Paths</div>
       <div class="footer-links">
-        <a href="/installation/"          class="footer-link">Install</a>
-        <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
-        <a href="/integrations/frontend/" class="footer-link">Frontend Integration</a>
-        <a href="/integrations/backend/"  class="footer-link">Backend Integration</a>
-        <a href="/architecture-kmel/"     class="footer-link">KMEL Stack</a>
+        <a href="/getting-started/installation/" class="footer-link">Install</a>
+        <a href="/getting-started/editor-setup/" class="footer-link">Editor &amp; VS Code</a>
+        <a href="/bootcamp/"                    class="footer-link">Bootcamp</a>
+        <a href="/integrations/frontend/"       class="footer-link">Frontend Integration</a>
+        <a href="/integrations/backend/"        class="footer-link">Backend Integration</a>
+        <a href="/architecture/architecture-kmel/" class="footer-link">KMEL Stack</a>
       </div>
     </div>
 

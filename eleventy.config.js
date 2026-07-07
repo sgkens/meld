@@ -72,7 +72,8 @@ export default function eleventyConfig(config) {
   };
 
   config.addPassthroughCopy({
-    'docs/assets': 'assets'
+    'docs/assets': 'assets',
+    'docs/_redirects': '_redirects'
   });
   config.addPassthroughCopy('logo.svg');
   config.ignores.add('docs/skipped/**');

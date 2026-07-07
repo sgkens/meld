@@ -20,7 +20,7 @@ Meld components are standard Custom Elements. React 19 improved custom element s
 - Meld.js available as an ES module
 
 ```bash
-npm install meldjs
+npm install @meldjs/meld
 ```
 
 ---

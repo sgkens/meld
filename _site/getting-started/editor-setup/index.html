@@ -87,7 +87,7 @@
       <i data-lucide="book-open"></i>
       Docs
     </a>
-    <a href="/core-api/" >
+    <a href="/api-reference/" >
       <i data-lucide="braces"></i>
       API
     </a>
@@ -653,7 +653,7 @@
 <h2>1. VS Code</h2>
 <p>We provide an official extension that handles syntax highlighting and provides snippets.</p>
 <h3>Option A: Install Official Extension</h3>
-<p>Search for <strong>&quot;Meld.js Support&quot;</strong> in the VS Code Marketplace and install it. The extension provides:</p>
+<p>Search for <strong>&quot;Meld.js Support&quot;</strong> (<code>meld-js.meld-vscode</code>) in the VS Code Marketplace and install it. The extension provides:</p>
 <ul>
 <li>Syntax highlighting for <code><a href="/api-reference/#meldHtml">meldHtml</a></code>, <code><a href="/api-reference/#meldRaw">meld.raw</a></code>, and <code><a href="/api-reference/#meldTheme">meld.theme</a></code> template literals.</li>
 <li>Snippet library for common Meld component patterns.</li>
@@ -684,14 +684,14 @@
     <span class="token property">"allowJs"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
     <span class="token property">"noEmit"</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
     <span class="token property">"paths"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
-      <span class="token property">"meldjs"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"./node_modules/meldjs/dist/index.d.ts"</span><span class="token punctuation">]</span>
+      <span class="token property">"@meldjs/meld"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"./node_modules/@meldjs/meld/src/meld.d.ts"</span><span class="token punctuation">]</span>
     <span class="token punctuation">}</span>
   <span class="token punctuation">}</span><span class="token punctuation">,</span>
   <span class="token property">"include"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token string">"src/**/*"</span><span class="token punctuation">,</span> <span class="token string">"components/**/*"</span><span class="token punctuation">]</span>
 <span class="token punctuation">}</span></code></pre>
 <p>Enable per-file type checking with a JSDoc comment at the top of any <code>.js</code> file:</p>
 <pre class="language-js" tabindex="0"><code class="language-js"><span class="token comment">// @ts-check</span>
-<span class="token keyword">import</span> <span class="token punctuation">{</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span></code></pre>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@meldjs/meld'</span><span class="token punctuation">;</span></code></pre>
 <h3>.vscode/settings.json — Formatting</h3>
 <p>The following workspace settings enforce consistent formatting with Prettier and enable JS type checking:</p>
 <pre class="language-json" tabindex="0"><code class="language-json"><span class="token punctuation">{</span>
@@ -721,7 +721,7 @@
     <span class="token string">"esbenp.prettier-vscode"</span><span class="token punctuation">,</span>
     <span class="token string">"dbaeumer.vscode-eslint"</span><span class="token punctuation">,</span>
     <span class="token string">"Tobermory.es6-string-html"</span><span class="token punctuation">,</span>
-    <span class="token string">"meldjs.meldjs-support"</span><span class="token punctuation">,</span>
+    <span class="token string">"meld-js.meld-vscode"</span><span class="token punctuation">,</span>
     <span class="token string">"ms-vscode.vscode-typescript-next"</span><span class="token punctuation">,</span>
     <span class="token string">"mtxr.sqltools"</span><span class="token punctuation">,</span>
     <span class="token string">"mtxr.sqltools-driver-pg"</span>
@@ -742,7 +742,7 @@
   <span class="token property">"meld-lsp.rootDir"</span><span class="token operator">:</span> <span class="token string">"./src"</span><span class="token punctuation">,</span>
   <span class="token property">"meld-lsp.diagnostics.strictSlots"</span><span class="token operator">:</span> <span class="token boolean">true</span>
 <span class="token punctuation">}</span></code></pre>
-<p>The LSP server starts automatically when VS Code opens a workspace containing a <code>meldjs</code> dependency.</p>
+<p>The LSP server starts automatically when VS Code opens a workspace containing a <code>@meldjs/meld</code> dependency.</p>
 <hr>
 <h2>2. Neovim (Tree-sitter)</h2>
 <p>Neovim users can get perfect highlighting by adding a Tree-sitter query injection.</p>
@@ -837,7 +837,7 @@ Plug <span class="token string">'jonsmithers/vim-html-template-literals'</span><
 <li><strong>Description:</strong> Meld component boilerplate</li>
 <li><strong>Template text:</strong></li>
 </ul>
-<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> meldHtml<span class="token punctuation">,</span> meld <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> meldHtml<span class="token punctuation">,</span> meld <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@meldjs/meld'</span><span class="token punctuation">;</span>
 
 <span class="token keyword">export</span> <span class="token keyword">function</span> $<span class="token constant">NAME</span><span class="token function">$</span><span class="token punctuation">(</span><span class="token parameter">$<span class="token constant">PROPS</span>$</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
   <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
@@ -1188,22 +1188,22 @@ localhost:5432:kmel_test:postgres:yourpassword
     <div class="footer-col">
       <div class="footer-heading head-docs">Resources</div>
       <div class="footer-links">
-        <a href="/"           class="footer-link">Documentation</a>
-        <a href="/core-api/"  class="footer-link">Core API</a>
-        <a href="/plugins/"   class="footer-link">Plugin Library</a>
-        <a href="/testing/"   class="footer-link">Testing</a>
-        <a href="/releases/"  class="footer-link">Releases</a>
+        <a href="/"                class="footer-link">Documentation</a>
+        <a href="/api-reference/"  class="footer-link">API Reference</a>
+        <a href="/plugins/"        class="footer-link">Plugin Library</a>
+        <a href="/releases/"       class="footer-link">Releases</a>
       </div>
     </div>
 
     <div class="footer-col">
       <div class="footer-heading head-social">Build Paths</div>
       <div class="footer-links">
-        <a href="/installation/"          class="footer-link">Install</a>
-        <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
-        <a href="/integrations/frontend/" class="footer-link">Frontend Integration</a>
-        <a href="/integrations/backend/"  class="footer-link">Backend Integration</a>
-        <a href="/architecture-kmel/"     class="footer-link">KMEL Stack</a>
+        <a href="/getting-started/installation/" class="footer-link">Install</a>
+        <a href="/getting-started/editor-setup/" class="footer-link">Editor &amp; VS Code</a>
+        <a href="/bootcamp/"                    class="footer-link">Bootcamp</a>
+        <a href="/integrations/frontend/"       class="footer-link">Frontend Integration</a>
+        <a href="/integrations/backend/"        class="footer-link">Backend Integration</a>
+        <a href="/architecture/architecture-kmel/" class="footer-link">KMEL Stack</a>
       </div>
     </div>
 

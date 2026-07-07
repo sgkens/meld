@@ -3,9 +3,6 @@
 
   # MELDjs
 
-
- *`Meldjs` - Fusing simplicity with performance.* **--• Made with ❤️ by the Meldjs Team**
-
 <img src="https://shields.io/badge/license-MIT-blue.svg" alt="License: MIT" /> <img src="https://shields.io/badge/size-2kb-brightgreen.svg" alt="Size: 2kb" /> <img src="https://shields.io/badge/build-passing-brightgreen.svg" alt="Build: Passing" /> <img src="https://shields.io/badge/version-1.0.0-blue.svg" alt="Version: 1.0.0" />
   
   ---
@@ -14,13 +11,11 @@
   *Reactive State. Native Components. No Build Step.*
 
   <span>
-      <code>
       <a href="https://meldjs.dev">🌐 <i><b>Meldjs.dev</b></i></a>
       <a href="https://meldjs.dev/core-api">📒 <i>API Reference</i></a>
-      <a href="https://www.npmjs.com/package/meldjs">📦 <i>NPM</i></a>
-      <a href="https://jsr.io/@meldjs/meldjs">🧊 <i>JSR</i></a>
+      <a href="https://www.npmjs.com/package/@meldjs/meld">📦 <i>NPM</i></a>
+      <a href="https://jsr.io/@meldjs/meld">🧊 <i>JSR</i></a>
       <a href="https://github.com/meldjs/meldjs">⬛  <i>GitHub</i></a>
-      </code>
   </span>
   <br>
   <br>

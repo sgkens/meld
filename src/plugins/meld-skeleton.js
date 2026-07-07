@@ -1,4 +1,18 @@
+/**
+ * MeldSkeleton plugin object.
+ * Defines a `<meld-skeleton>` custom element for rendering animated placeholder shimmer skeletons during loading states.
+ * 
+ * @type {object}
+ * @property {function} install - Installs skeleton element on the Meld instance.
+ */
 export const MeldSkeleton = {
+  /**
+   * Installs the skeleton placeholder component on the API object.
+   * Defines `<meld-skeleton>` custom element with configurable width, height, and shape.
+   * 
+   * @param {object} api - The Meld API instance.
+   * @returns {void}
+   */
   install(api) {
     api.defineMeld('meld-skeleton', (el) => {
       const w = el.getAttribute('width') || '100%';

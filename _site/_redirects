@@ -1,0 +1,11 @@
+# Permanent redirects for legacy URL paths that have moved under getting-started/ or architecture/
+/installation/           /getting-started/installation/           301
+/installation            /getting-started/installation/           301
+/nested-components/      /getting-started/nested-components/      301
+/nested-components       /getting-started/nested-components/      301
+/editor-setup/           /getting-started/editor-setup/           301
+/editor-setup            /getting-started/editor-setup/           301
+/core-api/               /api-reference/                         301
+/core-api                /api-reference/                         301
+/architecture-kmel/      /architecture/architecture-kmel/         301
+/architecture-kmel       /architecture/architecture-kmel/         301

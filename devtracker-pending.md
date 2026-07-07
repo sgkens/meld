@@ -7,6 +7,9 @@ Use this tracker as the local source of truth for release hardening, testing gap
 ## **Tasklist**
 
 ### **Issues Remaining (priority-1)**
+- [x] update all function plugins to have JSDoc fully documented inline with best practice + a little love on the top makes for a better DX
+- [x] update the docs site to reference npm meldjs group name pace @meldjs/meld
+- [x] Templaing and rendering page has broken sytax calling render to bleed have have a look and fix
 - [x] **Critical** - sidebar sroll to view is off, active page should be near the top eleganly not to distract
 - [x] **Critical** - Do a docs audit and make sure we are using the correct syntax for code blocks, some pages are broken namley astro, cli page as double yaml font matter in the page 
 - [x] **creitcal** - lets use the api styling of the strict api page on other pages on meld docs make it uniform keep old style where makes sence.

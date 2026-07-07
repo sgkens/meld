@@ -134,6 +134,104 @@ describe('Meld Core Rendering', () => {
     expect(shadow.querySelector('span')).toBe(preSpan);
     expect(shadow.innerHTML).toBe('<div>Label: <span>hydrated-and-updated</span></div>');
   });
+
+  it('handles element disconnect and reconnect (moving) without duplicating content or breaking reactivity', async () => {
+    const tagName = `m-test-move-${Date.now()}`;
+    let setupCount = 0;
+    
+    defineMeld(tagName, (el, { attrs }) => {
+      setupCount++;
+      return meldHtml`<div>Count: <span>${() => attrs.val}</span></div>`;
+    }, { observedAttributes: ['val'] });
+
+    const parent1 = document.createElement('div');
+    const parent2 = document.createElement('div');
+    document.body.appendChild(parent1);
+    document.body.appendChild(parent2);
+
+    const element = document.createElement(tagName);
+    element.setAttribute('val', '10');
+    parent1.appendChild(element);
+    await tick();
+
+    // Verify initial setup
+    expect(setupCount).toBe(1);
+    expect(element.shadowRoot.querySelectorAll('div').length).toBe(1);
+    expect(element.shadowRoot.querySelector('span').textContent).toBe('10');
+
+    // Move element to parent2 (disconnects and reconnects in same tick)
+    parent2.appendChild(element);
+    await tick();
+
+    // Verify it was NOT re-initialized, did NOT duplicate, and kept reactivity
+    expect(setupCount).toBe(1); // setupFn should not run again
+    expect(element.shadowRoot.querySelectorAll('div').length).toBe(1); // no duplicate templates
+    
+    // Verify it still responds to attribute updates
+    element.setAttribute('val', '20');
+    await tick();
+    expect(element.shadowRoot.querySelector('span').textContent).toBe('20');
+
+    // Remove element permanently, wait for microtask cleanup
+    element.remove();
+    await tick();
+
+    // Re-append element, it should now re-initialize as it was permanently destroyed
+    parent1.appendChild(element);
+    await tick();
+    expect(setupCount).toBe(2);
+    expect(element.shadowRoot.querySelectorAll('div').length).toBe(1); // old template cleared before appending new one
+  });
+
+  it('meld.list defaults gracefully to an empty array when given null, undefined, or invalid array data', () => {
+    const listFn = meld.list(null, (x) => x, (x) => meldHtml`<li>${x}</li>`);
+    const fragment1 = listFn();
+    expect(fragment1.childNodes.length).toBe(0);
+
+    const listFn2 = meld.list(undefined, (x) => x, (x) => meldHtml`<li>${x}</li>`);
+    const fragment2 = listFn2();
+    expect(fragment2.childNodes.length).toBe(0);
+
+    const listFn3 = meld.list('invalid', (x) => x, (x) => meldHtml`<li>${x}</li>`);
+    const fragment3 = listFn3();
+    expect(fragment3.childNodes.length).toBe(0);
+  });
+
+  it('supports reactive properties option in defineMeld', async () => {
+    const tagName = `m-test-props-${Date.now()}`;
+    defineMeld(tagName, (el, { props }) => {
+      return meldHtml`<div>Value: <span>${() => props.val || 'empty'}</span></div>`;
+    }, { properties: ['val'] });
+
+    const element = document.createElement(tagName);
+    document.body.appendChild(element);
+
+    expect(element.shadowRoot.textContent).toContain('Value: empty');
+
+    element.val = 'prop-updated';
+    await tick();
+    expect(element.shadowRoot.textContent).toContain('Value: prop-updated');
+  });
+
+  it('supports optional updateFn in meld.list', () => {
+    const items = [{ id: 1, text: 'A' }];
+    const updateFn = jest.fn((node, item) => {
+      node.textContent = item.text;
+    });
+    
+    const listFn = meld.list(items, (x) => x.id, (x) => document.createElement('div'), updateFn);
+    const fragment = listFn();
+    expect(fragment.childNodes.length).toBe(1);
+    expect(fragment.childNodes[0].textContent).toBe('A');
+    expect(updateFn).toHaveBeenCalledTimes(1);
+
+    // Reuse node in list and verify updateFn is called on update
+    items[0].text = 'B';
+    const fragment2 = listFn();
+    expect(fragment2.childNodes.length).toBe(1);
+    expect(fragment2.childNodes[0].textContent).toBe('B');
+    expect(updateFn).toHaveBeenCalledTimes(2);
+  });
 });
 
 describe('Meld Plugins', () => {

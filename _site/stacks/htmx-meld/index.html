@@ -87,7 +87,7 @@
       <i data-lucide="book-open"></i>
       Docs
     </a>
-    <a href="/core-api/" >
+    <a href="/api-reference/" >
       <i data-lucide="braces"></i>
       API
     </a>
@@ -758,7 +758,7 @@
 <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>section</span><span class="token punctuation">></span></span></code></pre>
 <p>The Meld component reads <code>data-endpoint</code> after mount and fetches its own data:</p>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// meld/meld-bar-chart.js</span>
-<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@meldjs/meld'</span><span class="token punctuation">;</span>
 
 <span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'meld-bar-chart'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> signal<span class="token punctuation">,</span> effect <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
   <span class="token keyword">const</span> chartData <span class="token operator">=</span> <span class="token function">signal</span><span class="token punctuation">(</span><span class="token keyword">null</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -786,7 +786,7 @@
 <h2>4. Wiring HTMX Events to Meld Components</h2>
 <p>HTMX emits lifecycle events on the DOM (<code>htmx:afterSwap</code>, <code>htmx:beforeRequest</code>, <code>htmx:responseError</code>, etc.). Meld components can listen to these events to react to navigation and swap state.</p>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// meld/meld-loading-indicator.js</span>
-<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@meldjs/meld'</span><span class="token punctuation">;</span>
 
 <span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'meld-loading-indicator'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> signal <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
   <span class="token keyword">const</span> active <span class="token operator">=</span> <span class="token function">signal</span><span class="token punctuation">(</span><span class="token boolean">false</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -821,7 +821,7 @@
 <h2>5. Triggering HTMX Requests from Meld Components</h2>
 <p>Meld components can trigger HTMX requests programmatically by dispatching the <code>htmx:trigger</code> event or by calling <code>htmx.ajax()</code> directly.</p>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// meld/meld-filter-bar.js</span>
-<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@meldjs/meld'</span><span class="token punctuation">;</span>
 
 <span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'meld-filter-bar'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> signal <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
   <span class="token keyword">const</span> activeFilter <span class="token operator">=</span> <span class="token function">signal</span><span class="token punctuation">(</span><span class="token string">'all'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
@@ -863,7 +863,7 @@
 <span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
 <p>Meld components import and read from this singleton:</p>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> session <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'../state/session.js'</span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'meldjs'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@meldjs/meld'</span><span class="token punctuation">;</span>
 
 <span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'meld-user-avatar'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
   <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
@@ -1038,22 +1038,22 @@
     <div class="footer-col">
       <div class="footer-heading head-docs">Resources</div>
       <div class="footer-links">
-        <a href="/"           class="footer-link">Documentation</a>
-        <a href="/core-api/"  class="footer-link">Core API</a>
-        <a href="/plugins/"   class="footer-link">Plugin Library</a>
-        <a href="/testing/"   class="footer-link">Testing</a>
-        <a href="/releases/"  class="footer-link">Releases</a>
+        <a href="/"                class="footer-link">Documentation</a>
+        <a href="/api-reference/"  class="footer-link">API Reference</a>
+        <a href="/plugins/"        class="footer-link">Plugin Library</a>
+        <a href="/releases/"       class="footer-link">Releases</a>
       </div>
     </div>
 
     <div class="footer-col">
       <div class="footer-heading head-social">Build Paths</div>
       <div class="footer-links">
-        <a href="/installation/"          class="footer-link">Install</a>
-        <a href="/bootcamp/"              class="footer-link">Bootcamp</a>
-        <a href="/integrations/frontend/" class="footer-link">Frontend Integration</a>
-        <a href="/integrations/backend/"  class="footer-link">Backend Integration</a>
-        <a href="/architecture-kmel/"     class="footer-link">KMEL Stack</a>
+        <a href="/getting-started/installation/" class="footer-link">Install</a>
+        <a href="/getting-started/editor-setup/" class="footer-link">Editor &amp; VS Code</a>
+        <a href="/bootcamp/"                    class="footer-link">Bootcamp</a>
+        <a href="/integrations/frontend/"       class="footer-link">Frontend Integration</a>
+        <a href="/integrations/backend/"        class="footer-link">Backend Integration</a>
+        <a href="/architecture/architecture-kmel/" class="footer-link">KMEL Stack</a>
       </div>
     </div>
 

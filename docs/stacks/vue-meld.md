@@ -20,7 +20,7 @@ Meld components are standards-compliant Custom Elements (Web Components). Vue 3 
 - Meld.js installed in the same project or loaded as an ES module
 
 ```bash
-npm install meldjs
+npm install @meldjs/meld
 ```
 
 ---
@@ -153,7 +153,7 @@ export const appState = reactive({
 
 ```javascript
 // src/meld/meld-notification-bell.js
-import { defineMeld, meldHtml } from 'meldjs';
+import { defineMeld, meldHtml } from '@meldjs/meld';
 
 defineMeld('meld-notification-bell', (el, { signal, effect }) => {
   const count = signal(0);
