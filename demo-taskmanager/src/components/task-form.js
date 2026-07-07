@@ -1,4 +1,4 @@
-import { defineMeld, meldHtml } from '../../../src/meld.core.js';
+import { defineMeld, meldHtml, store } from '../../../src/meld.core.js';
 import { actions } from '../store.js';
 
 defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
@@ -11,7 +11,9 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
       title: task ? task.title : '',
       description: task ? task.description : '',
       category: task ? task.category : 'General',
-      priority: task ? task.priority : 'medium'
+      priority: task ? task.priority : 'medium',
+      milestone: task ? (task.milestone || '') : '',
+      tags: task ? (Array.isArray(task.tags) ? task.tags.join(', ') : '') : ''
     },
     {
       title: ['required']
@@ -19,15 +21,21 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
   );
 
   const save = (data) => {
+    const formattedData = {
+      ...data,
+      milestone: data.milestone || null,
+      tags: typeof data.tags === 'string' ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : (data.tags || [])
+    };
+
     if (isEdit) {
-      actions.updateTask(task.id, data);
+      actions.updateTask(task.id, formattedData);
       if (announce) {
-        announce(`Task "${data.title}" has been updated successfully.`);
+        announce(`Task "${formattedData.title}" has been updated successfully.`);
       }
     } else {
-      actions.addTask(data);
+      actions.addTask(formattedData);
       if (announce) {
-        announce(`Task "${data.title}" has been created successfully.`);
+        announce(`Task "${formattedData.title}" has been created successfully.`);
       }
     }
     emit('success');
@@ -152,6 +160,33 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
             <option value="medium" ?selected="${() => fields.priority === 'medium'}">Medium</option>
             <option value="high" ?selected="${() => fields.priority === 'high'}">High</option>
           </select>
+        </div>
+      </div>
+
+      <div class="grid-2">
+        <div class="form-group">
+          <label for="task-milestone">Milestone</label>
+          <select
+            id="task-milestone"
+            class="form-control"
+            onchange="${(e) => { fields.milestone = e.target.value || ''; }}"
+          >
+            <option value="">None</option>
+            ${() => store.milestones.map(m => meldHtml`
+              <option value="${m}" ?selected="${() => fields.milestone === m}">${m}</option>
+            `)}
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="task-tags">Tags (comma-separated)</label>
+          <input
+            id="task-tags"
+            class="form-control"
+            value="${() => fields.tags}"
+            oninput="${(e) => { fields.tags = e.target.value; }}"
+            placeholder="e.g. frontend, core, docs"
+          />
         </div>
       </div>
 

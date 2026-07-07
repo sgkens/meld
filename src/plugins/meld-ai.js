@@ -60,5 +60,15 @@ export const MeldAI = {
         prompt 
       };
     };
+  },
+  /**
+   * Sets up helpers for components by returning an object containing `useAI`.
+   * 
+   * @param {object} api - The Meld API instance.
+   * @returns {object} Object containing the AI helper.
+   * @returns {function} returns.useAI - The useAI helper function.
+   */
+  setupHelpers(api) {
+    return { useAI: api.useAI };
   }
 };

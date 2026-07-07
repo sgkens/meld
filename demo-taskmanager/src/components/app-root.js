@@ -8,6 +8,12 @@ import { MeldDevtools } from '../../../src/plugins/meld-devtools.js';
 import { MeldForms } from '../../../src/plugins/meld-forms.js';
 import { MeldStore } from '../../../src/plugins/meld-store.js';
 
+import { MeldPersist } from '../../../src/plugins/meld-persist.js';
+import { MeldBroadcast } from '../../../src/plugins/meld-broadcast.js';
+import { MeldMarkdown } from '../../../src/plugins/meld-markdown.js';
+import { MeldAI } from '../../../src/plugins/meld-ai.js';
+import { MeldDownload } from '../../../src/plugins/meld-download.js';
+
 import { store, actions } from '../store.js';
 import './pages.js';
 import './dev-panel.js';
@@ -20,6 +26,11 @@ use(MeldLogger);
 use(MeldTime);
 use(MeldPortal);
 use(MeldDevtools); // Custom updates flashing plugin
+use(MeldPersist);
+use(MeldBroadcast);
+use(MeldMarkdown);
+use(MeldAI);
+use(MeldDownload);
 
 // Setup client side hash router config
 use(MeldRouter, {
@@ -27,6 +38,7 @@ use(MeldRouter, {
     { path: '/', component: 'page-dashboard' },
     { path: '/board', component: 'page-board' },
     { path: '/activity', component: 'page-activity' },
+    { path: '/archive', component: 'page-archive' },
     { path: '/settings', component: 'page-settings' }
   ]
 });
@@ -229,6 +241,9 @@ defineMeld('app-root', (el) => {
           </a>
           <a href="#/activity" class="${() => getNavLinkClass('/activity')}">
             <span>🕒</span> Activity Log
+          </a>
+          <a href="#/archive" class="${() => getNavLinkClass('/archive')}">
+            <span>📦</span> Archive
           </a>
           <a href="#/settings" class="${() => getNavLinkClass('/settings')}">
             <span>⚙️</span> Settings

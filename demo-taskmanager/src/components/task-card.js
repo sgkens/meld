@@ -1,7 +1,7 @@
-import { defineMeld, meldHtml } from '../../../src/meld.core.js';
+import { defineMeld, meldHtml, store } from '../../../src/meld.core.js';
 import { actions } from '../store.js';
 
-defineMeld('task-card', (el, { emit, props }) => {
+defineMeld('task-card', (el, { emit, props, effect }) => {
   // Grab the task object dynamically from props or fallback to element property
   const getTask = () => props.task || el.task;
 
@@ -28,6 +28,22 @@ defineMeld('task-card', (el, { emit, props }) => {
     }
   };
 
+  const archive = () => {
+    const t = getTask();
+    if (t) {
+      actions.archiveTask(t.id);
+      emit('archived', t.id);
+    }
+  };
+
+  const restore = () => {
+    const t = getTask();
+    if (t) {
+      actions.unarchiveTask(t.id);
+      emit('unarchived', t.id);
+    }
+  };
+
   const priorityColor = () => {
     const t = getTask();
     if (!t) return '#6b7280';
@@ -45,6 +61,38 @@ defineMeld('task-card', (el, { emit, props }) => {
     done: '✅'
   };
 
+  // Drag & Drop Handlers
+  const handleDragStart = (e) => {
+    const t = getTask();
+    if (t) {
+      e.dataTransfer.setData('text/plain', t.id.toString());
+      e.dataTransfer.effectAllowed = 'move';
+      el.classList.add('dragging');
+      // Set opacity for drag feedback
+      setTimeout(() => {
+        el.style.opacity = '0.4';
+      }, 0);
+    }
+  };
+
+  const handleDragEnd = () => {
+    el.classList.remove('dragging');
+    el.style.opacity = '';
+  };
+
+  // Bind drag events reactively depending on settings
+  effect(() => {
+    if (store.enableDragAndDrop) {
+      el.setAttribute('draggable', 'true');
+      el.addEventListener('dragstart', handleDragStart);
+      el.addEventListener('dragend', handleDragEnd);
+    } else {
+      el.removeAttribute('draggable');
+      el.removeEventListener('dragstart', handleDragStart);
+      el.removeEventListener('dragend', handleDragEnd);
+    }
+  });
+
   return meldHtml`
     <style>
       :host {
@@ -58,10 +106,18 @@ defineMeld('task-card', (el, { emit, props }) => {
         transition: box-shadow 0.2s, transform 0.2s;
         position: relative;
         overflow: hidden;
+        cursor: grab;
+      }
+      :host(:active) {
+        cursor: grabbing;
       }
       :host(:hover) {
         box-shadow: var(--mui-shadow-md);
         transform: translateY(-2px);
+      }
+      :host(.dragging) {
+        border: 2px dashed var(--mui-primary) !important;
+        box-shadow: none;
       }
       
       .priority-indicator {
@@ -91,8 +147,47 @@ defineMeld('task-card', (el, { emit, props }) => {
         font-size: 0.82rem;
         color: var(--mui-fg);
         opacity: 0.75;
-        margin: 0 0 var(--mui-space-4) 0;
+        margin: 0 0 var(--mui-space-3) 0;
         line-height: 1.4;
+      }
+
+      .tags-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-bottom: var(--mui-space-3);
+      }
+
+      .tag-pill {
+        background: var(--mui-surface);
+        border: 1px solid var(--mui-border);
+        font-size: 0.65rem;
+        font-weight: 600;
+        color: var(--mui-fg);
+        padding: 1px 6px;
+        border-radius: 10px;
+        opacity: 0.8;
+        cursor: pointer;
+        transition: all 0.15s;
+      }
+      .tag-pill:hover {
+        background: var(--mui-primary);
+        color: var(--mui-primary-fg);
+        opacity: 1;
+      }
+
+      .milestone-tag {
+        font-size: 0.7rem;
+        background: #eff6ff;
+        border: 1px solid #bfdbfe;
+        color: #1d4ed8;
+        padding: 1px 5px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        margin-bottom: var(--mui-space-2);
+        font-weight: 500;
       }
 
       .card-meta {
@@ -151,6 +246,11 @@ defineMeld('task-card', (el, { emit, props }) => {
         background: color-mix(in srgb, var(--mui-primary) 10%, transparent);
         border-color: var(--mui-primary);
       }
+      .action-btn.archive:hover {
+        background: #f0f9ff;
+        border-color: #93c5fd;
+        color: #0369a1;
+      }
       .action-btn.delete:hover {
         background: #fef2f2;
         border-color: #fca5a5;
@@ -180,10 +280,36 @@ defineMeld('task-card', (el, { emit, props }) => {
       }}</span>
     </div>
 
-    <p class="description">${() => {
+    ${() => {
       const t = getTask();
-      return t ? (t.description || 'No description provided.') : '';
-    }}</p>
+      if (t && t.milestone) {
+        return meldHtml`
+          <span class="milestone-tag">🏁 ${t.milestone}</span>
+        `;
+      }
+      return '';
+    }}
+
+    <div class="description">
+      <meld-markdown content="${() => {
+        const t = getTask();
+        return t ? (t.description || '*No description provided.*') : '';
+      }}"></meld-markdown>
+    </div>
+
+    ${() => {
+      const t = getTask();
+      if (t && Array.isArray(t.tags) && t.tags.length > 0) {
+        return meldHtml`
+          <div class="tags-list">
+            ${t.tags.map(tag => meldHtml`
+              <span class="tag-pill" onclick="${() => actions.setFilterTag(tag)}">#${tag}</span>
+            `)}
+          </div>
+        `;
+      }
+      return '';
+    }}
 
     <div class="card-meta">
       <div class="meta-left">
@@ -203,26 +329,20 @@ defineMeld('task-card', (el, { emit, props }) => {
         ${() => {
           const t = getTask();
           if (!t) return '';
-          return t.status !== 'todo' 
-            ? meldHtml`<button class="action-btn" onclick="${() => setStatus('todo')}" title="Move to To Do">${statusIcons.todo} To Do</button>` 
-            : '';
+          
+          if (t.archived) {
+            return meldHtml`
+              <button class="action-btn archive" onclick="${restore}" title="Unarchive Task">📤 Restore</button>
+              <button class="action-btn delete" onclick="${remove}" title="Permanently Delete Task">🗑️ Delete</button>
+            `;
+          }
+          
+          return meldHtml`
+            <button class="action-btn edit" onclick="${edit}" title="Edit Task">✏️</button>
+            <button class="action-btn archive" onclick="${archive}" title="Archive Task">📦 Archive</button>
+            <button class="action-btn delete" onclick="${remove}" title="Delete Task">🗑️</button>
+          `;
         }}
-        ${() => {
-          const t = getTask();
-          if (!t) return '';
-          return t.status !== 'doing' 
-            ? meldHtml`<button class="action-btn" onclick="${() => setStatus('doing')}" title="Move to In Progress">${statusIcons.doing} Doing</button>` 
-            : '';
-        }}
-        ${() => {
-          const t = getTask();
-          if (!t) return '';
-          return t.status !== 'done' 
-            ? meldHtml`<button class="action-btn" onclick="${() => setStatus('done')}" title="Complete Task">${statusIcons.done} Done</button>` 
-            : '';
-        }}
-        <button class="action-btn edit" onclick="${edit}" title="Edit Task">✏️</button>
-        <button class="action-btn delete" onclick="${remove}" title="Delete Task">🗑️</button>
       </div>
     </div>
   `;

@@ -209,20 +209,30 @@ defineMeld('page-dashboard', () => {
           ${() => recentActivities().length === 0 ? "No activities recorded." : ""}
         </div>
       </div>
+      ${() => store.showAICopilot ? meldHtml`
+        <div style="grid-column: 1 / -1; margin-top: var(--mui-space-2)">
+          <ai-copilot></ai-copilot>
+        </div>
+      ` : ''}
     </div>
   `;
 });
 
 
-// --- PAGE: KANBAN BOARD ---
 defineMeld('page-board', () => {
   const ui = meldState({ showModal: false, editingTask: null });
 
-  // Filter tasks based on global store filter & search query
+  // Filter tasks based on global store category, milestone, tag filters, & search query
   const filteredTasks = computed(() => {
-    let list = store.tasks;
+    let list = store.tasks.filter(t => !t.archived); // Exclude archived tasks on the board
     if (store.filter !== 'all') {
       list = list.filter(t => t.category === store.filter);
+    }
+    if (store.filterMilestone !== 'all') {
+      list = list.filter(t => t.milestone === store.filterMilestone);
+    }
+    if (store.filterTag !== 'all') {
+      list = list.filter(t => t.tags && t.tags.includes(store.filterTag));
     }
     if (store.searchQuery) {
       const q = store.searchQuery.toLowerCase();
@@ -237,6 +247,39 @@ defineMeld('page-board', () => {
 
   const categories = ['all', 'General', 'Learning', 'Development', 'DX'];
 
+  // Compute all unique tags from active tasks dynamically
+  const allTags = computed(() => {
+    const tags = new Set();
+    store.tasks.forEach(t => {
+      if (!t.archived && Array.isArray(t.tags)) {
+        t.tags.forEach(tag => tags.add(tag));
+      }
+    });
+    return Array.from(tags);
+  });
+
+  // Drag & Drop Handlers on Columns
+  const handleDrop = (e, status) => {
+    e.preventDefault();
+    const taskIdStr = e.dataTransfer.getData('text/plain');
+    const taskId = parseInt(taskIdStr, 10);
+    if (!isNaN(taskId)) {
+      actions.updateTaskStatus(taskId, status);
+    }
+    e.currentTarget.classList.remove('drag-over');
+  };
+
+  const handleDragEnter = (e) => {
+    e.preventDefault();
+    if (store.enableDragAndDrop) {
+      e.currentTarget.classList.add('drag-over');
+    }
+  };
+
+  const handleDragLeave = (e) => {
+    e.currentTarget.classList.remove('drag-over');
+  };
+
   return meldHtml`
     <style>
       .board-header {
@@ -245,7 +288,7 @@ defineMeld('page-board', () => {
         justify-content: space-between;
         align-items: center;
         gap: var(--mui-space-4);
-        margin-bottom: var(--mui-space-8);
+        margin-bottom: var(--mui-space-6);
       }
       .board-title {
         font-size: 1.8rem;
@@ -315,7 +358,14 @@ defineMeld('page-board', () => {
         display: flex;
         flex-direction: column;
         min-height: 500px;
+        transition: background-color 0.2s, border-color 0.2s;
       }
+      .board-column.drag-over {
+        background: color-mix(in srgb, var(--mui-primary) 6%, var(--mui-surface));
+        border-color: var(--mui-primary);
+        border-style: dashed;
+      }
+
       .column-title {
         font-size: 0.95rem;
         font-weight: 600;
@@ -348,6 +398,33 @@ defineMeld('page-board', () => {
         border-radius: var(--mui-radius-md);
         margin-bottom: var(--mui-space-2);
       }
+
+      .filter-indicators {
+        display: flex;
+        gap: var(--mui-space-2);
+        margin-bottom: var(--mui-space-4);
+        font-size: 0.75rem;
+        color: #64748b;
+        align-items: center;
+      }
+      .active-filter-badge {
+        background: var(--mui-border);
+        color: var(--mui-fg);
+        padding: 1px 6px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        font-weight: 600;
+      }
+      .clear-filter-btn {
+        border: none;
+        background: transparent;
+        color: #ef4444;
+        cursor: pointer;
+        padding: 0;
+        font-size: 0.7rem;
+      }
     </style>
 
     <div class="board-header">
@@ -370,14 +447,56 @@ defineMeld('page-board', () => {
             <option value="${cat}" ?selected="${() => store.filter === cat}">${cat === 'all' ? 'All Categories' : cat}</option>
           `)}
         </select>
+
+        <select 
+          class="select-filter"
+          onchange="${(e) => { actions.setFilterMilestone(e.target.value); }}"
+        >
+          <option value="all" ?selected="${() => store.filterMilestone === 'all'}">All Milestones</option>
+          ${() => store.milestones.map(m => meldHtml`
+            <option value="${m}" ?selected="${() => store.filterMilestone === m}">${m}</option>
+          `)}
+        </select>
+
+        <select 
+          class="select-filter"
+          onchange="${(e) => { actions.setFilterTag(e.target.value); }}"
+        >
+          <option value="all" ?selected="${() => store.filterTag === 'all'}">All Tags</option>
+          ${() => allTags().map(tag => meldHtml`
+            <option value="${tag}" ?selected="${() => store.filterTag === tag}">#${tag}</option>
+          `)}
+        </select>
         
         <button class="btn btn-primary" onclick="${() => { ui.editingTask = null; ui.showModal = true; }}">+ Add Task</button>
       </div>
     </div>
 
+    ${() => (store.filterMilestone !== 'all' || store.filterTag !== 'all') ? meldHtml`
+      <div class="filter-indicators">
+        <span>Active Filters:</span>
+        ${() => store.filterMilestone !== 'all' ? meldHtml`
+          <span class="active-filter-badge">
+            🏁 Milestone: ${store.filterMilestone}
+            <button class="clear-filter-btn" onclick="${() => actions.setFilterMilestone('all')}">✕</button>
+          </span>
+        ` : ''}
+        ${() => store.filterTag !== 'all' ? meldHtml`
+          <span class="active-filter-badge">
+            # Tag: ${store.filterTag}
+            <button class="clear-filter-btn" onclick="${() => actions.setFilterTag('all')}">✕</button>
+          </span>
+        ` : ''}
+      </div>
+    ` : ''}
+
     <div class="board-grid">
       <!-- COLUMN: TO DO -->
-      <div class="board-column">
+      <div class="board-column" 
+           ondragover="${e => store.enableDragAndDrop && e.preventDefault()}"
+           ondragenter="${handleDragEnter}"
+           ondragleave="${handleDragLeave}"
+           ondrop="${e => handleDrop(e, 'todo')}">
         <h3 class="column-title">
           <span>📋 To Do</span>
           <span class="column-badge">${() => todoTasks().length}</span>
@@ -386,14 +505,19 @@ defineMeld('page-board', () => {
           ${meld.list(
             todoTasks,
             (t) => t.id,
-            (t) => meldHtml`<task-card .task="${t}" onedit-task="${(e) => { ui.editingTask = e.detail; ui.showModal = true; }}"></task-card>`
+            (t) => meldHtml`<task-card .task="${t}" onedit-task="${(e) => { ui.editingTask = e.detail; ui.showModal = true; }}"></task-card>`,
+            (node, item) => { node.task = item; }
           )}
           ${() => todoTasks().length === 0 ? meldHtml`<div class="empty-state">No tasks to do</div>` : ''}
         </div>
       </div>
 
       <!-- COLUMN: IN PROGRESS -->
-      <div class="board-column">
+      <div class="board-column"
+           ondragover="${e => store.enableDragAndDrop && e.preventDefault()}"
+           ondragenter="${handleDragEnter}"
+           ondragleave="${handleDragLeave}"
+           ondrop="${e => handleDrop(e, 'doing')}">
         <h3 class="column-title">
           <span>⚡ In Progress</span>
           <span class="column-badge">${() => doingTasks().length}</span>
@@ -402,14 +526,19 @@ defineMeld('page-board', () => {
           ${meld.list(
             doingTasks,
             (t) => t.id,
-            (t) => meldHtml`<task-card .task="${t}" onedit-task="${(e) => { ui.editingTask = e.detail; ui.showModal = true; }}"></task-card>`
+            (t) => meldHtml`<task-card .task="${t}" onedit-task="${(e) => { ui.editingTask = e.detail; ui.showModal = true; }}"></task-card>`,
+            (node, item) => { node.task = item; }
           )}
           ${() => doingTasks().length === 0 ? meldHtml`<div class="empty-state">No tasks in progress</div>` : ''}
         </div>
       </div>
 
       <!-- COLUMN: DONE -->
-      <div class="board-column">
+      <div class="board-column"
+           ondragover="${e => store.enableDragAndDrop && e.preventDefault()}"
+           ondragenter="${handleDragEnter}"
+           ondragleave="${handleDragLeave}"
+           ondrop="${e => handleDrop(e, 'done')}">
         <h3 class="column-title">
           <span>✅ Completed</span>
           <span class="column-badge">${() => doneTasks().length}</span>
@@ -418,7 +547,8 @@ defineMeld('page-board', () => {
           ${meld.list(
             doneTasks,
             (t) => t.id,
-            (t) => meldHtml`<task-card .task="${t}" onedit-task="${(e) => { ui.editingTask = e.detail; ui.showModal = true; }}"></task-card>`
+            (t) => meldHtml`<task-card .task="${t}" onedit-task="${(e) => { ui.editingTask = e.detail; ui.showModal = true; }}"></task-card>`,
+            (node, item) => { node.task = item; }
           )}
           ${() => doneTasks().length === 0 ? meldHtml`<div class="empty-state">No completed tasks</div>` : ''}
         </div>
@@ -512,7 +642,7 @@ defineMeld('page-activity', () => {
 
 
 // --- PAGE: SETTINGS ---
-defineMeld('page-settings', () => {
+defineMeld('page-settings', (el, { download }) => {
   const sampleTasks = [
     {
       id: 101,
@@ -521,6 +651,9 @@ defineMeld('page-settings', () => {
       status: 'todo',
       category: 'Development',
       priority: 'low',
+      archived: false,
+      milestone: 'Sprint 2',
+      tags: ['cli', 'scaffolding'],
       createdAt: new Date().toISOString()
     },
     {
@@ -530,6 +663,9 @@ defineMeld('page-settings', () => {
       status: 'doing',
       category: 'Learning',
       priority: 'high',
+      archived: false,
+      milestone: 'Sprint 1',
+      tags: ['css', 'web-standards'],
       createdAt: new Date().toISOString()
     }
   ];
@@ -537,6 +673,46 @@ defineMeld('page-settings', () => {
   const resetSample = () => {
     store.tasks = sampleTasks;
     actions.addActivity('Reset to sample tasks');
+  };
+
+  const handleImportFile = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        try {
+          const data = JSON.parse(event.target.result);
+          actions.importTasks(data);
+          e.target.value = ''; // Reset input
+        } catch (err) {
+          alert('Failed to parse JSON file: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+    }
+  };
+
+  const triggerImport = () => {
+    const input = el.shadowRoot.getElementById('import-tasks-file');
+    if (input) input.click();
+  };
+
+  const exportData = () => {
+    if (download) {
+      download(JSON.stringify(store.tasks, null, 2), 'meld-taskflow-export.json', 'application/json');
+      actions.addActivity('Exported task data to JSON');
+    } else {
+      alert('Download helper is not active.');
+    }
+  };
+
+  const submitMilestone = (e) => {
+    e.preventDefault();
+    const input = el.shadowRoot.getElementById('new-milestone-input');
+    if (input && input.value.trim()) {
+      actions.addMilestone(input.value.trim());
+      input.value = '';
+    }
   };
 
   return meldHtml`
@@ -612,6 +788,13 @@ defineMeld('page-settings', () => {
       .btn-outline:hover {
         background: var(--mui-surface);
       }
+      .btn-primary {
+        background: var(--mui-primary);
+        color: var(--mui-primary-fg);
+      }
+      .btn-primary:hover {
+        background: var(--mui-primary-hover);
+      }
 
       /* Custom toggle styling */
       .switch {
@@ -651,6 +834,35 @@ defineMeld('page-settings', () => {
       input:checked + .slider:before {
         transform: translateX(20px);
       }
+
+      .milestone-input-group {
+        display: flex;
+        gap: var(--mui-space-2);
+        margin-bottom: var(--mui-space-4);
+      }
+      .milestone-input {
+        flex: 1;
+        padding: 8px 12px;
+        border: 1px solid var(--mui-border);
+        border-radius: var(--mui-radius-md);
+        background: var(--mui-bg);
+        color: var(--mui-fg);
+        font-size: 0.85rem;
+      }
+      .milestone-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+      }
+      .milestone-item {
+        background: var(--mui-surface);
+        border: 1px solid var(--mui-border);
+        padding: 4px 10px;
+        border-radius: var(--mui-radius-md);
+        font-size: 0.8rem;
+        color: var(--mui-fg);
+        font-weight: 500;
+      }
     </style>
 
     <h2 class="settings-title">Settings & System</h2>
@@ -682,18 +894,381 @@ defineMeld('page-settings', () => {
             <span class="slider"></span>
           </label>
         </div>
+
+        <div class="setting-row" style="margin-top:var(--mui-space-2)">
+          <div>
+            <span class="setting-label">AI Task Assistant</span>
+            <div class="setting-sublabel">Enables streaming AI task suggestions with markdown parsing</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" ?checked="${() => store.showAICopilot}" onchange="${actions.toggleAICopilot}" />
+            <span class="slider"></span>
+          </label>
+        </div>
+
+        <div class="setting-row" style="margin-top:var(--mui-space-2)">
+          <div>
+            <span class="setting-label">Kanban Drag & Drop</span>
+            <div class="setting-sublabel">Enables dragging task cards between columns on the Board</div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" ?checked="${() => store.enableDragAndDrop}" onchange="${actions.toggleDragAndDrop}" />
+            <span class="slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <!-- CARD: MILESTONES -->
+      <div class="card">
+        <h3 class="card-title">Milestones</h3>
+        <p class="card-desc">Define sprints, releases, and milestones for task categorization.</p>
+        
+        <form class="milestone-input-group" onsubmit="${submitMilestone}">
+          <input 
+            type="text" 
+            id="new-milestone-input" 
+            class="milestone-input" 
+            placeholder="e.g. Sprint 4 or Release 1.2" 
+          />
+          <button type="submit" class="btn btn-primary">Add Milestone</button>
+        </form>
+
+        <div class="milestone-list">
+          ${() => store.milestones.map(m => meldHtml`
+            <span class="milestone-item">🏁 ${m}</span>
+          `)}
+        </div>
       </div>
 
       <!-- CARD: SYSTEM CONTROLS -->
       <div class="card">
         <h3 class="card-title">System & Data Controls</h3>
-        <p class="card-desc">Manage task data states and cache values.</p>
+        <p class="card-desc">Manage task data states, export tasks, or import backups.</p>
         
-        <div style="display:flex; gap:var(--mui-space-2)">
-          <button class="btn btn-outline" onclick="${resetSample}">Load Sample Tasks</button>
-          <button class="btn btn-danger" onclick="${actions.clearAllTasks}">Delete All Tasks</button>
+        <div style="display:flex; flex-direction:column; gap:var(--mui-space-3)">
+          <div style="display:flex; gap:var(--mui-space-2)">
+            <button class="btn btn-outline" onclick="${resetSample}">Load Sample Tasks</button>
+            <button class="btn btn-danger" onclick="${actions.clearAllTasks}">Delete All Tasks</button>
+          </div>
+
+          <div style="display:flex; gap:var(--mui-space-2); border-top:1px solid var(--mui-border); padding-top:var(--mui-space-3)">
+            <button class="btn btn-outline" onclick="${exportData}">📥 Export Tasks JSON</button>
+            <button class="btn btn-outline" onclick="${triggerImport}">📤 Import Tasks JSON</button>
+            
+            <input 
+              type="file" 
+              id="import-tasks-file" 
+              accept=".json" 
+              style="display:none;" 
+              onchange="${handleImportFile}" 
+            />
+          </div>
         </div>
       </div>
     </div>
+  `;
+});
+
+defineMeld('ai-copilot', (el, { useAI, signal }) => {
+  const ai = useAI('/api/prompt');
+  const promptInput = signal('Suggest database design and API tasks');
+  const isFinished = signal(false);
+
+  const generate = async () => {
+    isFinished.value = false;
+    await ai.prompt(promptInput.value);
+    isFinished.value = true;
+  };
+
+  const parseAndAddTasks = () => {
+    const text = ai.completion;
+    const lines = text.split('\n');
+    let addedCount = 0;
+    
+    lines.forEach(line => {
+      // Format match: - **Configure Database connection** (Priority: high) - Description
+      const match = line.match(/^-\s+\*\*(.*?)\*\*\s+\((Priority:\s+\w+)\)\s+-\s+(.*)$/i);
+      if (match) {
+        const [, title, priorityStr, description] = match;
+        const priority = priorityStr.split(': ')[1].toLowerCase();
+        actions.addTask({
+          title: title.trim(),
+          description: description.trim(),
+          category: 'AI Suggestion',
+          priority
+        });
+        addedCount++;
+      } else {
+        const simpleMatch = line.match(/^-\s+\*\*(.*?)\*\*(.*)$/);
+        if (simpleMatch) {
+          const [, title, desc] = simpleMatch;
+          actions.addTask({
+            title: title.trim(),
+            description: desc.replace(/^\s*-\s*/, '').replace(/^\s*:\s*/, '').trim() || 'AI suggested task',
+            category: 'AI Suggestion',
+            priority: 'medium'
+          });
+          addedCount++;
+        }
+      }
+    });
+
+    if (addedCount > 0) {
+      actions.addActivity(`AI Copilot added ${addedCount} tasks to the board`);
+      // Reset completion to clear the list
+      ai.completion = '';
+      isFinished.value = false;
+    } else {
+      alert("No valid tasks found to add. Ensure the format matches '- **Task Title** - Description'");
+    }
+  };
+
+  return meldHtml`
+    <style>
+      .copilot-container {
+        background: linear-gradient(135deg, var(--mui-bg) 0%, var(--mui-surface) 100%);
+        border: 2px solid var(--mui-primary);
+        border-radius: var(--mui-radius-lg);
+        padding: var(--mui-space-6);
+        box-shadow: var(--mui-shadow-md);
+        display: flex;
+        flex-direction: column;
+        gap: var(--mui-space-4);
+        position: relative;
+        overflow: hidden;
+      }
+      .copilot-container::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle, rgba(59,130,246,0.05) 0%, transparent 70%);
+        pointer-events: none;
+      }
+      .copilot-header {
+        display: flex;
+        align-items: center;
+        gap: var(--mui-space-3);
+      }
+      .copilot-icon {
+        width: 32px;
+        height: 32px;
+        background: var(--mui-primary);
+        color: #fff;
+        border-radius: var(--mui-radius-md);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: 700;
+        font-size: 1.1rem;
+        box-shadow: 0 0 12px rgba(59, 130, 246, 0.4);
+      }
+      .copilot-title {
+        font-size: 1.2rem;
+        font-weight: 700;
+        color: var(--mui-fg);
+        margin: 0;
+      }
+      .copilot-desc {
+        font-size: 0.85rem;
+        color: #64748b;
+        margin: 0;
+      }
+      .copilot-input-group {
+        display: flex;
+        gap: var(--mui-space-2);
+        margin-top: var(--mui-space-2);
+      }
+      .copilot-input {
+        flex: 1;
+        background: var(--mui-bg);
+        border: 1px solid var(--mui-border);
+        padding: 8px 12px;
+        border-radius: var(--mui-radius-md);
+        color: var(--mui-fg);
+        font-size: 0.9rem;
+      }
+      .copilot-input:focus {
+        border-color: var(--mui-primary);
+        outline: none;
+      }
+      .copilot-results {
+        background: var(--mui-bg);
+        border: 1px solid var(--mui-border);
+        border-radius: var(--mui-radius-md);
+        padding: var(--mui-space-4);
+        min-height: 100px;
+        max-height: 250px;
+        overflow-y: auto;
+        font-size: 0.9rem;
+        position: relative;
+      }
+      .copilot-results ul {
+        margin: 0;
+        padding-left: var(--mui-space-4);
+      }
+      .copilot-results li {
+        margin-bottom: var(--mui-space-2);
+      }
+      .loader-dots {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+      }
+      .loader-dots span {
+        width: 6px;
+        height: 6px;
+        background-color: var(--mui-primary);
+        border-radius: 50%;
+        animation: bounce 1.4s infinite ease-in-out both;
+      }
+      .loader-dots span:nth-child(1) { animation-delay: -0.32s; }
+      .loader-dots span:nth-child(2) { animation-delay: -0.16s; }
+      
+      @keyframes bounce {
+        0%, 80%, 100% { transform: scale(0); }
+        40% { transform: scale(1.0); }
+      }
+      
+      .actions-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: var(--mui-space-2);
+      }
+    </style>
+
+    <div class="copilot-container">
+      <div class="copilot-header">
+        <div class="copilot-icon">✨</div>
+        <div>
+          <h3 class="copilot-title">AI Copilot Assistant</h3>
+          <p class="copilot-desc">Generate task lists dynamically and add them to your Kanban board.</p>
+        </div>
+      </div>
+
+      <div class="copilot-input-group">
+        <input 
+          type="text" 
+          class="copilot-input" 
+          .value="${() => promptInput.value}" 
+          oninput="${e => promptInput.value = e.target.value}"
+          placeholder="What tasks do you want to generate?" 
+          ?disabled="${() => ai.isLoading}"
+        />
+        <button 
+          class="btn btn-primary" 
+          onclick="${generate}"
+          ?disabled="${() => ai.isLoading || !promptInput.value}"
+        >
+          ${() => ai.isLoading ? 'Thinking...' : 'Generate'}
+        </button>
+      </div>
+
+      <div class="copilot-results">
+        ${() => {
+          if (ai.isLoading && !ai.completion) {
+            return meldHtml`
+              <div style="display:flex; justify-content:center; align-items:center; height:60px; color:#64748b;">
+                <div class="loader-dots"><span></span><span></span><span></span></div>
+                <span style="margin-left: 8px">Consulting AI model...</span>
+              </div>
+            `;
+          }
+          if (ai.error) {
+            return meldHtml`<span style="color:#ef4444">${ai.error}</span>`;
+          }
+          if (!ai.completion) {
+            return meldHtml`<span style="color:#64748b; font-style:italic;">Results will stream here...</span>`;
+          }
+          return meldHtml`<meld-markdown content="${() => ai.completion}"></meld-markdown>`;
+        }}
+      </div>
+
+      ${() => {
+        if (isFinished.value && ai.completion) {
+          return meldHtml`
+            <div class="actions-container">
+              <button class="btn btn-outline" onclick="${() => { ai.completion = ''; isFinished.value = false; }}">Clear</button>
+              <button class="btn btn-primary" onclick="${parseAndAddTasks}">Add suggestions to Kanban Board</button>
+            </div>
+          `;
+        }
+        return '';
+      }}
+    </div>
+  `;
+});
+
+defineMeld('page-archive', () => {
+  const archivedTasks = computed(() => store.tasks.filter(t => t.archived));
+
+  return meldHtml`
+    <style>
+      .archive-header {
+        margin-bottom: var(--mui-space-8);
+      }
+      .archive-title {
+        font-size: 1.8rem;
+        margin: 0 0 var(--mui-space-2) 0;
+        color: var(--mui-fg);
+        font-weight: 700;
+      }
+      .archive-desc {
+        font-size: 0.9rem;
+        color: #64748b;
+        margin: 0;
+      }
+      .archive-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: var(--mui-space-4);
+      }
+      .archive-empty {
+        background: var(--mui-surface);
+        border: 2px dashed var(--mui-border);
+        border-radius: var(--mui-radius-lg);
+        padding: var(--mui-space-12);
+        text-align: center;
+        color: #64748b;
+      }
+      .archive-empty-icon {
+        font-size: 3rem;
+        margin-bottom: var(--mui-space-4);
+      }
+      .archive-empty-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--mui-fg);
+        margin: 0 0 var(--mui-space-2) 0;
+      }
+      .archive-empty-desc {
+        font-size: 0.85rem;
+        margin: 0;
+      }
+    </style>
+
+    <div class="archive-header">
+      <h2 class="archive-title">Task Archive</h2>
+      <p class="archive-desc">View and manage tasks that have been archived. You can restore them to the board or delete them permanently.</p>
+    </div>
+
+    ${() => archivedTasks().length === 0 ? meldHtml`
+      <div class="archive-empty">
+        <div class="archive-empty-icon">📦</div>
+        <h3 class="archive-empty-title">Archive is empty</h3>
+        <p class="archive-empty-desc">No tasks have been archived yet.</p>
+      </div>
+    ` : meldHtml`
+      <div class="archive-grid">
+        ${meld.list(
+          archivedTasks,
+          (t) => t.id,
+          (t) => meldHtml`<task-card .task="${t}"></task-card>`,
+          (node, item) => { node.task = item; }
+        )}
+      </div>
+    `}
   `;
 });

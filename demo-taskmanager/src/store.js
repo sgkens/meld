@@ -1,75 +1,77 @@
-import { meldState, computed } from '../../src/meld.core.js';
+import { use, meldState, computed, onDestroy } from '../../src/meld.core.js';
+import { MeldPersist } from '../../src/plugins/meld-persist.js';
+import { MeldBroadcast } from '../../src/plugins/meld-broadcast.js';
 
-// Local storage persistence helper using computed
-export function persist(state, key, storage = localStorage) {
-  const saved = storage.getItem(key);
-  if (saved) {
-    try {
-      Object.assign(state, JSON.parse(saved));
-    } catch (e) {
-      console.error("MeldPersist Error", e);
-    }
-  }
-  
-  computed(() => {
-    storage.setItem(key, JSON.stringify(state));
-    return state;
-  });
-  return state;
-}
+// Setup and install plugins on a mock api context
+const api = { meldState, computed, onDestroy };
+MeldPersist.install(api);
+MeldBroadcast.install(api);
 
-// Tab synchronization helper using BroadcastChannel and computed
-export function broadcastSync(channelName, store, keys = null) {
-  if (typeof BroadcastChannel === 'undefined') return;
-  const channel = new BroadcastChannel(channelName);
-  let isReceiving = false;
-
-  channel.onmessage = (event) => {
-    isReceiving = true;
-    const { key, value } = event.data;
-    store[key] = value;
-    setTimeout(() => { isReceiving = false; }, 0);
-  };
-
-  const keysToWatch = keys || Object.keys(store);
-  keysToWatch.forEach(key => {
-    computed(() => {
-      const val = store[key];
-      if (!isReceiving) {
-        channel.postMessage({ key, value: val });
+// Mock streaming AI endpoint for Task Manager Suggestions
+const originalFetch = window.fetch;
+window.fetch = async (url, options) => {
+  if (url === '/api/prompt' || url === 'http://localhost/api/prompt') {
+    const encoder = new TextEncoder();
+    const suggestions = [
+      "- **Configure Database connection** (Priority: high) - Set up local postgres with knex migrations\n",
+      "- **Write authentication routes** (Priority: medium) - Implement Lucia login/logout endpoints\n",
+      "- **Design user profile UI** (Priority: low) - Add client-side custom elements for settings\n"
+    ];
+    
+    const stream = new ReadableStream({
+      async start(controller) {
+        for (const line of suggestions) {
+          controller.enqueue(encoder.encode(line));
+          await new Promise(r => setTimeout(r, 600));
+        }
+        controller.close();
       }
-      return val;
     });
-  });
-}
+    
+    return new Response(stream, {
+      status: 200,
+      headers: { 'Content-Type': 'text/plain; charset=utf-8' }
+    });
+  }
+  return originalFetch ? originalFetch(url, options) : Promise.reject("Fetch unavailable");
+};
 
-// Initial default tasks list
+// Initial default tasks list with Markdown description tags, tags, and milestones
 const initialTasks = [
   {
     id: 1,
     title: 'Explore Meld.js Architecture',
-    description: 'Investigate fine-grained reactivity using Proxy handlers and adopted stylesheets.',
+    description: 'Investigate **fine-grained reactivity** using *Proxy handlers* and adopted stylesheets.',
     status: 'todo',
     category: 'Learning',
     priority: 'high',
+    archived: false,
+    milestone: 'Sprint 1',
+    tags: ['reactivity', 'core'],
     createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
   },
   {
     id: 2,
     title: 'Implement TaskFlow Kanban Demo',
-    description: 'Wire up portals for modal dialogs and form validation using Meld plugin ecosystem.',
+    description: 'Wire up **portals** for modal dialogs and *form validation* using the Meld plugin ecosystem.',
     status: 'doing',
     category: 'Development',
     priority: 'medium',
+    archived: false,
+    milestone: 'Sprint 1',
+    tags: ['ux', 'plugins'],
     createdAt: new Date(Date.now() - 3600000 * 1.5).toISOString()
   },
   {
     id: 3,
     title: 'Enable Dev Mode Component Highlighting',
-    description: 'Inject a custom devtools wrapper to flash updated custom elements with render badges.',
+    description: 'Inject a custom **devtools** wrapper to flash updated custom elements with *render badges*.',
     status: 'done',
     category: 'DX',
     priority: 'high',
+    archived: false,
+    milestone: 'Sprint 2',
+    tags: ['dx', 'devtools'],
     createdAt: new Date(Date.now() - 600000).toISOString()
   }
 ];
@@ -77,6 +79,11 @@ const initialTasks = [
 const initialState = {
   theme: 'light',
   devMode: false,
+  showAICopilot: false,
+  enableDragAndDrop: true,
+  milestones: ['Sprint 1', 'Sprint 2', 'Sprint 3', 'Q3 Release'],
+  filterMilestone: 'all',
+  filterTag: 'all',
   tasks: initialTasks,
   activities: [
     { id: 1, text: 'Task Manager Demo initialized', time: new Date().toISOString() }
@@ -88,15 +95,22 @@ const initialState = {
 // Create a reactive proxy state
 export const store = meldState(initialState);
 
-// Apply persistence
-persist(store, 'meld-taskmanager-data');
+// Apply persistence using framework plugin implementation
+api.persist(store, 'meld-taskmanager-data');
 
-// Sync across tabs
-broadcastSync('meld-taskmanager-channel', store, ['theme', 'devMode', 'tasks', 'activities']);
+// Sync across tabs using framework plugin implementation
+api.useBroadcast('meld-taskmanager-channel', store, [
+  'theme', 'devMode', 'showAICopilot', 'enableDragAndDrop', 
+  'milestones', 'filterMilestone', 'filterTag', 'tasks', 'activities'
+]);
 
 // Define actions to manipulate store state
 export const actions = {
-  addTask({ title, description, category, priority }) {
+  addTask({ title, description, category, priority, milestone, tags }) {
+    const parsedTags = Array.isArray(tags) 
+      ? tags 
+      : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : []);
+      
     const newTask = {
       id: Date.now(),
       title,
@@ -104,6 +118,9 @@ export const actions = {
       status: 'todo',
       category: category || 'General',
       priority: priority || 'medium',
+      archived: false,
+      milestone: milestone || null,
+      tags: parsedTags,
       createdAt: new Date().toISOString()
     };
     store.tasks = [newTask, ...store.tasks];
@@ -125,6 +142,9 @@ export const actions = {
   updateTask(id, data) {
     const task = store.tasks.find(t => t.id === id);
     if (task) {
+      if (data.tags && typeof data.tags === 'string') {
+        data.tags = data.tags.split(',').map(t => t.trim()).filter(Boolean);
+      }
       Object.assign(task, data);
       // Force trigger array update
       store.tasks = [...store.tasks];
@@ -132,17 +152,55 @@ export const actions = {
     }
   },
 
+  archiveTask(id) {
+    const task = store.tasks.find(t => t.id === id);
+    if (task) {
+      task.archived = true;
+      store.tasks = [...store.tasks];
+      actions.addActivity(`Archived task: "${task.title}"`);
+    }
+  },
+
+  unarchiveTask(id) {
+    const task = store.tasks.find(t => t.id === id);
+    if (task) {
+      task.archived = false;
+      store.tasks = [...store.tasks];
+      actions.addActivity(`Unarchived task: "${task.title}"`);
+    }
+  },
+
   deleteTask(id) {
     const task = store.tasks.find(t => t.id === id);
     if (task) {
       store.tasks = store.tasks.filter(t => t.id !== id);
-      actions.addActivity(`Deleted task: "${task.title}"`);
+      actions.addActivity(`Permanently deleted task: "${task.title}"`);
     }
   },
 
   clearAllTasks() {
     store.tasks = [];
     actions.addActivity('Cleared all tasks');
+  },
+
+  addMilestone(name) {
+    if (name && !store.milestones.includes(name)) {
+      store.milestones = [...store.milestones, name];
+      actions.addActivity(`Added milestone: "${name}"`);
+    }
+  },
+
+  setFilterMilestone(val) {
+    store.filterMilestone = val;
+  },
+
+  setFilterTag(val) {
+    store.filterTag = val;
+  },
+
+  toggleDragAndDrop() {
+    store.enableDragAndDrop = !store.enableDragAndDrop;
+    actions.addActivity(`Drag & Drop ${store.enableDragAndDrop ? 'enabled' : 'disabled'}`);
   },
 
   toggleTheme() {
@@ -156,6 +214,30 @@ export const actions = {
     window.meldDevMode = store.devMode;
     window.localStorage.setItem('meld-devmode', store.devMode);
     actions.addActivity(`Dev Mode toggled ${store.devMode ? 'ON' : 'OFF'}`);
+  },
+
+  toggleAICopilot() {
+    store.showAICopilot = !store.showAICopilot;
+    actions.addActivity(`AI Copilot toggled ${store.showAICopilot ? 'ON' : 'OFF'}`);
+  },
+
+  importTasks(tasksArray) {
+    if (Array.isArray(tasksArray)) {
+      const sanitized = tasksArray.map(t => ({
+        id: t.id || Date.now() + Math.random(),
+        title: t.title || 'Untitled Task',
+        description: t.description || '',
+        status: t.status || 'todo',
+        category: t.category || 'General',
+        priority: t.priority || 'medium',
+        archived: !!t.archived,
+        milestone: t.milestone || null,
+        tags: Array.isArray(t.tags) ? t.tags : [],
+        createdAt: t.createdAt || new Date().toISOString()
+      }));
+      store.tasks = [...sanitized, ...store.tasks];
+      actions.addActivity(`Imported ${sanitized.length} tasks successfully`);
+    }
   },
 
   addActivity(text) {

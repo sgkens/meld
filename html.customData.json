@@ -262,11 +262,11 @@
       "attributes": [
         {
           "name": "date",
-          "description": "Attribute 'date' on <meld-time>."
+          "description": "Reactive attribute 'date' on <meld-time>."
         },
         {
           "name": "format",
-          "description": "Attribute 'format' on <meld-time>."
+          "description": "Reactive attribute 'format' on <meld-time>."
         }
       ]
     },

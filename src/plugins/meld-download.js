@@ -33,5 +33,15 @@ export const MeldDownload = {
       document.body.removeChild(a);
       setTimeout(() => URL.revokeObjectURL(url), 100);
     };
+  },
+  /**
+   * Sets up helpers for components by returning an object containing `download`.
+   * 
+   * @param {object} api - The Meld API instance.
+   * @returns {object} Object containing the download helper.
+   * @returns {function} returns.download - The download helper function.
+   */
+  setupHelpers(api) {
+    return { download: api.download };
   }
 };
