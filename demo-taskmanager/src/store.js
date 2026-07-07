@@ -89,6 +89,27 @@ const initialTasks = [
   }
 ];
 
+const initialWiki = [
+  {
+    slug: 'getting-started',
+    title: 'Getting Started with TaskFlow',
+    content: 'Welcome to **Meld TaskFlow**! This workspace integrates project planning, sprint milestones, and wiki pages. \n\n### Core Tips\n- Use **Kanban Board** to organize progress.\n- Drag-and-drop cards between columns to change status.\n- Add checklist items directly onto task cards.\n- Link wiki docs to specific tasks for context.',
+    category: 'Guides',
+    tags: ['welcome', 'docs'],
+    linkedTasks: [1],
+    createdAt: new Date().toISOString()
+  },
+  {
+    slug: 'reactivity-guide',
+    title: 'Meld Reactive Architecture',
+    content: 'Meld uses fine-grained proxy wrappers to track dependencies. \n\n- `meldState()` creates reactive proxy objects.\n- `computed()` evaluates expressions and caches results.\n- `effect()` reacts to store mutations automatically.',
+    category: 'Architecture',
+    tags: ['reactivity', 'advanced'],
+    linkedTasks: [2, 3],
+    createdAt: new Date().toISOString()
+  }
+];
+
 const initialState = {
   theme: 'light',
   devMode: false,
@@ -100,6 +121,7 @@ const initialState = {
   filterMilestone: 'all',
   filterTag: 'all',
   tasks: initialTasks,
+  wiki: initialWiki,
   activities: [
     { id: 1, text: 'Task Manager Demo initialized', time: new Date().toISOString() }
   ],
@@ -116,7 +138,7 @@ api.persist(store, 'meld-taskmanager-data');
 // Sync across tabs using framework plugin implementation
 api.useBroadcast('meld-taskmanager-channel', store, [
   'theme', 'devMode', 'showAICopilot', 'enableDragAndDrop', 
-  'milestones', 'categories', 'sortBy', 'filterMilestone', 'filterTag', 'tasks', 'activities'
+  'milestones', 'categories', 'sortBy', 'filterMilestone', 'filterTag', 'tasks', 'wiki', 'activities'
 ]);
 
 // Define actions to manipulate store state
@@ -281,6 +303,46 @@ export const actions = {
       task.subtasks = task.subtasks.filter(s => s.id !== subtaskId);
       store.tasks = [...store.tasks];
       actions.addActivity(`Deleted subtask`);
+    }
+  },
+
+  saveWikiArticle({ slug, title, content, category, tags, linkedTasks }) {
+    const existing = store.wiki.find(w => w.slug === slug);
+    const parsedTags = Array.isArray(tags) 
+      ? tags 
+      : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : []);
+    const parsedLinkedTasks = Array.isArray(linkedTasks)
+      ? linkedTasks.map(Number)
+      : [];
+
+    if (existing) {
+      existing.title = title;
+      existing.content = content;
+      existing.category = category;
+      existing.tags = parsedTags;
+      existing.linkedTasks = parsedLinkedTasks;
+      store.wiki = [...store.wiki];
+      actions.addActivity(`Updated wiki article: "${title}"`);
+    } else {
+      const newArticle = {
+        slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+        title,
+        content,
+        category: category || 'General',
+        tags: parsedTags,
+        linkedTasks: parsedLinkedTasks,
+        createdAt: new Date().toISOString()
+      };
+      store.wiki = [newArticle, ...store.wiki];
+      actions.addActivity(`Created wiki article: "${title}"`);
+    }
+  },
+
+  deleteWikiArticle(slug) {
+    const existing = store.wiki.find(w => w.slug === slug);
+    if (existing) {
+      store.wiki = store.wiki.filter(w => w.slug !== slug);
+      actions.addActivity(`Deleted wiki article: "${existing.title}"`);
     }
   },
 

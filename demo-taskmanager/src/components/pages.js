@@ -1,4 +1,4 @@
-import { defineMeld, meldHtml, meldState, computed, meld } from '../../../src/meld.core.js';
+import { defineMeld, meldHtml, meldState, computed, meld, inject } from '../../../src/meld.core.js';
 import { store, actions } from '../store.js';
 import './task-card.js';
 import './ui-modal.js';
@@ -1326,5 +1326,402 @@ defineMeld('page-archive', () => {
         )}
       </div>
     `}
+  `;
+});
+
+defineMeld('page-wiki', (el, { effect }) => {
+  // Selected article slug (tracked locally via meldState, or sync with URL query params!)
+  const state = meldState({
+    selectedSlug: store.wiki[0]?.slug || '',
+    drawerOpen: false,
+    editSlug: '',
+    editTitle: '',
+    editContent: '',
+    editCategory: '',
+    editTags: '',
+    editLinkedTasks: []
+  });
+
+  // Keep selected slug in sync with URL query parameter '?slug=...' if present
+  effect(() => {
+    const params = new URLSearchParams(window.location.hash.split('?')[1] || '');
+    const slugParam = params.get('slug');
+    if (slugParam && store.wiki.some(w => w.slug === slugParam)) {
+      state.selectedSlug = slugParam;
+    }
+  });
+
+  const selectedArticle = computed(() => {
+    return store.wiki.find(w => w.slug === state.selectedSlug) || store.wiki[0];
+  });
+
+  const openNew = () => {
+    state.editSlug = '';
+    state.editTitle = '';
+    state.editContent = '';
+    state.editCategory = 'Guides';
+    state.editTags = '';
+    state.editLinkedTasks = [];
+    state.drawerOpen = true;
+  };
+
+  const openEdit = () => {
+    const art = selectedArticle();
+    if (art) {
+      state.editSlug = art.slug;
+      state.editTitle = art.title;
+      state.editContent = art.content;
+      state.editCategory = art.category;
+      state.editTags = Array.isArray(art.tags) ? art.tags.join(', ') : '';
+      state.editLinkedTasks = Array.isArray(art.linkedTasks) ? [...art.linkedTasks] : [];
+      state.drawerOpen = true;
+    }
+  };
+
+  const handleSave = () => {
+    if (!state.editTitle.trim()) {
+      alert('Title is required!');
+      return;
+    }
+    actions.saveWikiArticle({
+      slug: state.editSlug,
+      title: state.editTitle.trim(),
+      content: state.editContent,
+      category: state.editCategory.trim(),
+      tags: state.editTags,
+      linkedTasks: state.editLinkedTasks
+    });
+    // If it was a new article, select it
+    if (!state.editSlug) {
+      state.selectedSlug = state.editTitle.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+    }
+    state.drawerOpen = false;
+  };
+
+  const handleDelete = () => {
+    const art = selectedArticle();
+    if (art && confirm(`Are you sure you want to delete "${art.title}"?`)) {
+      actions.deleteWikiArticle(art.slug);
+      state.selectedSlug = store.wiki[0]?.slug || '';
+    }
+  };
+
+  const toggleLinkedTask = (taskId) => {
+    const id = Number(taskId);
+    if (state.editLinkedTasks.includes(id)) {
+      state.editLinkedTasks = state.editLinkedTasks.filter(x => x !== id);
+    } else {
+      state.editLinkedTasks = [...state.editLinkedTasks, id];
+    }
+  };
+
+  return meldHtml`
+    <style>
+      .wiki-container {
+        display: grid;
+        grid-template-columns: 240px 1fr;
+        gap: var(--mui-space-6);
+        height: calc(100vh - 120px);
+        align-items: stretch;
+      }
+      @media (max-width: 768px) {
+        .wiki-container {
+          grid-template-columns: 1fr;
+          height: auto;
+        }
+      }
+      
+      .wiki-sidebar {
+        border-right: 1px solid var(--mui-border);
+        padding-right: var(--mui-space-4);
+        display: flex;
+        flex-direction: column;
+        gap: var(--mui-space-4);
+        overflow-y: auto;
+      }
+
+      .wiki-content {
+        padding-left: var(--mui-space-2);
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: var(--mui-space-4);
+      }
+
+      .article-link {
+        display: block;
+        padding: 8px 12px;
+        border-radius: var(--mui-radius-md);
+        text-decoration: none;
+        color: var(--mui-fg);
+        opacity: 0.8;
+        font-size: 0.9rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        border: 1px solid transparent;
+      }
+      .article-link:hover {
+        background: var(--mui-surface);
+        opacity: 1;
+      }
+      .article-link.active {
+        background: color-mix(in srgb, var(--mui-primary) 10%, var(--mui-bg));
+        border-color: var(--mui-primary);
+        color: var(--mui-primary);
+        opacity: 1;
+        font-weight: 600;
+      }
+
+      .article-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        border-bottom: 1px solid var(--mui-border);
+        padding-bottom: var(--mui-space-4);
+        margin-bottom: var(--mui-space-2);
+      }
+
+      .article-title {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0 0 6px 0;
+        color: var(--mui-fg);
+      }
+
+      .article-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--mui-space-2);
+        align-items: center;
+        margin-bottom: var(--mui-space-4);
+      }
+
+      .article-body {
+        line-height: 1.6;
+        color: var(--mui-fg);
+        font-size: 0.95rem;
+      }
+
+      .linked-tasks-card {
+        margin-top: var(--mui-space-6);
+        padding: var(--mui-space-4);
+        background: var(--mui-surface);
+        border: 1px solid var(--mui-border);
+        border-radius: var(--mui-radius-md);
+      }
+      .linked-tasks-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-top: 0;
+        margin-bottom: var(--mui-space-2);
+        color: var(--mui-fg);
+      }
+      .linked-task-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 0.8rem;
+        padding: 6px 0;
+        border-bottom: 1px solid var(--mui-border);
+      }
+      .linked-task-item:last-child {
+        border-bottom: none;
+      }
+
+      /* Drawer Edit Form styles */
+      .form-drawer-content {
+        padding: var(--mui-space-6);
+        display: flex;
+        flex-direction: column;
+        gap: var(--mui-space-4);
+        height: 100%;
+        overflow-y: auto;
+      }
+      .form-label {
+        font-size: 0.85rem;
+        font-weight: 500;
+        color: var(--mui-fg);
+      }
+      .textarea-field {
+        width: 100%;
+        min-height: 250px;
+        padding: 10px;
+        border: 1px solid var(--mui-border);
+        border-radius: var(--mui-radius-md);
+        background: var(--mui-bg);
+        color: var(--mui-fg);
+        font-family: var(--mui-font);
+        font-size: 0.9rem;
+        resize: vertical;
+      }
+      .textarea-field:focus {
+        outline: none;
+        border-color: var(--mui-primary);
+      }
+
+      .task-checkbox-list {
+        max-height: 150px;
+        overflow-y: auto;
+        border: 1px solid var(--mui-border);
+        border-radius: var(--mui-radius-md);
+        padding: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .task-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        cursor: pointer;
+      }
+    </style>
+
+    <div class="wiki-container">
+      <!-- SIDEBAR LIST -->
+      <div class="wiki-sidebar">
+        <m-button variant="primary" onclick="${openNew}" style="width:100%;">+ New Document</m-button>
+        
+        <div style="display:flex; flex-direction:column; gap:4px; margin-top:10px;">
+          ${() => store.wiki.map(art => meldHtml`
+            <div 
+              class="article-link ${() => state.selectedSlug === art.slug ? 'active' : ''}"
+              onclick="${() => { state.selectedSlug = art.slug; }}"
+            >
+              📖 ${art.title}
+            </div>
+          `)}
+        </div>
+      </div>
+
+      <!-- MAIN CONTENT VIEW -->
+      <div class="wiki-content">
+        ${() => {
+          const art = selectedArticle();
+          if (!art) {
+            return meldHtml`
+              <m-alert variant="info">
+                Create your first Wiki page to document your workspace guidelines, release schedules, or guides.
+              </m-alert>
+            `;
+          }
+
+          // Search for tasks linked to this article
+          const linkedTasksList = store.tasks.filter(t => art.linkedTasks && art.linkedTasks.includes(t.id));
+
+          return meldHtml`
+            <div class="article-header">
+              <div>
+                <h1 class="article-title">${art.title}</h1>
+                <div class="article-meta">
+                  <m-badge variant="success">${art.category}</m-badge>
+                  ${art.tags.map(t => meldHtml`
+                    <m-badge>#${t}</m-badge>
+                  `)}
+                </div>
+              </div>
+              <div style="display:flex; gap:8px;">
+                <m-button variant="secondary" onclick="${openEdit}">✏️ Edit</m-button>
+                <m-button variant="danger" onclick="${handleDelete}">🗑️ Delete</m-button>
+              </div>
+            </div>
+
+            <div class="article-body">
+              <meld-markdown content="${art.content}"></meld-markdown>
+            </div>
+
+            ${linkedTasksList.length > 0 ? meldHtml`
+              <div class="linked-tasks-card">
+                <h4 class="linked-tasks-title">🔗 Connected Board Tasks</h4>
+                <div>
+                  ${linkedTasksList.map(task => meldHtml`
+                    <div class="linked-task-item">
+                      <span><strong>${task.title}</strong> (${task.status})</span>
+                      <m-button variant="ghost" size="sm" onclick="${() => { window.location.hash = '#/board'; }}">View on Board</m-button>
+                    </div>
+                  `)}
+                </div>
+              </div>
+            ` : ''}
+          `;
+        }}
+      </div>
+    </div>
+
+    <!-- EDIT / CREATE ARTICLE DRAWER -->
+    <m-drawer open="${() => state.drawerOpen}" onclose="${() => { state.drawerOpen = false; }}" side="right">
+      <div class="form-drawer-content">
+        <h3 style="margin-top:0; color:var(--mui-fg); font-weight:700;">
+          ${() => state.editSlug ? 'Edit Wiki Document' : 'Create Wiki Document'}
+        </h3>
+        
+        <m-divider></m-divider>
+
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <label class="form-label">Document Title</label>
+          <input 
+            type="text" 
+            class="milestone-input" 
+            style="font-size:0.95rem; font-weight:600;"
+            value="${() => state.editTitle}" 
+            oninput="${(e) => { state.editTitle = e.target.value; }}"
+            placeholder="e.g. Project Architecture Docs"
+          />
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <label class="form-label">Category</label>
+          <input 
+            type="text" 
+            class="milestone-input" 
+            value="${() => state.editCategory}" 
+            oninput="${(e) => { state.editCategory = e.target.value; }}"
+            placeholder="e.g. Guides, Architecture"
+          />
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <label class="form-label">Tags (comma-separated)</label>
+          <input 
+            type="text" 
+            class="milestone-input" 
+            value="${() => state.editTags}" 
+            oninput="${(e) => { state.editTags = e.target.value; }}"
+            placeholder="e.g. dev, layout, config"
+          />
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:4px;">
+          <label class="form-label">Link to Kanban Tasks</label>
+          <div class="task-checkbox-list">
+            ${() => store.tasks.map(t => meldHtml`
+              <label class="task-checkbox-item">
+                <input 
+                  type="checkbox" 
+                  ?checked="${() => state.editLinkedTasks.includes(t.id)}"
+                  onchange="${() => toggleLinkedTask(t.id)}"
+                />
+                <span>${t.title}</span>
+              </label>
+            `)}
+          </div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:4px; flex:1;">
+          <label class="form-label">Content (Markdown supported)</label>
+          <textarea 
+            class="textarea-field" 
+            oninput="${(e) => { state.editContent = e.target.value; }}"
+            placeholder="Write markdown here..."
+          >${() => state.editContent}</textarea>
+        </div>
+
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <m-button variant="primary" onclick="${handleSave}" style="flex:1;">Save Document</m-button>
+          <m-button variant="secondary" onclick="${() => { state.drawerOpen = false; }}">Cancel</m-button>
+        </div>
+      </div>
+    </m-drawer>
   `;
 });

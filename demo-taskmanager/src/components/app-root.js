@@ -18,6 +18,9 @@ import { store, actions } from '../store.js';
 import './pages.js';
 import './dev-panel.js';
 
+// Import framework UI Web Components
+import '../../../src/components/index.js';
+
 // Activate and install Meld Plugins
 use(MeldStore);
 use(MeldForms);
@@ -37,6 +40,7 @@ use(MeldRouter, {
   routes: [
     { path: '/', component: 'page-dashboard' },
     { path: '/board', component: 'page-board' },
+    { path: '/wiki', component: 'page-wiki' },
     { path: '/activity', component: 'page-activity' },
     { path: '/archive', component: 'page-archive' },
     { path: '/settings', component: 'page-settings' }
@@ -238,6 +242,9 @@ defineMeld('app-root', (el) => {
           <a href="#/board" class="${() => getNavLinkClass('/board')}">
             <span>📋</span> Kanban Board
             <span class="badge-todo">${() => activeCount()}</span>
+          </a>
+          <a href="#/wiki" class="${() => getNavLinkClass('/wiki')}">
+            <span>📖</span> Wiki Docs
           </a>
           <a href="#/activity" class="${() => getNavLinkClass('/activity')}">
             <span>🕒</span> Activity Log

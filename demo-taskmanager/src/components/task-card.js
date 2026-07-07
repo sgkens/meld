@@ -474,6 +474,24 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
       return '';
     }}
 
+    <!-- LINKED WIKI DOCS -->
+    ${() => {
+      const t = getTask();
+      if (!t) return '';
+      const linkedDocs = store.wiki.filter(w => w.linkedTasks && w.linkedTasks.includes(t.id));
+      if (linkedDocs.length > 0) {
+        return meldHtml`
+          <div style="font-size: 0.72rem; color: #64748b; margin-top: var(--mui-space-2); margin-bottom: var(--mui-space-3); padding-top: var(--mui-space-2); border-top: 1px dashed var(--mui-border); display:flex; flex-wrap:wrap; gap:4px; align-items:center;">
+            <span style="font-weight:600;">Linked Wiki:</span>
+            ${linkedDocs.map(doc => meldHtml`
+              <a href="#/wiki?slug=${doc.slug}" style="color:var(--mui-primary); text-decoration:none; font-weight:600; display:inline-flex; align-items:center; gap:2px; background:var(--mui-surface); padding: 1px 6px; border-radius:4px; border:1px solid var(--mui-border);">📖 ${doc.title}</a>
+            `)}
+          </div>
+        `;
+      }
+      return '';
+    }}
+
     <div class="card-meta">
       <div class="meta-left">
         <span class="category-tag">${() => {
