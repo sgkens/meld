@@ -36,7 +36,7 @@ window.fetch = async (url, options) => {
   return originalFetch ? originalFetch(url, options) : Promise.reject("Fetch unavailable");
 };
 
-// Initial default tasks list with Markdown description tags, tags, and milestones
+// Initial default tasks list with Markdown description tags, tags, milestones, dueDates, and subtasks
 const initialTasks = [
   {
     id: 1,
@@ -48,6 +48,11 @@ const initialTasks = [
     archived: false,
     milestone: 'Sprint 1',
     tags: ['reactivity', 'core'],
+    dueDate: new Date(Date.now() + 86400000 * 2).toISOString().slice(0, 10), // 2 days from now
+    subtasks: [
+      { id: 101, text: 'Analyze Proxy handlers inside meldState', done: true },
+      { id: 102, text: 'Examine custom element attribute mapping', done: false }
+    ],
     createdAt: new Date(Date.now() - 3600000 * 3).toISOString()
   },
   {
@@ -60,6 +65,12 @@ const initialTasks = [
     archived: false,
     milestone: 'Sprint 1',
     tags: ['ux', 'plugins'],
+    dueDate: new Date(Date.now() - 86400000).toISOString().slice(0, 10), // Yesterday (Overdue!)
+    subtasks: [
+      { id: 201, text: 'Build page dashboard and grid components', done: true },
+      { id: 202, text: 'Add milestone filters to pages.js', done: true },
+      { id: 203, text: 'Verify drag and drop reactivity', done: false }
+    ],
     createdAt: new Date(Date.now() - 3600000 * 1.5).toISOString()
   },
   {
@@ -72,6 +83,8 @@ const initialTasks = [
     archived: false,
     milestone: 'Sprint 2',
     tags: ['dx', 'devtools'],
+    dueDate: new Date(Date.now() - 86400000 * 5).toISOString().slice(0, 10), // 5 days ago (Done, so not overdue)
+    subtasks: [],
     createdAt: new Date(Date.now() - 600000).toISOString()
   }
 ];
@@ -82,6 +95,8 @@ const initialState = {
   showAICopilot: false,
   enableDragAndDrop: true,
   milestones: ['Sprint 1', 'Sprint 2', 'Sprint 3', 'Q3 Release'],
+  categories: ['General', 'Learning', 'Development', 'DX'],
+  sortBy: 'created', // 'created', 'priority', 'dueDate'
   filterMilestone: 'all',
   filterTag: 'all',
   tasks: initialTasks,
@@ -101,12 +116,12 @@ api.persist(store, 'meld-taskmanager-data');
 // Sync across tabs using framework plugin implementation
 api.useBroadcast('meld-taskmanager-channel', store, [
   'theme', 'devMode', 'showAICopilot', 'enableDragAndDrop', 
-  'milestones', 'filterMilestone', 'filterTag', 'tasks', 'activities'
+  'milestones', 'categories', 'sortBy', 'filterMilestone', 'filterTag', 'tasks', 'activities'
 ]);
 
 // Define actions to manipulate store state
 export const actions = {
-  addTask({ title, description, category, priority, milestone, tags }) {
+  addTask({ title, description, category, priority, milestone, tags, dueDate, subtasks }) {
     const parsedTags = Array.isArray(tags) 
       ? tags 
       : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : []);
@@ -121,6 +136,8 @@ export const actions = {
       archived: false,
       milestone: milestone || null,
       tags: parsedTags,
+      dueDate: dueDate || null,
+      subtasks: subtasks || [],
       createdAt: new Date().toISOString()
     };
     store.tasks = [newTask, ...store.tasks];
@@ -190,6 +207,17 @@ export const actions = {
     }
   },
 
+  addCategory(name) {
+    if (name && !store.categories.includes(name)) {
+      store.categories = [...store.categories, name];
+      actions.addActivity(`Added category: "${name}"`);
+    }
+  },
+
+  setSortBy(val) {
+    store.sortBy = val;
+  },
+
   setFilterMilestone(val) {
     store.filterMilestone = val;
   },
@@ -221,6 +249,41 @@ export const actions = {
     actions.addActivity(`AI Copilot toggled ${store.showAICopilot ? 'ON' : 'OFF'}`);
   },
 
+  toggleSubtask(taskId, subtaskId) {
+    const task = store.tasks.find(t => t.id === taskId);
+    if (task && Array.isArray(task.subtasks)) {
+      const sub = task.subtasks.find(s => s.id === subtaskId);
+      if (sub) {
+        sub.done = !sub.done;
+        store.tasks = [...store.tasks];
+        actions.addActivity(`Toggled subtask: "${sub.text}"`);
+      }
+    }
+  },
+
+  addSubtask(taskId, text) {
+    const task = store.tasks.find(t => t.id === taskId);
+    if (task && text.trim()) {
+      if (!Array.isArray(task.subtasks)) task.subtasks = [];
+      task.subtasks.push({
+        id: Date.now(),
+        text: text.trim(),
+        done: false
+      });
+      store.tasks = [...store.tasks];
+      actions.addActivity(`Added subtask to "${task.title}"`);
+    }
+  },
+
+  deleteSubtask(taskId, subtaskId) {
+    const task = store.tasks.find(t => t.id === taskId);
+    if (task && Array.isArray(task.subtasks)) {
+      task.subtasks = task.subtasks.filter(s => s.id !== subtaskId);
+      store.tasks = [...store.tasks];
+      actions.addActivity(`Deleted subtask`);
+    }
+  },
+
   importTasks(tasksArray) {
     if (Array.isArray(tasksArray)) {
       const sanitized = tasksArray.map(t => ({
@@ -233,6 +296,8 @@ export const actions = {
         archived: !!t.archived,
         milestone: t.milestone || null,
         tags: Array.isArray(t.tags) ? t.tags : [],
+        dueDate: t.dueDate || null,
+        subtasks: Array.isArray(t.subtasks) ? t.subtasks : [],
         createdAt: t.createdAt || new Date().toISOString()
       }));
       store.tasks = [...sanitized, ...store.tasks];

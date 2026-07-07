@@ -238,14 +238,30 @@ defineMeld('page-board', () => {
       const q = store.searchQuery.toLowerCase();
       list = list.filter(t => t.title.toLowerCase().includes(q) || t.description.toLowerCase().includes(q));
     }
-    return list;
+
+    // Sort tasks!
+    const listCopy = [...list];
+    if (store.sortBy === 'priority') {
+      const pMap = { high: 3, medium: 2, low: 1 };
+      listCopy.sort((a, b) => (pMap[b.priority] || 0) - (pMap[a.priority] || 0));
+    } else if (store.sortBy === 'dueDate') {
+      listCopy.sort((a, b) => {
+        if (!a.dueDate) return 1;
+        if (!b.dueDate) return -1;
+        return a.dueDate.localeCompare(b.dueDate);
+      });
+    } else {
+      // Sort by created
+      listCopy.sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    }
+    return listCopy;
   });
 
   const todoTasks = computed(() => filteredTasks().filter(t => t.status === 'todo'));
   const doingTasks = computed(() => filteredTasks().filter(t => t.status === 'doing'));
   const doneTasks = computed(() => filteredTasks().filter(t => t.status === 'done'));
 
-  const categories = ['all', 'General', 'Learning', 'Development', 'DX'];
+  const categoriesList = computed(() => ['all', ...store.categories]);
 
   // Compute all unique tags from active tasks dynamically
   const allTags = computed(() => {
@@ -443,7 +459,7 @@ defineMeld('page-board', () => {
           class="select-filter"
           onchange="${(e) => { store.filter = e.target.value; }}"
         >
-          ${() => categories.map(cat => meldHtml`
+          ${() => categoriesList().map(cat => meldHtml`
             <option value="${cat}" ?selected="${() => store.filter === cat}">${cat === 'all' ? 'All Categories' : cat}</option>
           `)}
         </select>
@@ -466,6 +482,15 @@ defineMeld('page-board', () => {
           ${() => allTags().map(tag => meldHtml`
             <option value="${tag}" ?selected="${() => store.filterTag === tag}">#${tag}</option>
           `)}
+        </select>
+
+        <select 
+          class="select-filter"
+          onchange="${(e) => { actions.setSortBy(e.target.value); }}"
+        >
+          <option value="created" ?selected="${() => store.sortBy === 'created'}">Sort: Newest</option>
+          <option value="priority" ?selected="${() => store.sortBy === 'priority'}">Sort: Priority</option>
+          <option value="dueDate" ?selected="${() => store.sortBy === 'dueDate'}">Sort: Due Date</option>
         </select>
         
         <button class="btn btn-primary" onclick="${() => { ui.editingTask = null; ui.showModal = true; }}">+ Add Task</button>
@@ -715,6 +740,15 @@ defineMeld('page-settings', (el, { download }) => {
     }
   };
 
+  const submitCategory = (e) => {
+    e.preventDefault();
+    const input = el.shadowRoot.getElementById('new-category-input');
+    if (input && input.value.trim()) {
+      actions.addCategory(input.value.trim());
+      input.value = '';
+    }
+  };
+
   return meldHtml`
     <style>
       .settings-title {
@@ -936,6 +970,28 @@ defineMeld('page-settings', (el, { download }) => {
         <div class="milestone-list">
           ${() => store.milestones.map(m => meldHtml`
             <span class="milestone-item">🏁 ${m}</span>
+          `)}
+        </div>
+      </div>
+
+      <!-- CARD: CATEGORIES -->
+      <div class="card">
+        <h3 class="card-title">Categories</h3>
+        <p class="card-desc">Define custom categories to classify tasks on the Kanban Board.</p>
+        
+        <form class="milestone-input-group" onsubmit="${submitCategory}">
+          <input 
+            type="text" 
+            id="new-category-input" 
+            class="milestone-input" 
+            placeholder="e.g. Design or Documentation" 
+          />
+          <button type="submit" class="btn btn-primary">Add Category</button>
+        </form>
+
+        <div class="milestone-list">
+          ${() => store.categories.map(c => meldHtml`
+            <span class="milestone-item">🏷️ ${c}</span>
           `)}
         </div>
       </div>

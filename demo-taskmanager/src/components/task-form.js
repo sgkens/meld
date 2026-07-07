@@ -13,7 +13,8 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
       category: task ? task.category : 'General',
       priority: task ? task.priority : 'medium',
       milestone: task ? (task.milestone || '') : '',
-      tags: task ? (Array.isArray(task.tags) ? task.tags.join(', ') : '') : ''
+      tags: task ? (Array.isArray(task.tags) ? task.tags.join(', ') : '') : '',
+      dueDate: task ? (task.dueDate || '') : ''
     },
     {
       title: ['required']
@@ -24,6 +25,7 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
     const formattedData = {
       ...data,
       milestone: data.milestone || null,
+      dueDate: data.dueDate || null,
       tags: typeof data.tags === 'string' ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : (data.tags || [])
     };
 
@@ -142,13 +144,25 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
             class="form-control"
             onchange="${(e) => { fields.category = e.target.value; }}"
           >
-            <option value="General" ?selected="${() => fields.category === 'General'}">General</option>
-            <option value="Learning" ?selected="${() => fields.category === 'Learning'}">Learning</option>
-            <option value="Development" ?selected="${() => fields.category === 'Development'}">Development</option>
-            <option value="DX" ?selected="${() => fields.category === 'DX'}">DX</option>
+            ${() => store.categories.map(c => meldHtml`
+              <option value="${c}" ?selected="${() => fields.category === c}">${c}</option>
+            `)}
           </select>
         </div>
 
+        <div class="form-group">
+          <label for="task-due">Due Date</label>
+          <input
+            type="date"
+            id="task-due"
+            class="form-control"
+            value="${() => fields.dueDate}"
+            oninput="${(e) => { fields.dueDate = e.target.value; }}"
+          />
+        </div>
+      </div>
+
+      <div class="grid-2">
         <div class="form-group">
           <label for="task-priority">Priority</label>
           <select
@@ -161,9 +175,7 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
             <option value="high" ?selected="${() => fields.priority === 'high'}">High</option>
           </select>
         </div>
-      </div>
 
-      <div class="grid-2">
         <div class="form-group">
           <label for="task-milestone">Milestone</label>
           <select
@@ -177,17 +189,17 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
             `)}
           </select>
         </div>
+      </div>
 
-        <div class="form-group">
-          <label for="task-tags">Tags (comma-separated)</label>
-          <input
-            id="task-tags"
-            class="form-control"
-            value="${() => fields.tags}"
-            oninput="${(e) => { fields.tags = e.target.value; }}"
-            placeholder="e.g. frontend, core, docs"
-          />
-        </div>
+      <div class="form-group">
+        <label for="task-tags">Tags (comma-separated)</label>
+        <input
+          id="task-tags"
+          class="form-control"
+          value="${() => fields.tags}"
+          oninput="${(e) => { fields.tags = e.target.value; }}"
+          placeholder="e.g. frontend, core, docs"
+        />
       </div>
 
       <button type="submit" class="submit-btn">

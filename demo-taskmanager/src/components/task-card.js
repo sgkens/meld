@@ -55,10 +55,11 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
     }
   };
 
-  const statusIcons = {
-    todo: '📋',
-    doing: '⚡',
-    done: '✅'
+  const isOverdue = () => {
+    const t = getTask();
+    if (!t || !t.dueDate || t.status === 'done') return false;
+    const today = new Date().toISOString().slice(0, 10);
+    return t.dueDate < today;
   };
 
   // Drag & Drop Handlers
@@ -190,6 +191,104 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
         font-weight: 500;
       }
 
+      .due-date-tag {
+        font-size: 0.7rem;
+        color: #64748b;
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        margin-bottom: var(--mui-space-2);
+      }
+      .overdue-badge {
+        background: #fef2f2;
+        border: 1px solid #fca5a5;
+        color: #ef4444;
+        font-size: 0.7rem;
+        font-weight: 600;
+        padding: 1px 5px;
+        border-radius: 4px;
+        display: inline-flex;
+        align-items: center;
+        gap: 2px;
+        margin-bottom: var(--mui-space-2);
+      }
+
+      /* Subtask progress checklist styles */
+      .subtask-progress {
+        font-size: 0.72rem;
+        color: #64748b;
+        margin-bottom: var(--mui-space-3);
+      }
+      .progress-bar-container {
+        height: 5px;
+        background: var(--mui-surface);
+        border-radius: 3px;
+        overflow: hidden;
+        border: 1px solid var(--mui-border);
+        margin-top: 2px;
+      }
+      .progress-bar {
+        height: 100%;
+        transition: width 0.3s ease;
+      }
+
+      .subtasks-list {
+        margin-bottom: var(--mui-space-2);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        padding-left: 2px;
+      }
+      .subtask-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.78rem;
+        color: var(--mui-fg);
+        position: relative;
+      }
+      .subtask-item input[type="checkbox"] {
+        cursor: pointer;
+        width: 13px;
+        height: 13px;
+      }
+      .subtask-item span.done {
+        text-decoration: line-through;
+        opacity: 0.6;
+      }
+      .delete-sub-btn {
+        border: none;
+        background: transparent;
+        color: #ef4444;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s;
+        margin-left: auto;
+        padding: 0 4px;
+        font-size: 0.7rem;
+      }
+      .subtask-item:hover .delete-sub-btn {
+        opacity: 1;
+      }
+      .quick-subtask-form {
+        margin-bottom: var(--mui-space-3);
+      }
+      .new-subtask-input {
+        width: 100%;
+        border: 1px dashed var(--mui-border);
+        background: transparent;
+        padding: 4px 8px;
+        font-size: 0.75rem;
+        border-radius: 4px;
+        color: var(--mui-fg);
+        font-family: var(--mui-font);
+      }
+      .new-subtask-input:focus {
+        outline: none;
+        border-color: var(--mui-primary);
+        border-style: solid;
+      }
+
       .card-meta {
         display: flex;
         flex-wrap: wrap;
@@ -280,15 +379,21 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
       }}</span>
     </div>
 
-    ${() => {
-      const t = getTask();
-      if (t && t.milestone) {
-        return meldHtml`
-          <span class="milestone-tag">🏁 ${t.milestone}</span>
-        `;
-      }
-      return '';
-    }}
+    <div style="display:flex; flex-wrap:wrap; gap:4px; align-items:center;">
+      ${() => {
+        const t = getTask();
+        return t && t.milestone ? meldHtml`<span class="milestone-tag">🏁 ${t.milestone}</span>` : '';
+      }}
+
+      ${() => {
+        const t = getTask();
+        if (!t || !t.dueDate) return '';
+        if (isOverdue()) {
+          return meldHtml`<span class="overdue-badge">⚠️ Overdue: <meld-time date="${t.dueDate}" format="short"></meld-time></span>`;
+        }
+        return meldHtml`<span class="due-date-tag">📅 Due: <meld-time date="${t.dueDate}" format="short"></meld-time></span>`;
+      }}
+    </div>
 
     <div class="description">
       <meld-markdown content="${() => {
@@ -296,6 +401,64 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
         return t ? (t.description || '*No description provided.*') : '';
       }}"></meld-markdown>
     </div>
+
+    <!-- SUBTASK PROGRESS BAR -->
+    ${() => {
+      const t = getTask();
+      if (t && Array.isArray(t.subtasks) && t.subtasks.length > 0) {
+        const doneCount = t.subtasks.filter(s => s.done).length;
+        const pct = Math.round((doneCount / t.subtasks.length) * 100);
+        return meldHtml`
+          <div class="subtask-progress">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 2px;">
+              <span>Checklist (${doneCount}/${t.subtasks.length})</span>
+              <strong>${pct}%</strong>
+            </div>
+            <div class="progress-bar-container"><div class="progress-bar" style="width:${pct}%; background-color:#10b981;"></div></div>
+          </div>
+        `;
+      }
+      return '';
+    }}
+
+    <!-- SUBTASKS LIST -->
+    ${() => {
+      const t = getTask();
+      if (t && Array.isArray(t.subtasks) && t.subtasks.length > 0) {
+        return meldHtml`
+          <div class="subtasks-list">
+            ${t.subtasks.map(sub => meldHtml`
+              <div class="subtask-item">
+                <input type="checkbox" ?checked="${sub.done}" onchange="${() => actions.toggleSubtask(t.id, sub.id)}" />
+                <span class="${sub.done ? 'done' : ''}">${sub.text}</span>
+                <button class="delete-sub-btn" onclick="${() => actions.deleteSubtask(t.id, sub.id)}">✕</button>
+              </div>
+            `)}
+          </div>
+        `;
+      }
+      return '';
+    }}
+
+    <!-- QUICK SUBTASK ADD INPUT -->
+    ${() => {
+      const t = getTask();
+      if (t && !t.archived) {
+        return meldHtml`
+          <form class="quick-subtask-form" onsubmit="${(e) => {
+            e.preventDefault();
+            const input = e.target.querySelector('.new-subtask-input');
+            if (input && input.value.trim()) {
+              actions.addSubtask(t.id, input.value.trim());
+              input.value = '';
+            }
+          }}">
+            <input type="text" class="new-subtask-input" placeholder="+ Add checklist item..." />
+          </form>
+        `;
+      }
+      return '';
+    }}
 
     ${() => {
       const t = getTask();
