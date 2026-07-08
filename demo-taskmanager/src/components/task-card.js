@@ -1,4 +1,4 @@
-import { defineMeld, meldHtml, store } from '../../../src/meld.core.js';
+import { defineMeld, meldHtml, store, meld } from '../../../src/meld.core.js';
 import { actions } from '../store.js';
 
 defineMeld('task-card', (el, { emit, props, effect }) => {
@@ -364,6 +364,19 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
         border-radius: 3px;
         color: #fff;
       }
+      .clear-done-subtasks-btn {
+        background: transparent;
+        border: none;
+        color: #ef4444;
+        cursor: pointer;
+        font-size: 0.68rem;
+        padding: 0;
+        font-weight: 600;
+        transition: opacity 0.2s;
+      }
+      .clear-done-subtasks-btn:hover {
+        text-decoration: underline;
+      }
     </style>
 
     <div class="priority-indicator" style="background-color: ${() => priorityColor()}"></div>
@@ -410,9 +423,14 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
         const pct = Math.round((doneCount / t.subtasks.length) * 100);
         return meldHtml`
           <div class="subtask-progress">
-            <div style="display:flex; justify-content:space-between; margin-bottom: 2px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom: 2px; align-items:center;">
               <span>Checklist (${doneCount}/${t.subtasks.length})</span>
-              <strong>${pct}%</strong>
+              <div style="display:flex; gap:6px; align-items:center;">
+                ${doneCount > 0 && !t.archived ? meldHtml`
+                  <button class="clear-done-subtasks-btn" onclick="${() => actions.clearCompletedSubtasks(t.id)}">Clear Checked</button>
+                ` : ''}
+                <strong>${pct}%</strong>
+              </div>
             </div>
             <div class="progress-bar-container"><div class="progress-bar" style="width:${pct}%; background-color:#10b981;"></div></div>
           </div>
@@ -425,15 +443,29 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
     ${() => {
       const t = getTask();
       if (t && Array.isArray(t.subtasks) && t.subtasks.length > 0) {
+        const listHelper = meld.list(
+          () => t.subtasks,
+          (sub) => sub.id,
+          (sub) => meldHtml`
+            <div class="subtask-item">
+              <input type="checkbox" ?checked="${sub.done}" onchange="${() => actions.toggleSubtask(t.id, sub.id)}" />
+              <span class="${sub.done ? 'done' : ''}">${sub.text}</span>
+              <button class="delete-sub-btn" onclick="${() => actions.deleteSubtask(t.id, sub.id)}">✕</button>
+            </div>
+          `,
+          (node, sub) => {
+            const checkbox = node.querySelector('input[type="checkbox"]');
+            const span = node.querySelector('span');
+            if (checkbox) checkbox.checked = sub.done;
+            if (span) {
+              span.className = sub.done ? 'done' : '';
+              span.textContent = sub.text;
+            }
+          }
+        );
         return meldHtml`
           <div class="subtasks-list">
-            ${t.subtasks.map(sub => meldHtml`
-              <div class="subtask-item">
-                <input type="checkbox" ?checked="${sub.done}" onchange="${() => actions.toggleSubtask(t.id, sub.id)}" />
-                <span class="${sub.done ? 'done' : ''}">${sub.text}</span>
-                <button class="delete-sub-btn" onclick="${() => actions.deleteSubtask(t.id, sub.id)}">✕</button>
-              </div>
-            `)}
+            ${listHelper}
           </div>
         `;
       }

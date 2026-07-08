@@ -713,6 +713,27 @@
 <h3>Example</h3>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> term <span class="token operator">=</span> el<span class="token punctuation">.</span>shadowRoot<span class="token punctuation">.</span><span class="token function">querySelector</span><span class="token punctuation">(</span><span class="token string">'meld-terminal'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 term<span class="token punctuation">.</span><span class="token function">pushLine</span><span class="token punctuation">(</span><span class="token string">'> Connecting to server...'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<hr>
+<h2>6. Meld Motion (<code>meld-motion</code>)</h2>
+<p><strong>Purpose:</strong> Provides CSS transition wrapper components (<code>&lt;meld-transition&gt;</code>) to animate elements entering or leaving the viewport/DOM.</p>
+<h3>Attributes</h3>
+<ul>
+<li><code>name</code>: The transition class prefix (e.g. <code>fade</code> generates class names <code>fade-enter</code>, <code>fade-enter-active</code>, <code>fade-leave-active</code>, etc.). Defaults to <code>v</code>.</li>
+<li><code>show</code>: Boolean or reactive attribute. Toggling this triggers entering/leaving class lists and defers unmounting until transition hooks finish.</li>
+</ul>
+<h3>Example</h3>
+<pre class="language-html" tabindex="0"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>meld-transition</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>fade<span class="token punctuation">"</span></span> <span class="token attr-name">show</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>${() => state.visible}<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
+  <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>div</span> <span class="token attr-name">class</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>box<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>Animate Me!<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>div</span><span class="token punctuation">></span></span>
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>meld-transition</span><span class="token punctuation">></span></span></code></pre>
+<h3>CSS Transition Classes Example</h3>
+<pre class="language-css" tabindex="0"><code class="language-css"><span class="token comment">/* Entering styles */</span>
+<span class="token selector">.fade-enter</span> <span class="token punctuation">{</span> <span class="token property">opacity</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<span class="token selector">.fade-enter-active</span> <span class="token punctuation">{</span> <span class="token property">transition</span><span class="token punctuation">:</span> opacity 0.3s ease<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<span class="token selector">.fade-enter-to</span> <span class="token punctuation">{</span> <span class="token property">opacity</span><span class="token punctuation">:</span> 1<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+
+<span class="token comment">/* Leaving styles */</span>
+<span class="token selector">.fade-leave-active</span> <span class="token punctuation">{</span> <span class="token property">transition</span><span class="token punctuation">:</span> opacity 0.3s ease<span class="token punctuation">;</span> <span class="token punctuation">}</span>
+<span class="token selector">.fade-leave-to</span> <span class="token punctuation">{</span> <span class="token property">opacity</span><span class="token punctuation">:</span> 0<span class="token punctuation">;</span> <span class="token punctuation">}</span></code></pre>
 
 
         

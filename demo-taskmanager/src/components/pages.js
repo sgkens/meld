@@ -9,6 +9,7 @@ defineMeld('page-dashboard', () => {
   const totalTasks = computed(() => store.tasks.length);
   const todoCount = computed(() => store.tasks.filter(t => t.status === 'todo').length);
   const doingCount = computed(() => store.tasks.filter(t => t.status === 'doing').length);
+  const reviewCount = computed(() => store.tasks.filter(t => t.status === 'review').length);
   const doneCount = computed(() => store.tasks.filter(t => t.status === 'done').length);
 
   const completionRate = computed(() => {
@@ -18,7 +19,29 @@ defineMeld('page-dashboard', () => {
   });
 
   const highPriorityCount = computed(() => store.tasks.filter(t => t.priority === 'high').length);
+  const mediumPriorityCount = computed(() => store.tasks.filter(t => t.priority === 'medium').length);
+  const lowPriorityCount = computed(() => store.tasks.filter(t => t.priority === 'low').length);
   const recentActivities = computed(() => store.activities.slice(0, 5));
+
+  // Compute category breakdown
+  const categoryStats = computed(() => {
+    const counts = {};
+    store.categories.forEach(c => {
+      counts[c] = store.tasks.filter(t => t.category === c).length;
+    });
+    return counts;
+  });
+
+  // Compute upcoming tasks due soon (excluding done)
+  const upcomingTasks = computed(() => {
+    const active = store.tasks.filter(t => !t.archived && t.status !== 'done' && t.dueDate);
+    // Sort by due date ascending
+    const listCopy = [...active];
+    return listCopy.sort((a, b) => a.dueDate.localeCompare(b.dueDate)).slice(0, 3);
+  });
+
+  // Compute active wiki documents count
+  const wikiCount = computed(() => store.wiki.length);
 
   return meldHtml`
     <style>
@@ -34,16 +57,12 @@ defineMeld('page-dashboard', () => {
         gap: var(--mui-space-4);
         margin-bottom: var(--mui-space-8);
       }
-      .stat-card {
-        background: var(--mui-bg);
-        border: 1px solid var(--mui-border);
-        border-radius: var(--mui-radius-lg);
+      .stat-card-body {
         padding: var(--mui-space-4);
-        box-shadow: var(--mui-shadow-sm);
         display: flex;
         flex-direction: column;
       }
-      .stat-card .label {
+      .stat-card-body .label {
         font-size: 0.8rem;
         text-transform: uppercase;
         letter-spacing: 0.05em;
@@ -51,13 +70,13 @@ defineMeld('page-dashboard', () => {
         margin-bottom: 4px;
         font-weight: 600;
       }
-      .stat-card .value {
+      .stat-card-body .value {
         font-size: 2rem;
         font-weight: 700;
         color: var(--mui-fg);
         line-height: 1.1;
       }
-      .stat-card .subtext {
+      .stat-card-body .subtext {
         font-size: 0.75rem;
         color: #64748b;
         margin-top: var(--mui-space-2);
@@ -67,28 +86,12 @@ defineMeld('page-dashboard', () => {
         display: grid;
         grid-template-columns: 2fr 1fr;
         gap: var(--mui-space-8);
+        margin-bottom: var(--mui-space-8);
       }
-      @media (max-width: 768px) {
+      @media (max-width: 900px) {
         .dashboard-sections {
           grid-template-columns: 1fr;
         }
-      }
-
-      .panel {
-        background: var(--mui-bg);
-        border: 1px solid var(--mui-border);
-        border-radius: var(--mui-radius-lg);
-        padding: var(--mui-space-4);
-        box-shadow: var(--mui-shadow-sm);
-      }
-      .panel-title {
-        font-size: 1.1rem;
-        font-weight: 600;
-        margin-top: 0;
-        margin-bottom: var(--mui-space-4);
-        color: var(--mui-fg);
-        border-bottom: 1px solid var(--mui-border);
-        padding-bottom: var(--mui-space-2);
       }
 
       .progress-bar-container {
@@ -122,81 +125,273 @@ defineMeld('page-dashboard', () => {
       }
 
       .quick-link {
-        display: inline-block;
-        margin-top: var(--mui-space-4);
-        padding: 8px 16px;
-        background: var(--mui-surface);
-        border: 1px solid var(--mui-border);
-        color: var(--mui-fg);
+        color: var(--mui-primary);
         text-decoration: none;
-        border-radius: var(--mui-radius-md);
         font-size: 0.85rem;
         font-weight: 600;
-        transition: all 0.2s;
       }
       .quick-link:hover {
+        text-decoration: underline;
+      }
+
+      .upcoming-task-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: var(--mui-space-2) 0;
+        border-bottom: 1px dashed var(--mui-border);
+        font-size: 0.85rem;
+      }
+      .upcoming-task-item:last-child {
+        border-bottom: none;
+      }
+
+      /* Support styles for completion gauge and priority chart */
+      .completion-gauge-container {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .progress-ring-indicator {
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+        transition: stroke-dashoffset 0.35s ease;
+      }
+      .completion-gauge-text {
+        position: absolute;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: var(--mui-fg);
+      }
+      .priority-chart {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+      }
+      .priority-bar-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        font-size: 0.85rem;
+      }
+      .priority-bar-row .p-label {
+        width: 100px;
+        font-weight: 500;
+        color: var(--mui-fg);
+      }
+      .priority-bar-row .p-bar-track {
+        flex: 1;
+        height: 8px;
         background: var(--mui-border);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+      .priority-bar-row .p-bar {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.3s var(--mui-ease);
+      }
+      .priority-bar-row .fill-high { background: #ef4444; }
+      .priority-bar-row .fill-medium { background: #f59e0b; }
+      .priority-bar-row .fill-low { background: #3b82f6; }
+      .priority-bar-row .p-val {
+        width: 20px;
+        text-align: right;
+        font-weight: 600;
+        color: var(--mui-fg);
+      }
+
+      /* Telemetry panel styling */
+      .telemetry-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 12px;
+        font-family: monospace;
+        font-size: 0.8rem;
+        color: #10b981;
+      }
+      .telemetry-box {
+        background: #020617;
+        border: 1px solid #1e293b;
+        padding: 10px;
+        border-radius: var(--mui-radius-md);
       }
     </style>
 
     <h2 class="dashboard-title">Dashboard Overview</h2>
 
     <div class="grid-stats">
-      <div class="stat-card">
-        <span class="label">Total Tasks</span>
-        <span class="value">${() => totalTasks()}</span>
-        <span class="subtext">All active & archived tasks</span>
-      </div>
-      <div class="stat-card">
-        <span class="label">Completion Rate</span>
-        <span class="value">${() => completionRate()}%</span>
-        <div class="progress-bar-container">
-          <div class="progress-bar" style="width: ${() => completionRate()}%"></div>
+      <!-- STAT CARD 1: TOTAL -->
+      <m-card>
+        <div class="stat-card-body">
+          <span class="label">Total Tasks</span>
+          <span class="value">${() => totalTasks()}</span>
+          <span class="subtext">All active & archived items</span>
         </div>
-      </div>
-      <div class="stat-card">
-        <span class="label">Work In Progress</span>
-        <span class="value">${() => doingCount()}</span>
-        <span class="subtext">Tasks currently being worked on</span>
-      </div>
-      <div class="stat-card">
-        <span class="label">High Priority</span>
-        <span class="value" style="color: #ef4444">${() => highPriorityCount()}</span>
-        <span class="subtext">Urgent items needing attention</span>
-      </div>
+      </m-card>
+
+      <!-- STAT CARD 2: RATE -->
+      <m-card>
+        <div class="stat-card-body" style="flex-direction: row; justify-content: space-between; align-items: center;">
+          <div>
+            <span class="label">Completion Rate</span>
+            <span class="value" style="display:block; margin-bottom:4px;">${() => completionRate()}%</span>
+            <span class="subtext">Completed vs total tasks</span>
+          </div>
+          <div class="completion-gauge-container">
+            <svg class="progress-ring" width="60" height="60">
+              <circle class="progress-ring-bg" stroke="var(--mui-border)" stroke-width="5" fill="transparent" r="24" cx="30" cy="30"/>
+              <circle class="progress-ring-indicator" stroke="var(--mui-primary)" stroke-width="5" fill="transparent" r="24" cx="30" cy="30"
+                      stroke-dasharray="150.8"
+                      stroke-dashoffset="${() => 150.8 - (150.8 * completionRate()) / 100}"/>
+            </svg>
+            <div class="completion-gauge-text">${() => completionRate()}%</div>
+          </div>
+        </div>
+      </m-card>
+
+      <!-- STAT CARD 3: WIP -->
+      <m-card>
+        <div class="stat-card-body">
+          <span class="label">Work In Progress</span>
+          <span class="value">${() => doingCount()}</span>
+          <span class="subtext">Tasks active in columns</span>
+        </div>
+      </m-card>
+
+      <!-- STAT CARD 4: WIKI -->
+      <m-card>
+        <div class="stat-card-body">
+          <span class="label">Wiki Docs</span>
+          <span class="value">${() => wikiCount()}</span>
+          <span class="subtext">Linked documentation articles</span>
+        </div>
+      </m-card>
     </div>
 
     <div class="dashboard-sections">
-      <div class="panel">
-        <h3 class="panel-title">Tasks Distribution</h3>
+      <!-- PANEL: TASK STATUS DISTRIBUTION -->
+      <m-card>
+        <span slot="header">📊 Tasks Distribution</span>
         <div style="display:flex; flex-direction:column; gap: var(--mui-space-4);">
           <div>
             <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom: 4px;">
-              <span>To Do</span>
+              <span>📋 To Do</span>
               <strong>${() => todoCount()}</strong>
             </div>
             <div class="progress-bar-container"><div class="progress-bar" style="width: ${() => (todoCount() / (totalTasks() || 1)) * 100}%; background-color:#6b7280;"></div></div>
           </div>
           <div>
             <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom: 4px;">
-              <span>In Progress</span>
+              <span>⚡ In Progress</span>
               <strong>${() => doingCount()}</strong>
             </div>
             <div class="progress-bar-container"><div class="progress-bar" style="width: ${() => (doingCount() / (totalTasks() || 1)) * 100}%; background-color:#3b82f6;"></div></div>
           </div>
           <div>
             <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom: 4px;">
-              <span>Done</span>
+              <span>🔍 Under Review</span>
+              <strong>${() => reviewCount()}</strong>
+            </div>
+            <div class="progress-bar-container"><div class="progress-bar" style="width: ${() => (reviewCount() / (totalTasks() || 1)) * 100}%; background-color:#a855f7;"></div></div>
+          </div>
+          <div>
+            <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom: 4px;">
+              <span>✅ Completed</span>
               <strong>${() => doneCount()}</strong>
             </div>
             <div class="progress-bar-container"><div class="progress-bar" style="width: ${() => (doneCount() / (totalTasks() || 1)) * 100}%; background-color:#10b981;"></div></div>
           </div>
         </div>
-        <a href="#/board" class="quick-link">Go to Board →</a>
-      </div>
+        <div slot="footer">
+          <a href="#/board" class="quick-link">Go to Board →</a>
+        </div>
+      </m-card>
 
-      <div class="panel">
-        <h3 class="panel-title">Recent Activity</h3>
+      <!-- PANEL: UPCOMING DUES -->
+      <m-card>
+        <span slot="header">⏰ Upcoming Deadlines</span>
+        <div>
+          ${meld.list(
+            upcomingTasks,
+            (task) => task.id,
+            (task) => meldHtml`
+              <div class="upcoming-task-item">
+                <div>
+                  <span class="task-title" style="font-weight:600;">${task.title}</span>
+                  <div class="task-category" style="font-size:0.75rem; color:#64748b;">Category: ${task.category}</div>
+                </div>
+                <m-badge variant="${task.dueDate < new Date().toISOString().slice(0, 10) ? 'danger' : 'default'}">
+                  <meld-time date="${task.dueDate}" format="short"></meld-time>
+                </m-badge>
+              </div>
+            `,
+            (node, task) => {
+              const titleNode = node.querySelector('.task-title');
+              const catNode = node.querySelector('.task-category');
+              const badge = node.querySelector('m-badge');
+              const time = node.querySelector('meld-time');
+              if (titleNode) titleNode.textContent = task.title;
+              if (catNode) catNode.textContent = `Category: ${task.category}`;
+              if (badge) {
+                const today = new Date().toISOString().slice(0, 10);
+                badge.setAttribute('variant', task.dueDate < today ? 'danger' : 'default');
+              }
+              if (time) time.setAttribute('date', task.dueDate);
+            }
+          )}
+          ${() => upcomingTasks().length === 0 ? meldHtml`<div style="font-size:0.85rem; color:#64748b; font-style:italic;">No upcoming deadlines!</div>` : ''}
+        </div>
+        <div slot="footer">
+          <a href="#/board" class="quick-link">View Board →</a>
+        </div>
+      </m-card>
+
+      <!-- PANEL: PRIORITY BREAKDOWN -->
+      <m-card>
+        <span slot="header">🔥 Priority Distribution</span>
+        <div class="priority-chart">
+          <div class="priority-bar-row">
+            <span class="p-label">High Priority</span>
+            <div class="p-bar-track">
+              <div class="p-bar fill-high" style="width: ${() => (highPriorityCount() / (totalTasks() || 1)) * 100}%"></div>
+            </div>
+            <span class="p-val">${() => highPriorityCount()}</span>
+          </div>
+          <div class="priority-bar-row">
+            <span class="p-label">Medium Priority</span>
+            <div class="p-bar-track">
+              <div class="p-bar fill-medium" style="width: ${() => (mediumPriorityCount() / (totalTasks() || 1)) * 100}%"></div>
+            </div>
+            <span class="p-val">${() => mediumPriorityCount()}</span>
+          </div>
+          <div class="priority-bar-row">
+            <span class="p-label">Low Priority</span>
+            <div class="p-bar-track">
+              <div class="p-bar fill-low" style="width: ${() => (lowPriorityCount() / (totalTasks() || 1)) * 100}%"></div>
+            </div>
+            <span class="p-val">${() => lowPriorityCount()}</span>
+          </div>
+        </div>
+      </m-card>
+
+      <!-- PANEL: CATEGORY METRICS -->
+      <m-card>
+        <span slot="header">🏷️ Categories Breakdown</span>
+        <div style="display:flex; flex-direction:column; gap: var(--mui-space-3);">
+          ${() => Object.entries(categoryStats()).map(([cat, count]) => meldHtml`
+            <div style="display:flex; align-items:center; justify-content:space-between; font-size:0.85rem;">
+              <span>${cat}</span>
+              <m-badge variant="success">${count} tasks</m-badge>
+            </div>
+          `)}
+        </div>
+      </m-card>
+
+      <!-- PANEL: RECENT ACTIVITY -->
+      <m-card>
+        <span slot="header">🕒 Recent Activities</span>
         <div class="activity-list">
           ${() => recentActivities().map(act => meldHtml`
             <div class="activity-item">
@@ -208,9 +403,33 @@ defineMeld('page-dashboard', () => {
           `)}
           ${() => recentActivities().length === 0 ? "No activities recorded." : ""}
         </div>
-      </div>
+      </m-card>
+
+      <!-- EXPERIMENTAL: TELEMETRY (DEV MODE ONLY) -->
+      ${() => store.devMode ? meldHtml`
+        <div style="grid-column: 1 / -1;">
+          <m-card style="border-color:#10b981;">
+            <span slot="header" style="color:#10b981;">🛡️ Framework Telemetry Console (Meld.js Active)</span>
+            <div class="telemetry-grid">
+              <div class="telemetry-box">
+                <div style="font-weight:700; color:#34d399; margin-bottom:4px;">REACTIVE NODES</div>
+                <div>Tasks Store Size: ${() => store.tasks.length}</div>
+                <div>Wiki Pages Count: ${() => store.wiki.length}</div>
+                <div>Sprints milestones: ${() => store.milestones.length}</div>
+              </div>
+              <div class="telemetry-box">
+                <div style="font-weight:700; color:#34d399; margin-bottom:4px;">DX BENCHMARKS</div>
+                <div>DOM Flash Highlights: ACTIVE</div>
+                <div>Cross-Tab Sync Channel: meld-taskmanager-channel</div>
+                <div>Global Dev Mode State: ENABLED</div>
+              </div>
+            </div>
+          </m-card>
+        </div>
+      ` : ''}
+
       ${() => store.showAICopilot ? meldHtml`
-        <div style="grid-column: 1 / -1; margin-top: var(--mui-space-2)">
+        <div style="grid-column: 1 / -1;">
           <ai-copilot></ai-copilot>
         </div>
       ` : ''}
@@ -259,6 +478,7 @@ defineMeld('page-board', () => {
 
   const todoTasks = computed(() => filteredTasks().filter(t => t.status === 'todo'));
   const doingTasks = computed(() => filteredTasks().filter(t => t.status === 'doing'));
+  const reviewTasks = computed(() => filteredTasks().filter(t => t.status === 'review'));
   const doneTasks = computed(() => filteredTasks().filter(t => t.status === 'done'));
 
   const categoriesList = computed(() => ['all', ...store.categories]);
@@ -356,11 +576,16 @@ defineMeld('page-board', () => {
 
       .board-grid {
         display: grid;
-        grid-template-columns: repeat(3, 1fr);
+        grid-template-columns: repeat(4, 1fr);
         gap: var(--mui-space-4);
         align-items: start;
       }
-      @media (max-width: 900px) {
+      @media (max-width: 1200px) {
+        .board-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+      }
+      @media (max-width: 768px) {
         .board-grid {
           grid-template-columns: 1fr;
         }
@@ -558,7 +783,28 @@ defineMeld('page-board', () => {
         </div>
       </div>
 
-      <!-- COLUMN: DONE -->
+      <!-- COLUMN: UNDER REVIEW -->
+      <div class="board-column"
+           ondragover="${e => store.enableDragAndDrop && e.preventDefault()}"
+           ondragenter="${handleDragEnter}"
+           ondragleave="${handleDragLeave}"
+           ondrop="${e => handleDrop(e, 'review')}">
+        <h3 class="column-title">
+          <span>🔍 Under Review</span>
+          <span class="column-badge">${() => reviewTasks().length}</span>
+        </h3>
+        <div class="column-cards">
+          ${meld.list(
+            reviewTasks,
+            (t) => t.id,
+            (t) => meldHtml`<task-card .task="${t}" onedit-task="${(e) => { ui.editingTask = e.detail; ui.showModal = true; }}"></task-card>`,
+            (node, item) => { node.task = item; }
+          )}
+          ${() => reviewTasks().length === 0 ? meldHtml`<div class="empty-state">No tasks under review</div>` : ''}
+        </div>
+      </div>
+
+      <!-- COLUMN: COMPLETED -->
       <div class="board-column"
            ondragover="${e => store.enableDragAndDrop && e.preventDefault()}"
            ondragenter="${handleDragEnter}"
@@ -1339,7 +1585,19 @@ defineMeld('page-wiki', (el, { effect }) => {
     editContent: '',
     editCategory: '',
     editTags: '',
-    editLinkedTasks: []
+    editLinkedTasks: [],
+    searchQuery: ''
+  });
+
+  const filteredWiki = computed(() => {
+    if (!state.searchQuery) return store.wiki;
+    const q = state.searchQuery.toLowerCase();
+    return store.wiki.filter(art => 
+      art.title.toLowerCase().includes(q) || 
+      (art.content && art.content.toLowerCase().includes(q)) ||
+      (art.category && art.category.toLowerCase().includes(q)) ||
+      (Array.isArray(art.tags) && art.tags.some(t => t.toLowerCase().includes(q)))
+    );
   });
 
   // Keep selected slug in sync with URL query parameter '?slug=...' if present
@@ -1583,15 +1841,37 @@ defineMeld('page-wiki', (el, { effect }) => {
       <div class="wiki-sidebar">
         <m-button variant="primary" onclick="${openNew}" style="width:100%;">+ New Document</m-button>
         
+        <input 
+          type="text" 
+          class="milestone-input" 
+          style="margin-top: 10px; font-size: 0.85rem;"
+          placeholder="Search documents..." 
+          value="${() => state.searchQuery}" 
+          oninput="${(e) => { state.searchQuery = e.target.value; }}"
+        />
+
         <div style="display:flex; flex-direction:column; gap:4px; margin-top:10px;">
-          ${() => store.wiki.map(art => meldHtml`
-            <div 
-              class="article-link ${() => state.selectedSlug === art.slug ? 'active' : ''}"
-              onclick="${() => { state.selectedSlug = art.slug; }}"
-            >
-              📖 ${art.title}
-            </div>
-          `)}
+          ${meld.list(
+            () => filteredWiki(),
+            (art) => art.slug,
+            (art) => meldHtml`
+              <div 
+                class="article-link"
+                onclick="${() => { state.selectedSlug = art.slug; }}"
+              >
+                📖 ${art.title}
+              </div>
+            `,
+            (node, art) => {
+              if (state.selectedSlug === art.slug) {
+                node.classList.add('active');
+              } else {
+                node.classList.remove('active');
+              }
+              node.innerHTML = `📖 ${art.title}`;
+            }
+          )}
+          ${() => filteredWiki().length === 0 ? meldHtml`<div style="font-size:0.8rem; color:#64748b; font-style:italic; padding: 10px 0; text-align:center;">No articles found.</div>` : ''}
         </div>
       </div>
 
@@ -1635,12 +1915,20 @@ defineMeld('page-wiki', (el, { effect }) => {
               <div class="linked-tasks-card">
                 <h4 class="linked-tasks-title">🔗 Connected Board Tasks</h4>
                 <div>
-                  ${linkedTasksList.map(task => meldHtml`
-                    <div class="linked-task-item">
-                      <span><strong>${task.title}</strong> (${task.status})</span>
-                      <m-button variant="ghost" size="sm" onclick="${() => { window.location.hash = '#/board'; }}">View on Board</m-button>
-                    </div>
-                  `)}
+                  ${meld.list(
+                    () => linkedTasksList,
+                    (task) => task.id,
+                    (task) => meldHtml`
+                      <div class="linked-task-item">
+                        <span class="task-title-status"><strong>${task.title}</strong> (${task.status})</span>
+                        <m-button variant="ghost" size="sm" onclick="${() => { window.location.hash = '#/board'; }}">View on Board</m-button>
+                      </div>
+                    `,
+                    (node, task) => {
+                      const textSpan = node.querySelector('.task-title-status');
+                      if (textSpan) textSpan.innerHTML = `<strong>${task.title}</strong> (${task.status})`;
+                    }
+                  )}
                 </div>
               </div>
             ` : ''}

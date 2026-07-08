@@ -24,8 +24,8 @@ Use this tracker as the local source of truth for release hardening, testing gap
 - [x] 🟡🌟⏳6️⃣ **Enhancement** - Generate Meld custom data from current core, components, and plugins so LSP/VS Code completions stay aligned with the package instead of hardcoded CORE_DATA.
 ### **Features (priority-3)**
 
-- [ ] 🔴🌟⏳🔟 **Feature** - Epic: Build core framework test matrix covering meldState dependency tracking, computed cleanup, nested effects, no-op same-value sets, attribute bindings, event bindings, raw HTML rendering, Node replacement, list keyed reuse, lifecycle cleanup, provide/inject bubbling, theme adoption, and custom element duplicate-definition handling.
-- [ ] 🔴🌟⏳🔟 **Feature** - Epic: Build plugin test matrix for all src/plugins modules with isolated jsdom and mocked browser APIs for fetch, localStorage, cookies, BroadcastChannel, IntersectionObserver, WebAssembly, history/hash routing, document head mutations, file upload/download, and portal cleanup.
+- [x] 🔴🌟⏳🔟 **Feature** - Epic: Build core framework test matrix covering meldState dependency tracking, computed cleanup, nested effects, no-op same-value sets, attribute bindings, event bindings, raw HTML rendering, Node replacement, list keyed reuse, lifecycle cleanup, provide/inject bubbling, theme adoption, and custom element duplicate-definition handling.
+- [x] 🔴🌟⏳🔟 **Feature** - Epic: Build plugin test matrix for all src/plugins modules with isolated jsdom and mocked browser APIs for fetch, localStorage, cookies, BroadcastChannel, IntersectionObserver, WebAssembly, history/hash routing, document head mutations, file upload/download, and portal cleanup.
 
 - [x] 🟠🌟⏳8️⃣ **Feature** - Finish meld-lsp TypeScript server plugin: install dependencies, make tsc build pass, implement real meldHtml template completions, diagnostics, hover data, and plugin/custom-element metadata loading.
 - [x] 🟠🌟⏳8️⃣ **Feature** - Finish meld-vscode extension packaging: bundle or depend on meld-lsp, add VS Code package scripts, README, marketplace metadata, icon, license, vsce packaging, and extension smoke tests.

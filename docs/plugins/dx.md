@@ -90,3 +90,29 @@ return meldHtml`
 
   *  **Behavior:** Automatically adds a `data-meld-version` attribute to every component host element based on the global build configuration.
   *  **Benefit:** Allows monitoring tools (like Sentry) to identify which version of a micro-frontend is causing errors in production.
+
+-----
+
+## 6\. Meld Hotkeys (`meld-hotkeys`)
+
+**Purpose:** Reactive keyboard shortcuts manager that automatically handles key combos and lifecycle teardown.
+
+### API Reference
+
+  *   `useHotkeys(bindings, target?)`: Registers keydown event listeners on `target` (default: `window`). Automatically removes them when the component unmounts.
+
+### Example
+
+```javascript
+defineMeld('task-manager', (el, { useHotkeys }) => {
+  // Bind actions to key combos
+  useHotkeys({
+    'ctrl+s': () => saveTasks(),
+    'escape': () => closeModal(),
+    'n': () => createNewTask()
+  });
+});
+```
+
+> [!NOTE]
+> Single character hotkeys (like `n` or `/`) are automatically ignored when the user is actively typing inside editable fields (`<input>`, `<textarea>`, or `contenteditable` elements) to prevent unintended side effects. Key combos with modifiers (like `ctrl+s`) remain active.

@@ -105,3 +105,35 @@ return meldHtml`
 const term = el.shadowRoot.querySelector('meld-terminal');
 term.pushLine('> Connecting to server...');
 ```
+
+-----
+
+## 6\. Meld Motion (`meld-motion`)
+
+**Purpose:** Provides CSS transition wrapper components (`<meld-transition>`) to animate elements entering or leaving the viewport/DOM.
+
+### Attributes
+
+*   `name`: The transition class prefix (e.g. `fade` generates class names `fade-enter`, `fade-enter-active`, `fade-leave-active`, etc.). Defaults to `v`.
+*   `show`: Boolean or reactive attribute. Toggling this triggers entering/leaving class lists and defers unmounting until transition hooks finish.
+
+### Example
+
+```html
+<meld-transition name="fade" show="${() => state.visible}">
+  <div class="box">Animate Me!</div>
+</meld-transition>
+```
+
+### CSS Transition Classes Example
+
+```css
+/* Entering styles */
+.fade-enter { opacity: 0; }
+.fade-enter-active { transition: opacity 0.3s ease; }
+.fade-enter-to { opacity: 1; }
+
+/* Leaving styles */
+.fade-leave-active { transition: opacity 0.3s ease; }
+.fade-leave-to { opacity: 0; }
+```

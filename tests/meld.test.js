@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { computed, defineMeld, meld, meldHtml, meldState } from '../src/meld.core.js';
+import { computed, defineMeld, meld, meldHtml, meldState, onDestroy, provide, inject, use } from '../src/meld.core.js';
 import { MeldA11y } from '../src/plugins/meld-a11y.js';
 import { MeldAI } from '../src/plugins/meld-ai.js';
 import { MeldPortal } from '../src/plugins/meld-portal.js';
@@ -211,6 +211,7 @@ describe('Meld Core Rendering', () => {
     element.val = 'prop-updated';
     await tick();
     expect(element.shadowRoot.textContent).toContain('Value: prop-updated');
+    expect(element.val).toBe('prop-updated');
   });
 
   it('supports optional updateFn in meld.list', () => {
@@ -352,5 +353,237 @@ describe('Meld Plugins', () => {
     expect(userEl).not.toBeNull();
     expect(userEl.shadowRoot.querySelector('#user')).not.toBeNull();
     expect(userEl.shadowRoot.querySelector('#user').textContent).toBe('User Profile: 42');
+  });
+});
+
+describe('Meld Core Hardening Matrix', () => {
+  it('cleans up old dependencies in computed getters', () => {
+    const state = meldState({ flag: true, a: 1, b: 2 });
+    let count = 0;
+    const val = computed(() => {
+      count++;
+      return state.flag ? state.a : state.b;
+    });
+
+    expect(val()).toBe(1);
+    expect(count).toBe(1);
+
+    state.a = 10;
+    expect(val()).toBe(10);
+    expect(count).toBe(2);
+
+    state.flag = false;
+    expect(val()).toBe(2);
+    expect(count).toBe(3);
+
+    state.a = 20;
+    expect(val()).toBe(2);
+    expect(count).toBe(3);
+  });
+
+  it('prevents reactivity triggers on no-op same-value sets', () => {
+    const state = meldState({ count: 0 });
+    let triggerCount = 0;
+    
+    const double = computed(() => {
+      state.count;
+      triggerCount++;
+      return state.count * 2;
+    });
+
+    expect(double()).toBe(0);
+    expect(triggerCount).toBe(1);
+
+    state.count = 0;
+    expect(double()).toBe(0);
+    expect(triggerCount).toBe(1);
+
+    state.count = 1;
+    expect(double()).toBe(2);
+    expect(triggerCount).toBe(2);
+  });
+
+  it('runs onDestroy hooks when elements disconnect permanently', async () => {
+    const tagName = `m-test-destroy-${Date.now()}`;
+    let destroyedCount = 0;
+    
+    defineMeld(tagName, () => {
+      onDestroy(() => {
+        destroyedCount++;
+      });
+      return meldHtml`<div>component</div>`;
+    });
+
+    const element = document.createElement(tagName);
+    document.body.appendChild(element);
+    await tick();
+
+    expect(destroyedCount).toBe(0);
+
+    element.remove();
+    await tick();
+
+    expect(destroyedCount).toBe(1);
+  });
+
+  it('bubbles context request to resolve provide/inject values', async () => {
+    const parentTag = `m-parent-${Date.now()}`;
+    const childTag = `m-child-${Date.now()}`;
+
+    defineMeld(parentTag, () => {
+      provide('message', 'hello-world');
+      return meldHtml`<div><slot></slot></div>`;
+    });
+
+    let receivedMessage = '';
+    defineMeld(childTag, () => {
+      receivedMessage = inject('message', 'fallback');
+      return meldHtml`<span>child</span>`;
+    });
+
+    const parentEl = document.createElement(parentTag);
+    const childEl = document.createElement(childTag);
+    parentEl.appendChild(childEl);
+    document.body.appendChild(parentEl);
+    await tick();
+
+    expect(receivedMessage).toBe('hello-world');
+  });
+
+  it('adopts global stylesheets on connected elements shadowRoot', async () => {
+    const originalCSSStyleSheet = global.CSSStyleSheet;
+    // Always override CSSStyleSheet during the test to avoid JSDOM stubs failing on replaceSync
+    global.CSSStyleSheet = class {
+      constructor() {
+        this.cssRules = [];
+      }
+      replaceSync(css) {
+        this.cssRules = [{ cssText: css }];
+      }
+    };
+
+    const tagName = `m-test-theme-${Date.now()}`;
+    defineMeld(tagName, () => meldHtml`<p>styled text</p>`);
+
+    meld.theme('p { color: red; }');
+
+    const element = document.createElement(tagName);
+    document.body.appendChild(element);
+    await tick();
+
+    expect(element.shadowRoot.adoptedStyleSheets.length).toBeGreaterThan(0);
+    const sheet = element.shadowRoot.adoptedStyleSheets[element.shadowRoot.adoptedStyleSheets.length - 1];
+    expect(sheet.cssRules[0].cssText).toBe('p { color: red; }');
+
+    if (originalCSSStyleSheet) {
+      global.CSSStyleSheet = originalCSSStyleSheet;
+    } else {
+      delete global.CSSStyleSheet;
+    }
+  });
+
+  it('supports high-performance style object diffing and custom properties', async () => {
+    const state = meldState({
+      styleObj: { color: 'red', '--primary-var': '10px' }
+    });
+
+    const fragment = meldHtml`<div id="styled" style="${() => state.styleObj}"></div>`;
+    document.body.appendChild(fragment);
+    await tick();
+
+    const el = document.getElementById('styled');
+    expect(el.style.color).toBe('red');
+    expect(el.style.getPropertyValue('--primary-var')).toBe('10px');
+
+    // Update style property and add a new one, remove '--primary-var'
+    state.styleObj = { color: 'blue', display: 'flex' };
+    await tick();
+
+    expect(el.style.color).toBe('blue');
+    expect(el.style.display).toBe('flex');
+    expect(el.style.getPropertyValue('--primary-var')).toBe('');
+
+    // Remove a standard style property (covers line 308)
+    state.styleObj = { display: 'block' };
+    await tick();
+    expect(el.style.color).toBe('');
+    expect(el.style.display).toBe('block');
+
+    // Static object test
+    const staticFragment = meldHtml`<div id="static-style" style="${{ color: 'green', '--static-var': '20px' }}"></div>`;
+    document.body.appendChild(staticFragment);
+    const staticEl = document.getElementById('static-style');
+    expect(staticEl.style.color).toBe('green');
+    expect(staticEl.style.getPropertyValue('--static-var')).toBe('20px');
+
+    // Static string style binding (covers line 338 fallback)
+    const staticStrFragment = meldHtml`<div id="static-str" style="${'color: teal;'}"></div>`;
+    document.body.appendChild(staticStrFragment);
+    expect(document.getElementById('static-str').style.color).toBe('teal');
+
+    // String fallback test
+    state.styleObj = 'color: purple; margin: 5px;';
+    await tick();
+    expect(el.style.color).toBe('purple');
+    expect(el.style.margin).toBe('5px');
+  });
+
+  it('updates dynamic reactive attributes (boolean and string)', async () => {
+    const state = meldState({ active: true, title: 'hello' });
+    const fragment = meldHtml`<div id="reactive-attr" disabled="${() => state.active}" title="${() => state.title}"></div>`;
+    document.body.appendChild(fragment);
+    await tick();
+
+    const el = document.getElementById('reactive-attr');
+    expect(el.hasAttribute('disabled')).toBe(true);
+    expect(el.getAttribute('title')).toBe('hello');
+
+    state.active = false;
+    state.title = null;
+    await tick();
+
+    expect(el.hasAttribute('disabled')).toBe(false);
+    expect(el.hasAttribute('title')).toBe(false);
+  });
+
+  it('ignores duplicate plugin installations and registers setupHelpers', () => {
+    const dummyPlugin = {
+      install: jest.fn(),
+      setupHelpers: jest.fn().mockReturnValue({ myGlobalHelper: () => 'hello' })
+    };
+    use(dummyPlugin);
+    use(dummyPlugin);
+    expect(dummyPlugin.install).toHaveBeenCalledTimes(1);
+    expect(dummyPlugin.setupHelpers).toHaveBeenCalledTimes(1);
+  });
+
+  it('provides static css and style serialization helpers', () => {
+    expect(meld.css({ active: true, hidden: false, primary: true })).toBe('active primary');
+    expect(meld.style({ color: 'red', display: 'block' })).toBe('color:red;display:block');
+  });
+
+  it('supports dynamic property bindings with dot prefix in templates', async () => {
+    if (!customElements.get('m-test-dot-binding')) {
+      defineMeld('m-test-dot-binding', (el, { props }) => {
+        return meldHtml`<span>${() => props.val || 'empty'}</span>`;
+      }, { properties: ['val'] });
+    }
+
+    const state = meldState({ value: 'hello' });
+    const fragment = meldHtml`<m-test-dot-binding .val="${() => state.value}"></m-test-dot-binding>`;
+    document.body.appendChild(fragment);
+    await tick();
+
+    const element = document.body.querySelector('m-test-dot-binding');
+    expect(element.val).toBe('hello');
+    expect(element.shadowRoot.textContent).toBe('hello');
+
+    // Test static property value setting (covers line 289)
+    const staticFragment = meldHtml`<m-test-dot-binding .val="${'world'}"></m-test-dot-binding>`;
+    document.body.appendChild(staticFragment);
+    await tick();
+
+    const staticElement = document.body.querySelectorAll('m-test-dot-binding')[1];
+    expect(staticElement.val).toBe('world');
   });
 });

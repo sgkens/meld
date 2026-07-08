@@ -13,6 +13,7 @@ import { MeldBroadcast } from '../../../src/plugins/meld-broadcast.js';
 import { MeldMarkdown } from '../../../src/plugins/meld-markdown.js';
 import { MeldAI } from '../../../src/plugins/meld-ai.js';
 import { MeldDownload } from '../../../src/plugins/meld-download.js';
+import { MeldHotkeys } from '../../../src/plugins/meld-hotkeys.js';
 
 import { store, actions } from '../store.js';
 import './pages.js';
@@ -34,6 +35,7 @@ use(MeldBroadcast);
 use(MeldMarkdown);
 use(MeldAI);
 use(MeldDownload);
+use(MeldHotkeys);
 
 // Setup client side hash router config
 use(MeldRouter, {
@@ -47,9 +49,37 @@ use(MeldRouter, {
   ]
 });
 
-defineMeld('app-root', (el) => {
+defineMeld('app-root', (el, { useHotkeys }) => {
   const router = inject('router') || window.MeldRouter;
   provide('router', router);
+  
+  // Bind global keyboard shortcuts
+  useHotkeys({
+    'ctrl+t': () => {
+      actions.toggleTheme();
+    },
+    'ctrl+d': () => {
+      actions.toggleDevMode();
+    },
+    'ctrl+1': () => {
+      window.location.hash = '#/';
+    },
+    'ctrl+2': () => {
+      window.location.hash = '#/board';
+    },
+    'ctrl+3': () => {
+      window.location.hash = '#/wiki';
+    },
+    'ctrl+4': () => {
+      window.location.hash = '#/activity';
+    },
+    'ctrl+5': () => {
+      window.location.hash = '#/archive';
+    },
+    'ctrl+6': () => {
+      window.location.hash = '#/settings';
+    }
+  });
   
   // Inject body data-theme state on load
   document.body.setAttribute('data-theme', store.theme);
@@ -279,5 +309,6 @@ defineMeld('app-root', (el) => {
 
     <!-- FLOATING DEVTOOLS TELETEMRY CONSOLE -->
     <dev-panel></dev-panel>
+    <m-toast-provider></m-toast-provider>
   `;
 });

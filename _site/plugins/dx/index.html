@@ -710,6 +710,26 @@
 <li><strong>Behavior:</strong> Automatically adds a <code>data-meld-version</code> attribute to every component host element based on the global build configuration.</li>
 <li><strong>Benefit:</strong> Allows monitoring tools (like Sentry) to identify which version of a micro-frontend is causing errors in production.</li>
 </ul>
+<hr>
+<h2>6. Meld Hotkeys (<code>meld-hotkeys</code>)</h2>
+<p><strong>Purpose:</strong> Reactive keyboard shortcuts manager that automatically handles key combos and lifecycle teardown.</p>
+<h3>API Reference</h3>
+<ul>
+<li><code>useHotkeys(bindings, target?)</code>: Registers keydown event listeners on <code>target</code> (default: <code>window</code>). Automatically removes them when the component unmounts.</li>
+</ul>
+<h3>Example</h3>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'task-manager'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> useHotkeys <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token comment">// Bind actions to key combos</span>
+  <span class="token function">useHotkeys</span><span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token string-property property">'ctrl+s'</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">saveTasks</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token string-property property">'escape'</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">closeModal</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
+    <span class="token string-property property">'n'</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">createNewTask</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<blockquote>
+<p>[!NOTE]
+Single character hotkeys (like <code>n</code> or <code>/</code>) are automatically ignored when the user is actively typing inside editable fields (<code>&lt;input&gt;</code>, <code>&lt;textarea&gt;</code>, or <code>contenteditable</code> elements) to prevent unintended side effects. Key combos with modifiers (like <code>ctrl+s</code>) remain active.</p>
+</blockquote>
 
 
         

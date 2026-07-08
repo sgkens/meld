@@ -294,6 +294,49 @@ export function meldHtml(strings, ...values) {
             targetNode.removeEventListener(evt, value);
             targetNode.addEventListener(evt, value);
             targetNode.removeAttribute(attr.name);
+          } else if (attr.name === "style") {
+            if (typeof value === "function") {
+              let prevStyleObj = {};
+              createEffect(() => {
+                const res = value();
+                if (typeof res === "object" && res !== null) {
+                  Object.keys(prevStyleObj).forEach(key => {
+                    if (!(key in res)) {
+                      if (key.startsWith("--")) {
+                        targetNode.style.removeProperty(key);
+                      } else {
+                        targetNode.style[key] = "";
+                      }
+                    }
+                  });
+                  Object.keys(res).forEach(key => {
+                    if (res[key] !== prevStyleObj[key]) {
+                      const val = res[key] == null ? "" : res[key];
+                      if (key.startsWith("--")) {
+                        targetNode.style.setProperty(key, val);
+                      } else {
+                        targetNode.style[key] = val;
+                      }
+                    }
+                  });
+                  prevStyleObj = { ...res };
+                } else {
+                  targetNode.setAttribute("style", res || "");
+                  prevStyleObj = {};
+                }
+              });
+            } else if (typeof value === "object" && value !== null) {
+              Object.keys(value).forEach(key => {
+                const val = value[key] == null ? "" : value[key];
+                if (key.startsWith("--")) {
+                  targetNode.style.setProperty(key, val);
+                } else {
+                  targetNode.style[key] = val;
+                }
+              });
+            } else {
+              targetNode.setAttribute("style", value || "");
+            }
           } else {
             if (typeof value === "function") {
               createEffect(() => {
@@ -412,6 +455,10 @@ export function defineMeld(tagName, setupFn, options = {}) {
       this._meldProps = meldState(propsObj);
 
       propsList.forEach(prop => {
+        const preUpgradeVal = this[prop];
+        if (preUpgradeVal !== undefined) {
+          delete this[prop];
+        }
         Object.defineProperty(this, prop, {
           get() {
             return this._meldProps[prop];
@@ -422,6 +469,9 @@ export function defineMeld(tagName, setupFn, options = {}) {
           configurable: true,
           enumerable: true
         });
+        if (preUpgradeVal !== undefined) {
+          this._meldProps[prop] = preUpgradeVal;
+        }
       });
     }
 

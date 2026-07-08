@@ -727,6 +727,17 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <tr><td class="pname">strings</td><td class="ptype">TemplateStringsArray</td><td class="pdesc">Static template string segments.</td></tr>
     <tr><td class="pname">...values</td><td class="ptype">any[]</td><td class="pdesc">Dynamic values, functions, event handlers, refs, or fragments.</td></tr>
   </tbody></table>
+  <div class="api-subhead">Style Object Bindings</div>
+  <p class="api-entry-desc">
+    When binding to the <code>style</code> attribute, <code>meldHtml</code> supports standard style strings, static style objects, or reactive functions returning style objects. Object keys are diffed property-by-property at high speed. CSS Custom Properties (Variables) prefixed with <code>--</code> are reactively set or removed using native CSS variables APIs:
+  </p>
+  <pre><code class="language-javascript">return meldHtml`
+  &lt;div style="${() => ({ 
+    color: state.active ? 'var(--primary)' : 'var(--text)', 
+    '--opacity-val': state.opacity,
+    display: state.visible ? 'block' : 'none'
+  })}"&gt;Content&lt;/div&gt;
+`;</code></pre>
   <div class="api-subhead">Example</div>
 </section>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">

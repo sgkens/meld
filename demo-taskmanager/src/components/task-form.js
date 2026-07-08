@@ -5,6 +5,11 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
   const task = props.task || el.task;
   const isEdit = !!task;
 
+  const getLinkedWiki = () => {
+    if (!task) return [];
+    return store.wiki.filter(w => Array.isArray(w.linkedTasks) && w.linkedTasks.includes(task.id)).map(w => w.slug);
+  };
+
   // Initialize form validation state
   const { fields, errors, handleSubmit } = useForm(
     {
@@ -14,7 +19,9 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
       priority: task ? task.priority : 'medium',
       milestone: task ? (task.milestone || '') : '',
       tags: task ? (Array.isArray(task.tags) ? task.tags.join(', ') : '') : '',
-      dueDate: task ? (task.dueDate || '') : ''
+      dueDate: task ? (task.dueDate || '') : '',
+      subtasks: task && Array.isArray(task.subtasks) ? JSON.parse(JSON.stringify(task.subtasks)) : [],
+      linkedWiki: getLinkedWiki()
     },
     {
       title: ['required']
@@ -23,19 +30,25 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
 
   const save = (data) => {
     const formattedData = {
-      ...data,
+      title: data.title,
+      description: data.description,
+      category: data.category,
+      priority: data.priority,
       milestone: data.milestone || null,
       dueDate: data.dueDate || null,
-      tags: typeof data.tags === 'string' ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : (data.tags || [])
+      tags: typeof data.tags === 'string' ? data.tags.split(',').map(t => t.trim()).filter(Boolean) : (data.tags || []),
+      subtasks: data.subtasks || []
     };
 
     if (isEdit) {
       actions.updateTask(task.id, formattedData);
+      actions.updateWikiLinks(task.id, data.linkedWiki || []);
       if (announce) {
         announce(`Task "${formattedData.title}" has been updated successfully.`);
       }
     } else {
-      actions.addTask(formattedData);
+      const newTask = actions.addTask(formattedData);
+      actions.updateWikiLinks(newTask.id, data.linkedWiki || []);
       if (announce) {
         announce(`Task "${formattedData.title}" has been created successfully.`);
       }
@@ -200,6 +213,55 @@ defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
           oninput="${(e) => { fields.tags = e.target.value; }}"
           placeholder="e.g. frontend, core, docs"
         />
+      </div>
+
+      <!-- Checklist Items UI inside the form -->
+      <div class="form-group">
+        <label>Checklist Items</label>
+        <div style="display:flex; flex-direction:column; gap:6px; margin-bottom:8px;">
+          ${() => fields.subtasks.map((sub, idx) => meldHtml`
+            <div style="display:flex; align-items:center; gap:8px;">
+              <input type="checkbox" ?checked="${sub.done}" onchange="${() => { sub.done = !sub.done; fields.subtasks = [...fields.subtasks]; }}" />
+              <input type="text" class="form-control" style="padding: 6px 10px; font-size:0.85rem;" value="${sub.text}" oninput="${(e) => { sub.text = e.target.value; }}" />
+              <button type="button" class="btn btn-outline" style="padding: 6px 10px; border-color:#fca5a5; color:#ef4444; background:transparent; border:1px solid var(--mui-border); border-radius:var(--mui-radius-md); cursor:pointer;" onclick="${() => { fields.subtasks = fields.subtasks.filter((_, i) => i !== idx); }}">✕</button>
+            </div>
+          `)}
+          ${() => fields.subtasks.length === 0 ? meldHtml`<div style="font-size:0.8rem; color:#64748b; font-style:italic;">No checklist items added yet.</div>` : ''}
+        </div>
+        <div style="display:flex; gap:8px;">
+          <input type="text" id="new-form-subtask-input" class="form-control" style="font-size:0.85rem; padding: 6px 10px;" placeholder="Add new checklist item..." />
+          <button type="button" class="btn btn-outline" style="padding:6px 12px; font-size:0.85rem; border:1px solid var(--mui-border); background:var(--mui-surface); border-radius:var(--mui-radius-md); cursor:pointer; color:var(--mui-fg);" onclick="${() => {
+            const input = el.shadowRoot.getElementById('new-form-subtask-input');
+            if (input && input.value.trim()) {
+              fields.subtasks = [...fields.subtasks, { id: Date.now() + Math.random(), text: input.value.trim(), done: false }];
+              input.value = '';
+            }
+          }}">Add</button>
+        </div>
+      </div>
+
+      <!-- Wiki Document Links checklist -->
+      <div class="form-group">
+        <label>Link to Wiki Documents</label>
+        <div class="task-checkbox-list" style="max-height: 120px; overflow-y: auto; border: 1px solid var(--mui-border); border-radius: var(--mui-radius-md); padding: 8px; display: flex; flex-direction: column; gap: 6px;">
+          ${() => store.wiki.map(doc => meldHtml`
+            <label class="task-checkbox-item" style="display: flex; align-items: center; gap: 6px; font-size: 0.8rem; cursor: pointer; color: var(--mui-fg);">
+              <input 
+                type="checkbox" 
+                ?checked="${() => fields.linkedWiki.includes(doc.slug)}"
+                onchange="${(e) => {
+                  if (e.target.checked) {
+                    fields.linkedWiki = [...fields.linkedWiki, doc.slug];
+                  } else {
+                    fields.linkedWiki = fields.linkedWiki.filter(s => s !== doc.slug);
+                  }
+                }}"
+              />
+              <span>📖 ${doc.title}</span>
+            </label>
+          `)}
+          ${() => store.wiki.length === 0 ? meldHtml`<div style="font-size:0.8rem; color:#64748b; font-style:italic;">No wiki documents available.</div>` : ''}
+        </div>
       </div>
 
       <button type="submit" class="submit-btn">

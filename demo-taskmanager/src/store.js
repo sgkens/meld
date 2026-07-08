@@ -1,6 +1,7 @@
 import { use, meldState, computed, onDestroy } from '../../src/meld.core.js';
 import { MeldPersist } from '../../src/plugins/meld-persist.js';
 import { MeldBroadcast } from '../../src/plugins/meld-broadcast.js';
+import { toast } from '../../src/components/data/m-toast.js';
 
 // Setup and install plugins on a mock api context
 const api = { meldState, computed, onDestroy };
@@ -138,7 +139,8 @@ api.persist(store, 'meld-taskmanager-data');
 // Sync across tabs using framework plugin implementation
 api.useBroadcast('meld-taskmanager-channel', store, [
   'theme', 'devMode', 'showAICopilot', 'enableDragAndDrop', 
-  'milestones', 'categories', 'sortBy', 'filterMilestone', 'filterTag', 'tasks', 'wiki', 'activities'
+  'milestones', 'categories', 'sortBy', 'filterMilestone', 'filterTag', 'tasks', 'wiki', 'activities',
+  'filter', 'searchQuery'
 ]);
 
 // Define actions to manipulate store state
@@ -164,6 +166,7 @@ export const actions = {
     };
     store.tasks = [newTask, ...store.tasks];
     actions.addActivity(`Created task: "${title}"`);
+    toast.success(`Task "${title}" created successfully.`);
     return newTask;
   },
 
@@ -175,6 +178,7 @@ export const actions = {
       // Force trigger array update
       store.tasks = [...store.tasks];
       actions.addActivity(`Moved "${task.title}" from ${oldStatus} to ${status}`);
+      toast.success(`Moved "${task.title}" to ${status}.`);
     }
   },
 
@@ -188,6 +192,7 @@ export const actions = {
       // Force trigger array update
       store.tasks = [...store.tasks];
       actions.addActivity(`Updated task: "${task.title}"`);
+      toast.success(`Task "${task.title}" updated.`);
     }
   },
 
@@ -197,6 +202,7 @@ export const actions = {
       task.archived = true;
       store.tasks = [...store.tasks];
       actions.addActivity(`Archived task: "${task.title}"`);
+      toast.success(`Task "${task.title}" archived.`);
     }
   },
 
@@ -206,6 +212,7 @@ export const actions = {
       task.archived = false;
       store.tasks = [...store.tasks];
       actions.addActivity(`Unarchived task: "${task.title}"`);
+      toast.success(`Task "${task.title}" restored to board.`);
     }
   },
 
@@ -214,18 +221,22 @@ export const actions = {
     if (task) {
       store.tasks = store.tasks.filter(t => t.id !== id);
       actions.addActivity(`Permanently deleted task: "${task.title}"`);
+      toast.success(`Task deleted permanently.`);
     }
   },
 
   clearAllTasks() {
+    const count = store.tasks.length;
     store.tasks = [];
     actions.addActivity('Cleared all tasks');
+    toast.show(`Cleared all ${count} tasks.`, 'error');
   },
 
   addMilestone(name) {
     if (name && !store.milestones.includes(name)) {
       store.milestones = [...store.milestones, name];
       actions.addActivity(`Added milestone: "${name}"`);
+      toast.success(`Milestone "${name}" added.`);
     }
   },
 
@@ -233,6 +244,7 @@ export const actions = {
     if (name && !store.categories.includes(name)) {
       store.categories = [...store.categories, name];
       actions.addActivity(`Added category: "${name}"`);
+      toast.success(`Category "${name}" added.`);
     }
   },
 
@@ -251,6 +263,7 @@ export const actions = {
   toggleDragAndDrop() {
     store.enableDragAndDrop = !store.enableDragAndDrop;
     actions.addActivity(`Drag & Drop ${store.enableDragAndDrop ? 'enabled' : 'disabled'}`);
+    toast.success(`Drag & Drop ${store.enableDragAndDrop ? 'enabled' : 'disabled'}.`);
   },
 
   toggleTheme() {
@@ -306,6 +319,33 @@ export const actions = {
     }
   },
 
+  clearCompletedSubtasks(taskId) {
+    const task = store.tasks.find(t => t.id === taskId);
+    if (task && Array.isArray(task.subtasks)) {
+      const initialCount = task.subtasks.length;
+      task.subtasks = task.subtasks.filter(s => !s.done);
+      const clearedCount = initialCount - task.subtasks.length;
+      store.tasks = [...store.tasks];
+      actions.addActivity(`Cleared ${clearedCount} completed checklist items from "${task.title}"`);
+      toast.success(`Cleared ${clearedCount} checklist items.`);
+    }
+  },
+
+  updateWikiLinks(taskId, selectedWikiSlugs) {
+    const id = Number(taskId);
+    store.wiki.forEach(doc => {
+      if (!Array.isArray(doc.linkedTasks)) doc.linkedTasks = [];
+      const isLinked = selectedWikiSlugs.includes(doc.slug);
+      const index = doc.linkedTasks.indexOf(id);
+      if (isLinked && index === -1) {
+        doc.linkedTasks.push(id);
+      } else if (!isLinked && index !== -1) {
+        doc.linkedTasks.splice(index, 1);
+      }
+    });
+    store.wiki = [...store.wiki];
+  },
+
   saveWikiArticle({ slug, title, content, category, tags, linkedTasks }) {
     const existing = store.wiki.find(w => w.slug === slug);
     const parsedTags = Array.isArray(tags) 
@@ -323,6 +363,7 @@ export const actions = {
       existing.linkedTasks = parsedLinkedTasks;
       store.wiki = [...store.wiki];
       actions.addActivity(`Updated wiki article: "${title}"`);
+      toast.success(`Wiki article "${title}" updated.`);
     } else {
       const newArticle = {
         slug: slug || title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
@@ -335,6 +376,7 @@ export const actions = {
       };
       store.wiki = [newArticle, ...store.wiki];
       actions.addActivity(`Created wiki article: "${title}"`);
+      toast.success(`Wiki article "${title}" created.`);
     }
   },
 
@@ -343,6 +385,7 @@ export const actions = {
     if (existing) {
       store.wiki = store.wiki.filter(w => w.slug !== slug);
       actions.addActivity(`Deleted wiki article: "${existing.title}"`);
+      toast.show(`Deleted wiki article "${existing.title}".`, 'error');
     }
   },
 
@@ -364,6 +407,7 @@ export const actions = {
       }));
       store.tasks = [...sanitized, ...store.tasks];
       actions.addActivity(`Imported ${sanitized.length} tasks successfully`);
+      toast.success(`Imported ${sanitized.length} tasks successfully.`);
     }
   },
 
