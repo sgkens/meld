@@ -2,47 +2,76 @@
 title: Diagnostics Plugin
 parent: Plugin Ecosystem
 nav_order: 6
-excerpt: The meld-diagnostics plugin installs a runtime diagnostics hook and reports initialization details to the browser console.
-tags: [plugins, diagnostics, debugging, console, runtime]
+excerpt: The meld-diagnostics plugin monitors component setups, mount durations, active instances, and reactive effect counts for production telemetry.
+tags: [plugins, diagnostics, debugging, telemetry, performance, active-effects]
 category: Plugin Ecosystem
 ---
 
-# Diagnostics Plugin
+# Diagnostics & Telemetry Plugin
 
-`meld-diagnostics` installs a diagnostics hook and writes an initialization message to the console.
+`meld-diagnostics` transparently intercepts custom element registration and lifecycles to collect performance metrics, trace reactive overhead, and aggregate runtime errors.
 
-## Import
+## Import & Installation
 
 ```javascript
-import { use } from './src/meld.core.js';
-import { MeldDiagnostics } from './src/plugins/meld-diagnostics.js';
+import { use } from '@meldjs/meld';
+import { MeldDiagnostics } from '@meldjs/meld/plugins/meld-diagnostics';
 
 use(MeldDiagnostics);
 ```
 
-## Current Behavior
+Once installed, it wraps `defineMeld` transparently. Every component registered subsequently is profiled automatically without altering its source code.
 
-The plugin exposes an `install(api)` function and logs this message when installed:
+## Generating Reports
 
-```text
-Meld Diagnostics Engine initialized
-```
-
-The current implementation does not register runtime metrics, component counters, warnings, or error aggregation.
-
-## Source
+The diagnostics engine exposes a global telemetry reporter helper `getDiagnosticsReport` (also available via component setup context):
 
 ```javascript
-export const MeldDiagnostics = {
-  install(_api) {
-    console.log("Meld Diagnostics Engine initialized");
-  }
-};
+// Access inside a component setup function
+defineMeld('my-component', (el, { getDiagnosticsReport }) => {
+  const printTelemetry = () => {
+    console.log(getDiagnosticsReport());
+  };
+});
 ```
 
-## Reference
+### Telemetry Report Structure
 
-| Property | Type | Required | Description |
-| :--- | :--- | :--- | :--- |
-| `MeldDiagnostics.install` | `Function` | Yes | Called by `use()` when the plugin is installed. |
-| `_api` | `Object` | No | Plugin API argument. It is currently unused. |
+Calling `getDiagnosticsReport()` returns a JSON object outlining the health and performance profile of your application:
+
+```json
+{
+  "totalActiveComponents": 5,
+  "totalActiveEffects": 34,
+  "components": {
+    "task-card": {
+      "totalCreated": 12,
+      "activeCount": 4,
+      "averageSetupMs": 0.124,
+      "averageMountMs": 0.452,
+      "errorCount": 0,
+      "errors": []
+    },
+    "circular-completion-gauge": {
+      "totalCreated": 1,
+      "activeCount": 1,
+      "averageSetupMs": 0.089,
+      "averageMountMs": 0.211,
+      "errorCount": 0,
+      "errors": []
+    }
+  }
+}
+```
+
+## Collected Metrics
+
+| Metric | Description |
+| :--- | :--- |
+| `totalActiveComponents` | The number of custom elements currently attached to the DOM. |
+| `totalActiveEffects` | The total number of active reactive effects running across all mounted components. Useful for identifying memory leaks. |
+| `totalCreated` | The cumulative count of instances created for a given tag name. |
+| `averageSetupMs` | Average execution duration of the component's `setupFn` (constructor phase) using high-precision `performance.now()`. |
+| `averageMountMs` | Average execution duration of the component's `onMount` hooks. |
+| `errorCount` | Cumulative count of exceptions thrown inside the component's constructor or setup phase. |
+| `errors` | List of aggregated errors containing error messages, stacks, and timestamps. |

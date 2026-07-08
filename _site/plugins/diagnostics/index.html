@@ -382,8 +382,8 @@
           <a
             href="/plugins/diagnostics/"
             aria-current="page"
-            data-excerpt="The meld-diagnostics plugin installs a runtime diagnostics hook and reports initialization details to the browser console."
-            data-tags="plugins,diagnostics,debugging,console,runtime"
+            data-excerpt="The meld-diagnostics plugin monitors component setups, mount durations, active instances, and reactive effect counts for production telemetry."
+            data-tags="plugins,diagnostics,debugging,telemetry,performance,active-effects"
           >
             <i data-lucide="file-text"></i>
             <span>Diagnostics Plugin</span>
@@ -648,45 +648,82 @@
           </a>
         </div>
 
-        <h1>Diagnostics Plugin</h1>
-<p><code>meld-diagnostics</code> installs a diagnostics hook and writes an initialization message to the console.</p>
-<h2>Import</h2>
-<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> use <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./src/meld.core.js'</span><span class="token punctuation">;</span>
-<span class="token keyword">import</span> <span class="token punctuation">{</span> MeldDiagnostics <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'./src/plugins/meld-diagnostics.js'</span><span class="token punctuation">;</span>
+        <h1>Diagnostics &amp; Telemetry Plugin</h1>
+<p><code>meld-diagnostics</code> transparently intercepts custom element registration and lifecycles to collect performance metrics, trace reactive overhead, and aggregate runtime errors.</p>
+<h2>Import &amp; Installation</h2>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">import</span> <span class="token punctuation">{</span> use <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@meldjs/meld'</span><span class="token punctuation">;</span>
+<span class="token keyword">import</span> <span class="token punctuation">{</span> MeldDiagnostics <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@meldjs/meld/plugins/meld-diagnostics'</span><span class="token punctuation">;</span>
 
 <span class="token function">use</span><span class="token punctuation">(</span>MeldDiagnostics<span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
-<h2>Current Behavior</h2>
-<p>The plugin exposes an <code>install(api)</code> function and logs this message when installed:</p>
-<pre class="language-text" tabindex="0"><code class="language-text">Meld Diagnostics Engine initialized</code></pre>
-<p>The current implementation does not register runtime metrics, component counters, warnings, or error aggregation.</p>
-<h2>Source</h2>
-<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">const</span> MeldDiagnostics <span class="token operator">=</span> <span class="token punctuation">{</span>
-  <span class="token function">install</span><span class="token punctuation">(</span><span class="token parameter">_api</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
-    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">"Meld Diagnostics Engine initialized"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<p>Once installed, it wraps <code><a href="/api-reference/#defineMeld">defineMeld</a></code> transparently. Every component registered subsequently is profiled automatically without altering its source code.</p>
+<h2>Generating Reports</h2>
+<p>The diagnostics engine exposes a global telemetry reporter helper <code>getDiagnosticsReport</code> (also available via component setup context):</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// Access inside a component setup function</span>
+<span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'my-component'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> getDiagnosticsReport <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> <span class="token function-variable function">printTelemetry</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token function">getDiagnosticsReport</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<h3>Telemetry Report Structure</h3>
+<p>Calling <code>getDiagnosticsReport()</code> returns a JSON object outlining the health and performance profile of your application:</p>
+<pre class="language-json" tabindex="0"><code class="language-json"><span class="token punctuation">{</span>
+  <span class="token property">"totalActiveComponents"</span><span class="token operator">:</span> <span class="token number">5</span><span class="token punctuation">,</span>
+  <span class="token property">"totalActiveEffects"</span><span class="token operator">:</span> <span class="token number">34</span><span class="token punctuation">,</span>
+  <span class="token property">"components"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token property">"task-card"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"totalCreated"</span><span class="token operator">:</span> <span class="token number">12</span><span class="token punctuation">,</span>
+      <span class="token property">"activeCount"</span><span class="token operator">:</span> <span class="token number">4</span><span class="token punctuation">,</span>
+      <span class="token property">"averageSetupMs"</span><span class="token operator">:</span> <span class="token number">0.124</span><span class="token punctuation">,</span>
+      <span class="token property">"averageMountMs"</span><span class="token operator">:</span> <span class="token number">0.452</span><span class="token punctuation">,</span>
+      <span class="token property">"errorCount"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+      <span class="token property">"errors"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token property">"circular-completion-gauge"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+      <span class="token property">"totalCreated"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+      <span class="token property">"activeCount"</span><span class="token operator">:</span> <span class="token number">1</span><span class="token punctuation">,</span>
+      <span class="token property">"averageSetupMs"</span><span class="token operator">:</span> <span class="token number">0.089</span><span class="token punctuation">,</span>
+      <span class="token property">"averageMountMs"</span><span class="token operator">:</span> <span class="token number">0.211</span><span class="token punctuation">,</span>
+      <span class="token property">"errorCount"</span><span class="token operator">:</span> <span class="token number">0</span><span class="token punctuation">,</span>
+      <span class="token property">"errors"</span><span class="token operator">:</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token punctuation">}</span>
   <span class="token punctuation">}</span>
-<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
-<h2>Reference</h2>
+<span class="token punctuation">}</span></code></pre>
+<h2>Collected Metrics</h2>
 <table>
 <thead>
 <tr>
-<th style="text-align:left">Property</th>
-<th style="text-align:left">Type</th>
-<th style="text-align:left">Required</th>
+<th style="text-align:left">Metric</th>
 <th style="text-align:left">Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td style="text-align:left"><code>MeldDiagnostics.install</code></td>
-<td style="text-align:left"><code>Function</code></td>
-<td style="text-align:left">Yes</td>
-<td style="text-align:left">Called by <code>use()</code> when the plugin is installed.</td>
+<td style="text-align:left"><code>totalActiveComponents</code></td>
+<td style="text-align:left">The number of custom elements currently attached to the DOM.</td>
 </tr>
 <tr>
-<td style="text-align:left"><code>_api</code></td>
-<td style="text-align:left"><code>Object</code></td>
-<td style="text-align:left">No</td>
-<td style="text-align:left">Plugin API argument. It is currently unused.</td>
+<td style="text-align:left"><code>totalActiveEffects</code></td>
+<td style="text-align:left">The total number of active reactive effects running across all mounted components. Useful for identifying memory leaks.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>totalCreated</code></td>
+<td style="text-align:left">The cumulative count of instances created for a given tag name.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>averageSetupMs</code></td>
+<td style="text-align:left">Average execution duration of the component's <code>setupFn</code> (constructor phase) using high-precision <code>performance.now()</code>.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>averageMountMs</code></td>
+<td style="text-align:left">Average execution duration of the component's <code><a href="/api-reference/#onMount">onMount</a></code> hooks.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>errorCount</code></td>
+<td style="text-align:left">Cumulative count of exceptions thrown inside the component's constructor or setup phase.</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>errors</code></td>
+<td style="text-align:left">List of aggregated errors containing error messages, stacks, and timestamps.</td>
 </tr>
 </tbody>
 </table>

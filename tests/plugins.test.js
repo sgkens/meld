@@ -439,3 +439,63 @@ describe('MeldHotkeys Plugin', () => {
     document.body.removeChild(target);
   });
 });
+
+describe('MeldDiagnostics Plugin', () => {
+  it('transparently monitors component setups, mount times, active instances, and error reporting', async () => {
+    const originalDefineMeld = api.defineMeld;
+    
+    MeldDiagnostics.install(api);
+    expect(api.getDiagnosticsReport).toBeDefined();
+
+    const mountFn = jest.fn();
+    const cleanupFn = jest.fn();
+
+    api.defineMeld('m-test-diag', (el) => {
+      el.mountHooks.push(mountFn);
+      el.destroyHooks.push(cleanupFn);
+      return meldHtml`<div>Diag Test</div>`;
+    });
+
+    let report = api.getDiagnosticsReport();
+    expect(report.components['m-test-diag']).toBeDefined();
+    expect(report.components['m-test-diag'].totalCreated).toBe(0);
+
+    const element = document.createElement('m-test-diag');
+    document.body.appendChild(element);
+    await tick();
+
+    report = api.getDiagnosticsReport();
+    expect(report.components['m-test-diag'].totalCreated).toBe(1);
+    expect(report.components['m-test-diag'].activeCount).toBe(1);
+    expect(report.totalActiveComponents).toBe(1);
+    expect(mountFn).toHaveBeenCalled();
+
+    document.body.removeChild(element);
+    await tick();
+
+    report = api.getDiagnosticsReport();
+    expect(report.components['m-test-diag'].activeCount).toBe(0);
+    expect(report.totalActiveComponents).toBe(0);
+    expect(cleanupFn).toHaveBeenCalled();
+
+    api.defineMeld('m-test-diag-err', () => {
+      throw new Error('Diag test error');
+    });
+
+    const errorElement = document.createElement('m-test-diag-err');
+    expect(() => {
+      errorElement.connectedCallback();
+    }).toThrow('Diag test error');
+
+    report = api.getDiagnosticsReport();
+    expect(report.components['m-test-diag-err'].errorCount).toBe(1);
+    expect(report.components['m-test-diag-err'].errors[0].message).toBe('Diag test error');
+
+    api.defineMeld = originalDefineMeld;
+  });
+
+  it('provides helpers via setupHelpers', () => {
+    const helpers = MeldDiagnostics.setupHelpers(api);
+    expect(helpers.getDiagnosticsReport).toBe(api.getDiagnosticsReport);
+  });
+});
