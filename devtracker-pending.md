@@ -1,4 +1,4 @@
-# meldjs - Development Notes and Workflow Instructions
+﻿# meldjs - Development Notes and Workflow Instructions
 
 ## **REPO INSTRUCTIONS**
 
@@ -33,6 +33,10 @@ Use this tracker as the local source of truth for release hardening, testing gap
   - Runtime/export/docs integration is in place; final verification is blocked until node/npm/npx are available for lint, tests, and docs build.
 - [x] 🟠🌟❓8️⃣ **Feature** - Consolidate Meld docs UI: smaller H1 scale, site-wide API reference styling, Mermaid theme alignment, dismissible release banner, and benchmark harness for Meld/Vue/React/HTMX.
   - Implementation is in place across docs templates, CSS, docs JS, benchmark harness, and performance docs; build/runtime verification is blocked until node/npm/npx are available.
+- [ ] 🟠🌟⏳8️⃣ **Feature** - Developer Tooling & Diagnostics: Build Chrome/Firefox DevTools Extension for visual diagnostics inspection
+- [ ] 🟡🌟⏳9️⃣ **Feature** - Microtask Render Batching: Implement update batching scheduler in core reactivity compiler
+- [ ] 🟡🌟⏳7️⃣ **Feature** - Progressive Plugin Bundles: Create lightweight preset bundles for SPA and MFE packages
+- [ ] 🟡🌟⏳7️⃣ **Feature** - Rich Boilerplates & Stacks: Deliver official starter templates for KMEL, Astro, HTMX, and Postgres
 ### **Bug Fixes (priority-4)**
 
 - [x] 🟠🦀❓7️⃣ **BugFix** - Fix meld-vscode TypeScript server plugin contribution: current package references meld-lsp by name but does not ship the plugin inside the extension package.
