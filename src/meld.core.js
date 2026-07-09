@@ -391,6 +391,29 @@ export function meldHtml(strings, ...values) {
               targetNode[targetProp] = value;
             }
             targetNode.removeAttribute(attr.name);
+          } else if (attr.name.startsWith("?")) {
+            const rawAttr = attr.name.slice(1);
+            if (typeof value === "function") {
+              createEffect(() => {
+                const res = value();
+                if (res) {
+                  targetNode.setAttribute(rawAttr, "");
+                  if (rawAttr in targetNode) targetNode[rawAttr] = true;
+                } else {
+                  targetNode.removeAttribute(rawAttr);
+                  if (rawAttr in targetNode) targetNode[rawAttr] = false;
+                }
+              });
+            } else {
+              if (value) {
+                targetNode.setAttribute(rawAttr, "");
+                if (rawAttr in targetNode) targetNode[rawAttr] = true;
+              } else {
+                targetNode.removeAttribute(rawAttr);
+                if (rawAttr in targetNode) targetNode[rawAttr] = false;
+              }
+            }
+            targetNode.removeAttribute(attr.name);
           } else if (attr.name.startsWith("on")) {
             const evt = attr.name.slice(2).toLowerCase();
             targetNode.removeEventListener(evt, value);

@@ -717,4 +717,46 @@ describe('Meld Core Hardening Matrix', () => {
   });
 });
 
+describe('Boolean Attributes (?attr)', () => {
+  it('correctly handles ?attr boolean properties and attributes reactively', async () => {
+    const tagName = 'm-boolean-test-' + Math.random().toString(36).slice(2, 6);
+    const state = meldState({ isChecked: false, isDisabled: true });
+
+    defineMeld(tagName, () => {
+      return meldHtml`
+        <input id="check" type="checkbox" ?checked="${() => state.isChecked}" />
+        <button id="btn" ?disabled="${() => state.isDisabled}">Button</button>
+        <div id="static-check" ?checked="${true}"></div>
+      `;
+    });
+
+    const el = document.createElement(tagName);
+    document.body.appendChild(el);
+    await tick();
+
+    const check = el.shadowRoot.querySelector('#check');
+    const btn = el.shadowRoot.querySelector('#btn');
+    const staticCheck = el.shadowRoot.querySelector('#static-check');
+
+    // Initially
+    expect(check.checked).toBe(false);
+    expect(check.hasAttribute('checked')).toBe(false);
+    expect(btn.disabled).toBe(true);
+    expect(btn.hasAttribute('disabled')).toBe(true);
+    expect(staticCheck.hasAttribute('checked')).toBe(true);
+
+    // Toggle states reactively
+    state.isChecked = true;
+    state.isDisabled = false;
+    meld.flush();
+
+    expect(check.checked).toBe(true);
+    expect(check.hasAttribute('checked')).toBe(true);
+    expect(btn.disabled).toBe(false);
+    expect(btn.hasAttribute('disabled')).toBe(false);
+
+    el.remove();
+  });
+});
+
 
