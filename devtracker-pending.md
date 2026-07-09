@@ -1,4 +1,4 @@
-﻿# meldjs - Development Notes and Workflow Instructions
+# meldjs - Development Notes and Workflow Instructions
 
 ## **REPO INSTRUCTIONS**
 
@@ -7,6 +7,14 @@ Use this tracker as the local source of truth for release hardening, testing gap
 ## **Tasklist**
 
 ### **Issues Remaining (priority-1)**
+- [x] **fix** im seeing Architecture [object DocumentFragment],[object DocumentFragment] in the description or the wikki, let me to beleive that we are return raw objects
+- [x] wikki must support markdown, 
+- [x] add polish padding to taskflow menu items and content, change font to a more readable font.
+- [x] make sure we are use melds models for all actions
+- [x] recent activity is also returning the raw objects
+- [x] lets sperate tasks and milstones into groups
+- [x] lets add login and lets give the admin user full permissions, allow multiple users, simple user profiles
+- [x] lets allow the side menu to callapse to icons mode
 - [x] update all function plugins to have JSDoc fully documented inline with best practice + a little love on the top makes for a better DX
 - [x] update the docs site to reference npm meldjs group name pace @meldjs/meld
 - [x] Templaing and rendering page has broken sytax calling render to bleed have have a look and fix

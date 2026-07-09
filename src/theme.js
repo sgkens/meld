@@ -3,7 +3,7 @@ import { meld } from './meld.core.js';
 export const initMeldUI = (config = {}) => {
   const tokens = `
     :root {
-      --mui-font: 'Inter', system-ui, sans-serif;
+      --mui-font: 'Outfit', 'Inter', system-ui, sans-serif;
       --mui-space-1: 4px;
       --mui-space-2: 8px;
       --mui-space-4: 16px;

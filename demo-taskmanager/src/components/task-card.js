@@ -8,6 +8,12 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
   const setStatus = (status) => {
     const t = getTask();
     if (t) {
+      if (store.currentUser && store.currentUser.role === 'guest') {
+        import('../../../src/components/data/m-toast.js').then(({ toast }) => {
+          toast.error('Permission Denied: Guests cannot modify task status.');
+        });
+        return;
+      }
       actions.updateTaskStatus(t.id, status);
       emit('status-changed', { id: t.id, status });
     }
@@ -16,6 +22,12 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
   const remove = () => {
     const t = getTask();
     if (t) {
+      if (store.currentUser && store.currentUser.role !== 'admin') {
+        import('../../../src/components/data/m-toast.js').then(({ toast }) => {
+          toast.error('Permission Denied: Only Admin can delete tasks.');
+        });
+        return;
+      }
       actions.deleteTask(t.id);
       emit('deleted', t.id);
     }
@@ -24,6 +36,12 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
   const edit = () => {
     const t = getTask();
     if (t) {
+      if (store.currentUser && store.currentUser.role === 'guest') {
+        import('../../../src/components/data/m-toast.js').then(({ toast }) => {
+          toast.error('Permission Denied: Guests cannot edit tasks.');
+        });
+        return;
+      }
       emit('edit-task', t);
     }
   };
@@ -31,6 +49,12 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
   const archive = () => {
     const t = getTask();
     if (t) {
+      if (store.currentUser && store.currentUser.role !== 'admin') {
+        import('../../../src/components/data/m-toast.js').then(({ toast }) => {
+          toast.error('Permission Denied: Only Admin can archive tasks.');
+        });
+        return;
+      }
       actions.archiveTask(t.id);
       emit('archived', t.id);
     }
@@ -39,6 +63,12 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
   const restore = () => {
     const t = getTask();
     if (t) {
+      if (store.currentUser && store.currentUser.role !== 'admin') {
+        import('../../../src/components/data/m-toast.js').then(({ toast }) => {
+          toast.error('Permission Denied: Only Admin can restore tasks.');
+        });
+        return;
+      }
       actions.unarchiveTask(t.id);
       emit('unarchived', t.id);
     }
@@ -66,6 +96,13 @@ defineMeld('task-card', (el, { emit, props, effect }) => {
   const handleDragStart = (e) => {
     const t = getTask();
     if (t) {
+      if (store.currentUser && store.currentUser.role === 'guest') {
+        e.preventDefault();
+        import('../../../src/components/data/m-toast.js').then(({ toast }) => {
+          toast.error('Permission Denied: Guests cannot drag and drop tasks.');
+        });
+        return;
+      }
       e.dataTransfer.setData('text/plain', t.id.toString());
       e.dataTransfer.effectAllowed = 'move';
       el.classList.add('dragging');

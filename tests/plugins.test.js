@@ -546,3 +546,24 @@ describe('MeldRouter Plugin', () => {
   });
 });
 
+describe('MeldMarkdown Plugin', () => {
+  it('renders compiled markdown to raw HTML reactively', async () => {
+    MeldMarkdown.install(api);
+
+    const el = document.createElement('meld-markdown');
+    el.setAttribute('content', '# Hello **Meld**');
+    document.body.appendChild(el);
+    await tick();
+
+    expect(el.shadowRoot.innerHTML).toContain('<h1>Hello <strong>Meld</strong></h1>');
+
+    // Test property updates
+    el.content = '## Subheading';
+    await tick();
+    expect(el.shadowRoot.innerHTML).toContain('<h2>Subheading</h2>');
+
+    el.remove();
+  });
+});
+
+

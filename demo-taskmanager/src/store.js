@@ -127,7 +127,13 @@ const initialState = {
     { id: 1, text: 'Task Manager Demo initialized', time: new Date().toISOString() }
   ],
   filter: 'all',
-  searchQuery: ''
+  searchQuery: '',
+  currentUser: { username: 'admin', role: 'admin', name: 'System Administrator', avatar: '🛡️' },
+  users: [
+    { username: 'admin', role: 'admin', name: 'System Administrator', avatar: '🛡️', pin: '1234' },
+    { username: 'developer', role: 'developer', name: 'Lead Developer', avatar: '💻', pin: '0000' },
+    { username: 'guest', role: 'guest', name: 'Guest Viewer', avatar: '👀', pin: '' }
+  ]
 };
 
 // Create a reactive proxy state
@@ -140,12 +146,32 @@ api.persist(store, 'meld-taskmanager-data');
 api.useBroadcast('meld-taskmanager-channel', store, [
   'theme', 'devMode', 'showAICopilot', 'enableDragAndDrop', 
   'milestones', 'categories', 'sortBy', 'filterMilestone', 'filterTag', 'tasks', 'wiki', 'activities',
-  'filter', 'searchQuery'
+  'filter', 'searchQuery', 'currentUser'
 ]);
 
 // Define actions to manipulate store state
 export const actions = {
+  login(username, pin) {
+    const user = store.users.find(u => u.username === username);
+    if (!user) return { success: false, error: 'User not found' };
+    if (user.pin && user.pin !== pin) return { success: false, error: 'Incorrect PIN' };
+    store.currentUser = user;
+    actions.addActivity(`User logged in: ${user.name}`);
+    return { success: true };
+  },
+
+  logout() {
+    if (store.currentUser) {
+      actions.addActivity(`User logged out: ${store.currentUser.name}`);
+    }
+    store.currentUser = null;
+  },
+
   addTask({ title, description, category, priority, milestone, tags, dueDate, subtasks }) {
+    if (store.currentUser && store.currentUser.role === 'guest') {
+      toast.error('Permission Denied: Guests cannot create tasks.');
+      return null;
+    }
     const parsedTags = Array.isArray(tags) 
       ? tags 
       : (typeof tags === 'string' ? tags.split(',').map(t => t.trim()).filter(Boolean) : []);
@@ -171,6 +197,10 @@ export const actions = {
   },
 
   updateTaskStatus(id, status) {
+    if (store.currentUser && store.currentUser.role === 'guest') {
+      toast.error('Permission Denied: Guests cannot change task status.');
+      return;
+    }
     const task = store.tasks.find(t => t.id === id);
     if (task) {
       const oldStatus = task.status;
@@ -183,6 +213,10 @@ export const actions = {
   },
 
   updateTask(id, data) {
+    if (store.currentUser && store.currentUser.role === 'guest') {
+      toast.error('Permission Denied: Guests cannot update tasks.');
+      return;
+    }
     const task = store.tasks.find(t => t.id === id);
     if (task) {
       if (data.tags && typeof data.tags === 'string') {
@@ -197,6 +231,10 @@ export const actions = {
   },
 
   archiveTask(id) {
+    if (store.currentUser && store.currentUser.role !== 'admin') {
+      toast.error('Permission Denied: Only Admin can archive tasks.');
+      return;
+    }
     const task = store.tasks.find(t => t.id === id);
     if (task) {
       task.archived = true;
@@ -207,6 +245,10 @@ export const actions = {
   },
 
   unarchiveTask(id) {
+    if (store.currentUser && store.currentUser.role !== 'admin') {
+      toast.error('Permission Denied: Only Admin can restore tasks.');
+      return;
+    }
     const task = store.tasks.find(t => t.id === id);
     if (task) {
       task.archived = false;
@@ -217,6 +259,10 @@ export const actions = {
   },
 
   deleteTask(id) {
+    if (store.currentUser && store.currentUser.role !== 'admin') {
+      toast.error('Permission Denied: Only Admin can delete tasks.');
+      return;
+    }
     const task = store.tasks.find(t => t.id === id);
     if (task) {
       store.tasks = store.tasks.filter(t => t.id !== id);
@@ -226,6 +272,10 @@ export const actions = {
   },
 
   clearAllTasks() {
+    if (store.currentUser && store.currentUser.role !== 'admin') {
+      toast.error('Permission Denied: Only Admin can clear task data.');
+      return;
+    }
     const count = store.tasks.length;
     store.tasks = [];
     actions.addActivity('Cleared all tasks');
@@ -233,6 +283,10 @@ export const actions = {
   },
 
   addMilestone(name) {
+    if (store.currentUser && store.currentUser.role === 'guest') {
+      toast.error('Permission Denied: Guests cannot add milestones.');
+      return;
+    }
     if (name && !store.milestones.includes(name)) {
       store.milestones = [...store.milestones, name];
       actions.addActivity(`Added milestone: "${name}"`);
@@ -241,6 +295,10 @@ export const actions = {
   },
 
   addCategory(name) {
+    if (store.currentUser && store.currentUser.role === 'guest') {
+      toast.error('Permission Denied: Guests cannot add categories.');
+      return;
+    }
     if (name && !store.categories.includes(name)) {
       store.categories = [...store.categories, name];
       actions.addActivity(`Added category: "${name}"`);
@@ -261,6 +319,10 @@ export const actions = {
   },
 
   toggleDragAndDrop() {
+    if (store.currentUser && store.currentUser.role === 'guest') {
+      toast.error('Permission Denied: Guests cannot modify Kanban preferences.');
+      return;
+    }
     store.enableDragAndDrop = !store.enableDragAndDrop;
     actions.addActivity(`Drag & Drop ${store.enableDragAndDrop ? 'enabled' : 'disabled'}`);
     toast.success(`Drag & Drop ${store.enableDragAndDrop ? 'enabled' : 'disabled'}.`);
@@ -273,6 +335,10 @@ export const actions = {
   },
 
   toggleDevMode() {
+    if (store.currentUser && store.currentUser.role === 'guest') {
+      toast.error('Permission Denied: Guests cannot enable Developer Mode.');
+      return;
+    }
     store.devMode = !store.devMode;
     window.meldDevMode = store.devMode;
     window.localStorage.setItem('meld-devmode', store.devMode);
@@ -280,6 +346,10 @@ export const actions = {
   },
 
   toggleAICopilot() {
+    if (store.currentUser && store.currentUser.role === 'guest') {
+      toast.error('Permission Denied: Guests cannot toggle AI Assistant.');
+      return;
+    }
     store.showAICopilot = !store.showAICopilot;
     actions.addActivity(`AI Copilot toggled ${store.showAICopilot ? 'ON' : 'OFF'}`);
   },
@@ -347,6 +417,10 @@ export const actions = {
   },
 
   saveWikiArticle({ slug, title, content, category, tags, linkedTasks }) {
+    if (store.currentUser && store.currentUser.role === 'guest') {
+      toast.error('Permission Denied: Guests cannot save wiki articles.');
+      return;
+    }
     const existing = store.wiki.find(w => w.slug === slug);
     const parsedTags = Array.isArray(tags) 
       ? tags 
@@ -381,6 +455,10 @@ export const actions = {
   },
 
   deleteWikiArticle(slug) {
+    if (store.currentUser && store.currentUser.role !== 'admin') {
+      toast.error('Permission Denied: Only Admin can delete wiki articles.');
+      return;
+    }
     const existing = store.wiki.find(w => w.slug === slug);
     if (existing) {
       store.wiki = store.wiki.filter(w => w.slug !== slug);
@@ -390,6 +468,10 @@ export const actions = {
   },
 
   importTasks(tasksArray) {
+    if (store.currentUser && store.currentUser.role !== 'admin') {
+      toast.error('Permission Denied: Only Admin can import tasks.');
+      return;
+    }
     if (Array.isArray(tasksArray)) {
       const sanitized = tasksArray.map(t => ({
         id: t.id || Date.now() + Math.random(),

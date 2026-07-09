@@ -680,5 +680,41 @@ describe('Meld Core Hardening Matrix', () => {
 
     el.remove();
   });
+
+  it('correctly handles static and dynamic array and Node interpolation in meldHtml', async () => {
+    const tagName = `m-array-render-${Date.now()}`;
+    const state = meldState({ tags: ['a', 'b'] });
+
+    defineMeld(tagName, () => {
+      // Dynamic rendering of arrays and nodes
+      const dynamicList = () => state.tags.map(t => meldHtml`<span>#${t}</span>`);
+      // Static rendering of arrays and nodes
+      const staticList = ['c', 'd'].map(t => meldHtml`<span>#${t}</span>`);
+
+      return meldHtml`
+        <div id="dynamic">${dynamicList}</div>
+        <div id="static">${staticList}</div>
+      `;
+    });
+
+    const el = document.createElement(tagName);
+    document.body.appendChild(el);
+    await tick();
+
+    const dynamicDiv = el.shadowRoot.querySelector('#dynamic');
+    const staticDiv = el.shadowRoot.querySelector('#static');
+
+    expect(dynamicDiv.innerHTML).toContain('<span>#a</span><span>#b</span>');
+    expect(staticDiv.innerHTML).toContain('<span>#c</span><span>#d</span>');
+
+    // Test reactivity on array updates
+    state.tags = ['a', 'b', 'e'];
+    meld.flush();
+
+    expect(dynamicDiv.innerHTML).toContain('<span>#a</span><span>#b</span><span>#e</span>');
+
+    el.remove();
+  });
 });
+
 

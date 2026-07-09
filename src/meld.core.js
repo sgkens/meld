@@ -311,6 +311,57 @@ export function meldHtml(strings, ...values) {
 
   const hydrationNode = currentComponent && currentComponent._isHydrating ? currentComponent._hydrationTarget : null;
 
+  const splitTextMarkers = (tempNode, hydNode) => {
+    let child = tempNode.firstChild;
+    let hydChild = hydNode ? hydNode.firstChild : null;
+    const markerRegex = /__meld_(\d+)__/;
+
+    while (child) {
+      const next = child.nextSibling;
+      const hydNext = hydChild ? hydChild.nextSibling : null;
+
+      if (child.nodeType === 3 && child.nodeValue.includes("__meld_")) {
+        let match;
+        let currentTextNode = child;
+        let currentHydNode = hydChild;
+
+        while ((match = currentTextNode.nodeValue.match(markerRegex))) {
+          const marker = match[0];
+          const partIndex = currentTextNode.nodeValue.indexOf(marker);
+
+          let markerNode = currentTextNode;
+          let hydMarkerNode = currentHydNode;
+
+          if (partIndex > 0) {
+            markerNode = currentTextNode.splitText(partIndex);
+            if (currentHydNode) {
+              hydMarkerNode = currentHydNode.splitText(partIndex);
+            }
+          }
+
+          const suffixLength = markerNode.nodeValue.length - marker.length;
+          if (suffixLength > 0) {
+            markerNode.splitText(marker.length);
+            if (hydMarkerNode) {
+              hydMarkerNode.splitText(hydMarkerNode.nodeValue.length - suffixLength);
+            }
+          }
+
+          currentTextNode = markerNode.nextSibling;
+          currentHydNode = hydMarkerNode ? hydMarkerNode.nextSibling : null;
+          if (!currentTextNode || currentTextNode.nodeType !== 3) break;
+        }
+      } else if (child.nodeType === 1) {
+        splitTextMarkers(child, hydChild);
+      }
+
+      child = next;
+      hydChild = hydNext;
+    }
+  };
+
+  splitTextMarkers(fragment, hydrationNode);
+
   const walk = (node, hydNode) => {
     const targetNode = hydNode || node;
 
@@ -328,16 +379,16 @@ export function meldHtml(strings, ...values) {
             // Search prototype and instance keys for a case-insensitive match (recovering camelCase properties lost to browser lowercasing)
             const protoKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(targetNode) || {});
             const instanceKeys = Object.keys(targetNode);
-            const matchedKey = [...protoKeys, ...instanceKeys].find(k => k.toLowerCase() === rawProp.toLowerCase());
-            
-            const propName = matchedKey || rawProp.replace(/-([a-z])/g, (g) => g[1].toUpperCase());
-            
+            const targetProp = protoKeys.find(k => k.toLowerCase() === rawProp) || 
+                               instanceKeys.find(k => k.toLowerCase() === rawProp) || 
+                               rawProp;
+
             if (typeof value === "function") {
               createEffect(() => {
-                targetNode[propName] = value();
+                targetNode[targetProp] = value();
               });
             } else {
-              targetNode[propName] = value;
+              targetNode[targetProp] = value;
             }
             targetNode.removeAttribute(attr.name);
           } else if (attr.name.startsWith("on")) {
@@ -346,11 +397,12 @@ export function meldHtml(strings, ...values) {
             targetNode.addEventListener(evt, value);
             targetNode.removeAttribute(attr.name);
           } else if (attr.name === "style") {
+            let prevStyleObj = {};
             if (typeof value === "function") {
-              let prevStyleObj = {};
               createEffect(() => {
                 const res = value();
                 if (typeof res === "object" && res !== null) {
+                  // Style Object Diffing: remove keys no longer present
                   Object.keys(prevStyleObj).forEach(key => {
                     if (!(key in res)) {
                       if (key.startsWith("--")) {
@@ -405,44 +457,92 @@ export function meldHtml(strings, ...values) {
     }
 
     if (node.nodeType === 3 && node.nodeValue.includes("__meld_")) {
-      const idx = parseInt(node.nodeValue.replace("__meld_", "").replace("__", ""));
-      const value = values[idx];
-      const parent = targetNode.parentNode;
+      const match = node.nodeValue.match(/__meld_(\d+)__/);
+      if (match) {
+        const idx = parseInt(match[1]);
+        const value = values[idx];
+        const parent = targetNode.parentNode;
 
-      if (typeof value === "function") {
-        const start = document.createTextNode("");
-        const end = document.createTextNode("");
-        parent.replaceChild(end, targetNode);
-        parent.insertBefore(start, end);
+        if (typeof value === "function") {
+          const start = document.createTextNode("");
+          const end = document.createTextNode("");
+          parent.replaceChild(end, targetNode);
+          parent.insertBefore(start, end);
 
-        const clearDynamicNodes = () => {
-          let current = start.nextSibling;
-          while (current && current !== end) {
-            const next = current.nextSibling;
-            current.remove();
-            current = next;
-          }
-        };
+          const clearDynamicNodes = () => {
+            let current = start.nextSibling;
+            while (current && current !== end) {
+              const next = current.nextSibling;
+              current.remove();
+              current = next;
+            }
+          };
 
-        createEffect(() => {
-          const res = value();
-          clearDynamicNodes();
-          const actualParent = start.parentNode || parent;
-          if (!actualParent) return;
-          if (res && res.__raw) {
-             start.data = "";
-             const template = document.createElement('template');
-             template.innerHTML = res.__raw;
-             actualParent.insertBefore(template.content.cloneNode(true), end);
-          } else if (res instanceof Node) {
-             start.data = "";
-             actualParent.insertBefore(res, end);
-          } else {
-             start.data = res == null ? "" : String(res);
-          }
-        });
-      } else {
-        targetNode.nodeValue = value;
+          const insertValue = (actualParent, val) => {
+            if (val == null) return;
+            if (Array.isArray(val)) {
+              val.forEach(item => insertValue(actualParent, item));
+            } else if (val && val.__raw) {
+              const template = document.createElement('template');
+              template.innerHTML = val.__raw;
+              actualParent.insertBefore(template.content.cloneNode(true), end);
+            } else if (val instanceof Node) {
+              actualParent.insertBefore(val, end);
+            } else {
+              actualParent.insertBefore(document.createTextNode(String(val)), end);
+            }
+          };
+
+          createEffect(() => {
+            const res = value();
+            clearDynamicNodes();
+            const actualParent = start.parentNode || parent;
+            if (!actualParent) return;
+            if (res && res.__raw) {
+               start.data = "";
+               const template = document.createElement('template');
+               template.innerHTML = res.__raw;
+               actualParent.insertBefore(template.content.cloneNode(true), end);
+            } else if (res instanceof Node) {
+               start.data = "";
+               actualParent.insertBefore(res, end);
+            } else if (Array.isArray(res)) {
+               start.data = "";
+               insertValue(actualParent, res);
+            } else {
+               start.data = res == null ? "" : String(res);
+            }
+          });
+        } else {
+          const insertStatic = (val) => {
+            if (val == null) {
+              targetNode.nodeValue = "";
+            } else if (Array.isArray(val)) {
+              const anchor = document.createTextNode("");
+              parent.replaceChild(anchor, targetNode);
+              val.forEach(item => {
+                if (item instanceof Node) parent.insertBefore(item, anchor);
+                else if (item && item.__raw) {
+                  const template = document.createElement('template');
+                  template.innerHTML = item.__raw;
+                  parent.insertBefore(template.content.cloneNode(true), anchor);
+                } else {
+                  parent.insertBefore(document.createTextNode(String(item)), anchor);
+                }
+              });
+              anchor.remove();
+            } else if (val && val.__raw) {
+              const template = document.createElement('template');
+              template.innerHTML = val.__raw;
+              parent.replaceChild(template.content.cloneNode(true), targetNode);
+            } else if (val instanceof Node) {
+              parent.replaceChild(val, targetNode);
+            } else {
+              targetNode.nodeValue = String(val);
+            }
+          };
+          insertStatic(value);
+        }
       }
     }
     let child = node.firstChild;
