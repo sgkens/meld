@@ -1,47 +1,22 @@
 import { defineMeld, meldHtml, meldState } from '../../../src/meld.core.js';
 import { store, actions } from '../store.js';
 
-defineMeld('user-login', (el) => {
+defineMeld('user-login', () => {
   const loginState = meldState({
-    selectedUsername: '',
-    pin: '',
+    username: '',
+    password: '',
     error: ''
   });
 
-  const selectUser = (username) => {
-    const user = store.users.find(u => u.username === username);
-    if (user && !user.pin) {
-      // Guest login has no PIN
-      const res = actions.login(username, '');
-      if (res.success) {
-        // Logged in
-      } else {
-        loginState.error = res.error;
-      }
-    } else {
-      loginState.selectedUsername = username;
-      loginState.pin = '';
-      loginState.error = '';
-    }
-  };
-
-  const handlePinInput = (e) => {
-    loginState.pin = e.target.value;
-    if (loginState.pin.length === 4) {
-      const res = actions.login(loginState.selectedUsername, loginState.pin);
-      if (res.success) {
-        // Successful login
-      } else {
-        loginState.error = res.error;
-        loginState.pin = '';
-      }
-    }
-  };
-
-  const backToUsers = () => {
-    loginState.selectedUsername = '';
-    loginState.pin = '';
+  const handleSubmit = (e) => {
+    e.preventDefault();
     loginState.error = '';
+    const res = actions.login(loginState.username, loginState.password);
+    if (res.success) {
+      // Successful login updates store.currentUser, switching view reactively
+    } else {
+      loginState.error = res.error;
+    }
   };
 
   return meldHtml`
@@ -63,7 +38,7 @@ defineMeld('user-login', (el) => {
         border-radius: 24px;
         padding: 40px;
         width: 100%;
-        max-width: 440px;
+        max-width: 400px;
         text-align: center;
         box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
         animation: fadeIn 0.4s var(--mui-ease) forwards;
@@ -100,101 +75,66 @@ defineMeld('user-login', (el) => {
         margin-bottom: var(--mui-space-8);
       }
 
-      .user-list {
+      .form-group {
         display: flex;
         flex-direction: column;
-        gap: 12px;
-      }
-
-      .user-card {
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        background: rgba(255, 255, 255, 0.03);
-        border: 1px solid rgba(255, 255, 255, 0.05);
-        padding: 16px 20px;
-        border-radius: 16px;
-        cursor: pointer;
-        transition: all 0.25s var(--mui-ease);
+        gap: 6px;
         text-align: left;
+        margin-bottom: var(--mui-space-4);
       }
 
-      .user-card:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: var(--mui-primary);
-        transform: translateY(-2px);
-        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
-      }
-
-      .avatar {
-        font-size: 1.75rem;
-        background: rgba(255, 255, 255, 0.06);
-        width: 48px;
-        height: 48px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border-radius: 50%;
-      }
-
-      .user-info {
-        flex: 1;
-      }
-
-      .user-name {
+      .form-label {
+        font-size: 0.8rem;
         font-weight: 600;
-        font-size: 0.975rem;
-        color: #f8fafc;
-      }
-
-      .user-role {
-        font-size: 0.8rem;
         color: #94a3b8;
-        text-transform: capitalize;
-        margin-top: 2px;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
       }
 
-      .pin-screen {
-        animation: fadeIn 0.25s var(--mui-ease) forwards;
-      }
-
-      .pin-dots {
-        display: flex;
-        justify-content: center;
-        gap: var(--mui-space-4);
-        margin: var(--mui-space-6) 0;
-      }
-
-      .pin-dot {
-        width: 16px;
-        height: 16px;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.15);
+      .form-input {
+        padding: 12px 16px;
+        background: rgba(15, 23, 42, 0.6);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 12px;
+        color: #f8fafc;
+        font-size: 0.95rem;
         transition: all 0.2s;
+        font-family: var(--mui-font);
       }
 
-      .pin-dot.filled {
+      .form-input:focus {
+        outline: none;
+        border-color: var(--mui-primary);
+        box-shadow: 0 0 8px color-mix(in srgb, var(--mui-primary) 30%, transparent);
+        background: rgba(15, 23, 42, 0.8);
+      }
+
+      .submit-btn {
+        width: 100%;
+        padding: 12px;
         background: var(--mui-primary);
-        box-shadow: 0 0 10px var(--mui-primary);
+        color: var(--mui-primary-fg);
+        border: none;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        margin-top: 10px;
+        box-shadow: 0 4px 12px color-mix(in srgb, var(--mui-primary) 20%, transparent);
       }
 
-      .hidden-input {
-        position: absolute;
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-
-      .pin-hint {
-        font-size: 0.8rem;
-        color: #64748b;
-        margin-bottom: var(--mui-space-6);
+      .submit-btn:hover {
+        background: var(--mui-primary-hover);
+        transform: translateY(-1px);
+        box-shadow: 0 6px 16px color-mix(in srgb, var(--mui-primary) 30%, transparent);
       }
 
       .error-msg {
         color: #f87171;
         font-size: 0.85rem;
         margin-bottom: var(--mui-space-4);
+        text-align: left;
         animation: shake 0.3s ease;
       }
 
@@ -204,20 +144,16 @@ defineMeld('user-login', (el) => {
         75% { transform: translateX(6px); }
       }
 
-      .back-btn {
-        background: transparent;
-        border: 1px solid rgba(255, 255, 255, 0.15);
-        color: #e2e8f0;
-        padding: 8px 20px;
-        border-radius: 9999px;
-        font-size: 0.85rem;
-        cursor: pointer;
-        transition: all 0.2s;
-      }
-
-      .back-btn:hover {
-        background: rgba(255, 255, 255, 0.08);
-        border-color: #f8fafc;
+      .hint-box {
+        margin-top: 25px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.04);
+        border-radius: 12px;
+        padding: 12px;
+        font-size: 0.78rem;
+        color: #64748b;
+        line-height: 1.5;
+        text-align: left;
       }
     </style>
 
@@ -226,59 +162,41 @@ defineMeld('user-login', (el) => {
       <h1 class="title">Meld TaskFlow</h1>
       <p class="subtitle">Secure workspace orchestrator</p>
 
-      ${() => !loginState.selectedUsername ? meldHtml`
-        <div class="user-list">
-          ${() => store.users.map(u => meldHtml`
-            <div class="user-card" onclick="${() => selectUser(u.username)}">
-              <div class="avatar">${u.avatar}</div>
-              <div class="user-info">
-                <div class="user-name">${u.name}</div>
-                <div class="user-role">${u.role}</div>
-              </div>
-              <div style="font-size:0.85rem; color:#64748b;">🔑</div>
-            </div>
-          `)}
+      <form onsubmit="${handleSubmit}">
+        ${() => loginState.error ? meldHtml`<div class="error-msg">⚠️ ${loginState.error}</div>` : ''}
+
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <input 
+            type="text" 
+            class="form-input" 
+            placeholder="e.g. admin or developer"
+            required
+            value="${() => loginState.username}"
+            oninput="${(e) => { loginState.username = e.target.value; }}"
+          />
         </div>
-      ` : meldHtml`
-        <div class="pin-screen">
-          <div class="avatar" style="margin: 0 auto 16px auto;">
-            ${() => store.users.find(u => u.username === loginState.selectedUsername)?.avatar}
-          </div>
-          <div class="user-name" style="font-size:1.1rem; margin-bottom:4px;">
-            ${() => store.users.find(u => u.username === loginState.selectedUsername)?.name}
-          </div>
-          <div class="user-role" style="margin-bottom:20px;">
-            ${() => store.users.find(u => u.username === loginState.selectedUsername)?.role}
-          </div>
 
-          ${() => loginState.error ? meldHtml`<div class="error-msg">${loginState.error}</div>` : ''}
-
-          <div class="pin-hint">Enter your 4-digit PIN to gain access</div>
-
-          <div class="pin-dots" onclick="${() => { el.shadowRoot.getElementById('pin-input')?.focus(); }}">
-            <div class="pin-dot ${() => loginState.pin.length >= 1 ? 'filled' : ''}"></div>
-            <div class="pin-dot ${() => loginState.pin.length >= 2 ? 'filled' : ''}"></div>
-            <div class="pin-dot ${() => loginState.pin.length >= 3 ? 'filled' : ''}"></div>
-            <div class="pin-dot ${() => loginState.pin.length >= 4 ? 'filled' : ''}"></div>
-          </div>
-
+        <div class="form-group">
+          <label class="form-label">Password</label>
           <input 
             type="password" 
-            id="pin-input"
-            class="hidden-input" 
-            maxlength="4"
-            pattern="[0-9]*"
-            inputmode="numeric"
-            autofocus
-            value="${() => loginState.pin}"
-            oninput="${handlePinInput}"
+            class="form-input" 
+            placeholder="••••••••"
+            value="${() => loginState.password}"
+            oninput="${(e) => { loginState.password = e.target.value; }}"
           />
-
-          <div class="pin-hint" style="font-style:italic;">Hint: Admin PIN is 1234, Developer is 0000</div>
-
-          <button class="back-btn" onclick="${backToUsers}">Change User</button>
         </div>
-      `}
+
+        <button type="submit" class="submit-btn">Sign In</button>
+      </form>
+
+      <div class="hint-box">
+        <strong>Demo Accounts (user / password):</strong><br/>
+        • 🛡️ admin / admin <br/>
+        • 💻 developer / dev <br/>
+        • 👀 guest / (leave blank)
+      </div>
     </div>
   `;
 });

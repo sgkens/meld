@@ -34,6 +34,7 @@ import { MeldTime } from '../src/plugins/meld-time.js';
 import { MeldUpload } from '../src/plugins/meld-upload.js';
 import { MeldVersioning } from '../src/plugins/meld-versioning.js';
 import { MeldWasm } from '../src/plugins/meld-wasm.js';
+import { MeldToast, toast } from '../src/plugins/meld-toast.js';
 
 const tick = () => new Promise(resolve => setTimeout(resolve, 0));
 
@@ -565,5 +566,56 @@ describe('MeldMarkdown Plugin', () => {
     el.remove();
   });
 });
+
+describe('MeldToast Plugin', () => {
+  it('correctly manages toast message queue and renders overlay', async () => {
+    MeldToast.install(api);
+
+    // Overlay is automatically mounted
+    const overlay = document.querySelector('m-toast-overlay');
+    expect(overlay).toBeDefined();
+
+    toast.success('Task Created');
+    await tick();
+
+    // Verify toast overlay contains the toast message
+    expect(overlay.shadowRoot.innerHTML).toContain('Task Created');
+    expect(overlay.shadowRoot.innerHTML).toContain('toast-success');
+
+    toast.error('Failed Action');
+    toast.warning('Warning Action');
+    toast.info('Info Action');
+    await tick();
+    expect(overlay.shadowRoot.innerHTML).toContain('Failed Action');
+    expect(overlay.shadowRoot.innerHTML).toContain('toast-error');
+    expect(overlay.shadowRoot.innerHTML).toContain('Warning Action');
+    expect(overlay.shadowRoot.innerHTML).toContain('toast-warning');
+    expect(overlay.shadowRoot.innerHTML).toContain('Info Action');
+    expect(overlay.shadowRoot.innerHTML).toContain('toast-info');
+
+    // Test context request
+    let receivedToast = null;
+    window.dispatchEvent(new CustomEvent('meld-context-request', {
+      detail: { key: 'toast', callback: (val) => receivedToast = val },
+      bubbles: true, composed: true
+    }));
+    expect(receivedToast).toBe(toast);
+
+    // Test setupHelpers
+    const helpers = MeldToast.setupHelpers(api);
+    expect(helpers.toast).toBe(toast);
+
+    // Test auto-dismissal with short duration
+    toast.show('Dismiss Me', 'info', 1);
+    meld.flush();
+    expect(overlay.shadowRoot.innerHTML).toContain('Dismiss Me');
+    await new Promise(resolve => setTimeout(resolve, 5));
+    meld.flush();
+    expect(overlay.shadowRoot.innerHTML).not.toContain('Dismiss Me');
+
+    overlay.remove();
+  });
+});
+
 
 

@@ -1,7 +1,7 @@
 import { use, meldState, computed, onDestroy } from '../../src/meld.core.js';
 import { MeldPersist } from '../../src/plugins/meld-persist.js';
 import { MeldBroadcast } from '../../src/plugins/meld-broadcast.js';
-import { toast } from '../../src/components/data/m-toast.js';
+import { toast } from '../../src/plugins/meld-toast.js';
 
 // Setup and install plugins on a mock api context
 const api = { meldState, computed, onDestroy };
@@ -130,9 +130,9 @@ const initialState = {
   searchQuery: '',
   currentUser: { username: 'admin', role: 'admin', name: 'System Administrator', avatar: '🛡️' },
   users: [
-    { username: 'admin', role: 'admin', name: 'System Administrator', avatar: '🛡️', pin: '1234' },
-    { username: 'developer', role: 'developer', name: 'Lead Developer', avatar: '💻', pin: '0000' },
-    { username: 'guest', role: 'guest', name: 'Guest Viewer', avatar: '👀', pin: '' }
+    { username: 'admin', role: 'admin', name: 'System Administrator', avatar: '🛡️', password: 'admin' },
+    { username: 'developer', role: 'developer', name: 'Lead Developer', avatar: '💻', password: 'dev' },
+    { username: 'guest', role: 'guest', name: 'Guest Viewer', avatar: '👀', password: '' }
   ]
 };
 
@@ -151,10 +151,10 @@ api.useBroadcast('meld-taskmanager-channel', store, [
 
 // Define actions to manipulate store state
 export const actions = {
-  login(username, pin) {
-    const user = store.users.find(u => u.username === username);
-    if (!user) return { success: false, error: 'User not found' };
-    if (user.pin && user.pin !== pin) return { success: false, error: 'Incorrect PIN' };
+  login(username, password) {
+    const user = store.users.find(u => u.username.toLowerCase() === username.toLowerCase().trim());
+    if (!user) return { success: false, error: 'Incorrect username or password' };
+    if (user.password && user.password !== password) return { success: false, error: 'Incorrect username or password' };
     store.currentUser = user;
     actions.addActivity(`User logged in: ${user.name}`);
     return { success: true };

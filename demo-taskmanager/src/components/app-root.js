@@ -14,6 +14,7 @@ import { MeldMarkdown } from '../../../src/plugins/meld-markdown.js';
 import { MeldAI } from '../../../src/plugins/meld-ai.js';
 import { MeldDownload } from '../../../src/plugins/meld-download.js';
 import { MeldHotkeys } from '../../../src/plugins/meld-hotkeys.js';
+import { MeldToast } from '../../../src/plugins/meld-toast.js';
 
 import { store, actions } from '../store.js';
 import './pages.js';
@@ -37,6 +38,7 @@ use(MeldMarkdown);
 use(MeldAI);
 use(MeldDownload);
 use(MeldHotkeys);
+use(MeldToast);
 
 // Setup client side hash router config
 use(MeldRouter, {
@@ -406,10 +408,8 @@ defineMeld('app-root', (el, { useHotkeys }) => {
 
       <!-- FLOATING DEVTOOLS TELEMETRY CONSOLE -->
       <dev-panel></dev-panel>
-      <m-toast-provider></m-toast-provider>
     ` : meldHtml`
       <user-login></user-login>
-      <m-toast-provider></m-toast-provider>
     `}
   `;
 });
