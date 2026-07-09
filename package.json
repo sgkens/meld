@@ -44,11 +44,10 @@
     "lint:fix": "eslint src/**/*.js --fix",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage",
     "lsp:generate": "node tools/generate-custom-data.js",
+    "demo": "vite --config demo-taskmanager/vite.config.js",
     "serve": "vite --host 0.0.0.0",
-    "docs": "npm run docs:serve",
-    "docs:build": "eleventy --config=eleventy.config.js --input=docs --output=_site",
-    "docs:serve": "eleventy --config=eleventy.config.js --input=docs --output=_site --serve --watch",
-    "build:docs": "npm run docs:build"
+    "docs": "eleventy --config=eleventy.config.js --input=docs --output=_site --serve --watch",
+    "docs:build": "eleventy --config=eleventy.config.js --input=docs --output=_site"
   },
   "files": [
     "dist",

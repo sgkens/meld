@@ -328,7 +328,7 @@ deploy:vscode:
 
 generate:generic:release:metadata:
   stage: release
-  image: sgkens/phellams-automator:2.5.1
+  image: sgkens/phellams-automator:${AUTOMATOR_VERSION}
   needs:
     - job: deploy:generic
       artifacts: false
