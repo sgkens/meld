@@ -1,4 +1,4 @@
-import { defineMeld, meldHtml, use, computed, inject, provide } from '../../../src/meld.core.js';
+import { defineMeld, meldHtml, use, computed, inject, provide, meldState } from '../../../src/meld.core.js';
 import { MeldRouter } from '../../../src/plugins/meld-router.js';
 import { MeldA11y } from '../../../src/plugins/meld-a11y.js';
 import { MeldLogger } from '../../../src/plugins/meld-logger.js';
