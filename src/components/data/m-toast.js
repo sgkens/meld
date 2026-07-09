@@ -1,4 +1,4 @@
-import { meldState, defineMeld, meldHtml, meld } from '../meld.core.js';
+import { meldState, defineMeld, meldHtml, meld } from '../../meld.core.js';
 
 const toastState = meldState({ messages: [] });
 
