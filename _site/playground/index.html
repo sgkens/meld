@@ -671,7 +671,7 @@ Test and experiment with Meld.js directly in your browser. Select an example fro
     </div>
     <div class="playground-pane preview-pane">
       <div class="pane-header">Live Preview</div>
-      <iframe id="preview-frame" sandbox="allow-scripts"></iframe>
+      <iframe id="preview-frame" sandbox="allow-scripts allow-same-origin"></iframe>
     </div>
   </div>
 </div>
@@ -899,80 +899,38 @@ document.getElementById('app').innerHTML = '<user-profile></user-profile>';`
     runCode();
   };
 
+  const MELD_CDN = 'https://unpkg.com/@meldjs/meld@latest/dist/meld.core.esm.js';
+
   const runCode = () => {
     const code = editor.value;
-    const iframeDoc = preview.contentDocument || preview.contentWindow.document;
-    
-    iframeDoc.open();
-    iframeDoc.write(\`
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <meta charset="utf-8">
-        <style>
-          body {
-            font-family: system-ui, -apple-system, sans-serif;
-            color: #f3f4f6;
-            background: #111827;
-            padding: 1.5rem;
-            margin: 0;
-          }
-          button {
-            background: #2563eb;
-            color: white;
-            border: none;
-            padding: 0.5rem 1rem;
-            border-radius: 0.375rem;
-            cursor: pointer;
-            font-weight: 500;
-            transition: background 0.2s;
-          }
-          button:hover {
-            background: #1d4ed8;
-          }
-          input {
-            background: #1f2937;
-            border: 1px solid #374151;
-            color: white;
-            padding: 0.5rem;
-            border-radius: 0.375rem;
-            margin-bottom: 1rem;
-            outline: none;
-          }
-          ul {
-            padding-left: 1.25rem;
-            margin-top: 1rem;
-          }
-          li {
-            margin-bottom: 0.5rem;
-          }
-        </style>
-        <script type="module">
-          import { defineMeld, meldState, meldHtml, onMount, computed, meld } from '/dist/meld.core.esm.js';
-          window.defineMeld = defineMeld;
-          window.meldState = meldState;
-          window.meldHtml = meldHtml;
-          window.onMount = onMount;
-          window.computed = computed;
-          window.meld = meld;
-        </script>
-      </head>
-      <body>
-        <div id="app"></div>
-        <script type="module">
-          // Wait for ESM imports to load into window scope
-          setTimeout(() => {
-            try {
-              \${code}
-            } catch (e) {
-              document.getElementById('app').innerHTML = '<pre style="color: #ef4444; background: #fee2e2; padding: 1rem; border-radius: 0.375rem;">Error: ' + e.message + '</pre>';
-            }
-          }, 50);
-        </script>
-      </body>
-      </html>
-    \`);
-    iframeDoc.close();
+
+    // Build the iframe HTML as a plain string — no template literal
+    // so esbuild never sees user code as part of a JS expression.
+    const html = [
+      '<!DOCTYPE html><html><head><meta charset="utf-8"><style>',
+      'body{font-family:system-ui,-apple-system,sans-serif;color:#f3f4f6;background:#111827;padding:1.5rem;margin:0}',
+      'button{background:#2563eb;color:white;border:none;padding:0.5rem 1rem;border-radius:0.375rem;cursor:pointer;font-weight:500;transition:background 0.2s}',
+      'button:hover{background:#1d4ed8}',
+      'input{background:#1f2937;border:1px solid #374151;color:white;padding:0.5rem;border-radius:0.375rem;margin-bottom:1rem;outline:none}',
+      'ul{padding-left:1.25rem;margin-top:1rem}li{margin-bottom:0.5rem}',
+      '</style></head><body><div id="app"></div>',
+      '<script type="module">',
+      'import{defineMeld,meldState,meldHtml,onMount,computed,meld}from"' + MELD_CDN + '";',
+      'window.defineMeld=defineMeld;window.meldState=meldState;window.meldHtml=meldHtml;',
+      'window.onMount=onMount;window.computed=computed;window.meld=meld;',
+      'setTimeout(()=>{try{',
+      code,
+      '}catch(e){document.getElementById("app").innerHTML="<pre style=\'color:#ef4444;background:#1f2937;padding:1rem;border-radius:0.375rem;\'>Error: "+e.message+"</pre>";}},50);',
+      '<\/script></body></html>'
+    ].join('\n');
+
+    // Inject via Blob URL to avoid document.write cross-origin restrictions
+    const blob = new Blob([html], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const old = preview.src;
+    preview.src = url;
+    // Revoke previous blob URL after navigation
+    if (old && old.startsWith('blob:')) URL.revokeObjectURL(old);
   };
 
   // Event Listeners
