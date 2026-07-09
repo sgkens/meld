@@ -122,10 +122,13 @@ export const MeldRouter = {
       push: (path) => { window.location.hash = path; }
     };
 
-    // Inject a special global provider if we are at root
-    if (!document.querySelector('meld-view')) {
-       // Naive global mock
-     }
+    // Global provider fallback via window context event interception
+    window.addEventListener('meld-context-request', (e) => {
+      if (e.detail.key === 'router') {
+        e.detail.callback(routerApi);
+        e.stopPropagation();
+      }
+    });
 
     provide('router', routerApi);
     

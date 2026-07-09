@@ -500,3 +500,49 @@ describe('MeldDiagnostics Plugin', () => {
     expect(helpers.getDiagnosticsReport).toBe(api.getDiagnosticsReport);
   });
 });
+
+describe('MeldRouter Plugin', () => {
+  it('installs router state, provides router globally, and handles views', async () => {
+    MeldRouter.install(api, {
+      routes: [
+        { path: '/', component: 'home-test' },
+        { path: '/other', component: 'other-test' }
+      ]
+    });
+
+    let homeInstantiated = false;
+    api.defineMeld('home-test', () => {
+      homeInstantiated = true;
+      return meldHtml`<div>home</div>`;
+    });
+
+    let receivedRouter = null;
+    api.defineMeld('child-router-test', (el, { inject }) => {
+      receivedRouter = inject('router');
+      return meldHtml`<div></div>`;
+    });
+
+    // Check custom element meld-view is registered
+    expect(customElements.get('meld-view')).toBeDefined();
+
+    // Verify context injection works globally
+    const child = document.createElement('child-router-test');
+    document.body.appendChild(child);
+    await tick();
+
+    expect(receivedRouter).toBeDefined();
+    expect(receivedRouter.currentPath).toBe('/');
+    expect(typeof receivedRouter.push).toBe('function');
+
+    // Mount meld-view and test routing
+    const view = document.createElement('meld-view');
+    document.body.appendChild(view);
+    await tick();
+
+    expect(homeInstantiated).toBe(true);
+
+    child.remove();
+    view.remove();
+  });
+});
+
