@@ -18,7 +18,12 @@ const bannertext = `/**
 
 export default defineConfig({
   optimizeDeps: {
-    entries: ['index.html', 'demo-taskmanager/index.html']
+    entries: ['index.html', 'demo-taskmanager/index.html'],
+    // Exclude local source files from esbuild pre-bundling.
+    // Pre-bundling can silently drop named ESM exports from local modules
+    // (e.g. `inject`, `provide`), causing "is not a function" at runtime.
+    // Native ESM serving via Vite's dev transform pipeline is correct here.
+    exclude: ['src/meld.core.js', 'src/plugins', 'src/components', 'src/theme.js']
   },
   build: {
     outDir: 'dist',
