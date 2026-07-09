@@ -545,7 +545,7 @@ export function defineMeld(tagName, setupFn, options = {}) {
         if (this._isHydrating) {
           this._hydrationTarget = this.shadowRoot;
         }
-        const template = setupFn(this, { emit, attrs: this._meldAttrs, props: this._meldProps, ...extensionContext });
+        const template = setupFn(this, { emit, inject, provide, attrs: this._meldAttrs, props: this._meldProps, ...extensionContext });
         if (template && !this._isHydrating) {
           this.shadowRoot.innerHTML = '';
           this.shadowRoot.appendChild(template);

@@ -618,4 +618,28 @@ describe('Meld Core Hardening Matrix', () => {
     await tick();
     expect(triggerCount).toBe(3);
   });
+
+  it('passes inject and provide in the setup function context argument', async () => {
+    const tagName = `m-ctx-args-${Date.now()}`;
+    let passedInject = null;
+    let passedProvide = null;
+
+    defineMeld(tagName, (el, { inject, provide }) => {
+      passedInject = inject;
+      passedProvide = provide;
+      return meldHtml`<div></div>`;
+    });
+
+    const el = document.createElement(tagName);
+    document.body.appendChild(el);
+    await tick();
+
+    expect(typeof passedInject).toBe('function');
+    expect(typeof passedProvide).toBe('function');
+    expect(passedInject).toBe(inject);
+    expect(passedProvide).toBe(provide);
+
+    el.remove();
+  });
 });
+
