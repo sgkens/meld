@@ -1,5 +1,5 @@
-import { defineMeld, meldHtml, store } from '../../../src/meld.core.js';
-import { actions } from '../store.js';
+import { defineMeld, meldHtml } from '../../../src/meld.core.js';
+import { store, actions } from '../store.js';
 
 defineMeld('task-form', (el, { useForm, emit, props, announce }) => {
   const task = props.task || el.task;

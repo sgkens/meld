@@ -1,5 +1,5 @@
-import { defineMeld, meldHtml, store, meld } from '../../../src/meld.core.js';
-import { actions } from '../store.js';
+import { defineMeld, meldHtml, meld } from '../../../src/meld.core.js';
+import { store, actions } from '../store.js';
 
 defineMeld('task-card', (el, { emit, props, effect }) => {
   // Grab the task object dynamically from props or fallback to element property
