@@ -13,7 +13,7 @@ The **Meld Artisan CLI** is the recommended way to start any project, as it hand
 
 ## 1. Local Setup
 
-Meld requires Node.js (v14+) to run the Artisan CLI.
+Meld requires Node.js (v18+) to run the Artisan CLI.
 
 ### Basic Project Scaffolding
 Scaffolds a frontend-only project with `index.html` and the required directory structure.
@@ -21,7 +21,18 @@ Scaffolds a frontend-only project with `index.html` and the required directory s
 ```bash
 npx meld-artisan init my-client-widgets
 # cd my-client-widgets
-````
+```
+
+**Verify installation** — after running the command, your project directory should contain:
+
+```
+my-client-widgets/
+├── index.html
+├── src/
+│   └── components/
+├── public/
+└── package.json
+```
 
 ### Fullstack KMEL Setup (Recommended)
 
@@ -33,7 +44,7 @@ npx meld-artisan init:stack my-startup
 
 > **Post-Setup Action:** After scaffolding the KMEL stack, remember to run: `npm install` and `npm run db:migrate` to set up dependencies and the database schema.
 
-## 2\. Artisan Command Reference
+## 2. Artisan Command Reference
 
 | Command          | Usage                       | Description                                                                         |
 | :--------------- | :-------------------------- | :---------------------------------------------------------------------------------- |
@@ -43,7 +54,7 @@ npx meld-artisan init:stack my-startup
 | `serve`          | `serve`                     | Starts a local static server to correctly load ES Modules over HTTP.                |
 | `test`           | `test`                      | Executes the unit test suite using the configured testing library (requires setup). |
 
-## 3\. Launching Development
+## 3. Launching Development
 
 To maintain a smooth developer experience (DX), always use the `serve` command to launch your app.
 

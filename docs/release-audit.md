@@ -1,6 +1,9 @@
 ---
 title: Release Audit
 nav_order: 99
+eleventyExcludeFromCollections: true
+layout: false
+permalink: false
 ---
 
 # Release Audit

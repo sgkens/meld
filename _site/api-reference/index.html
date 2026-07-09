@@ -188,16 +188,6 @@
             <span>Strict API Reference</span>
           </a>
         
-          <a
-            href="/release-audit/"
-            
-            data-excerpt=""
-            data-tags=""
-          >
-            <i data-lucide="file-text"></i>
-            <span>Release Audit</span>
-          </a>
-        
       </section>
     
       <section class="nav-category" aria-labelledby="nav-cat-getting-started" >
@@ -668,7 +658,6 @@
     <tr><td class="pname">setupFn</td><td class="ptype">Function</td><td class="pdesc">Setup function receiving <code>(element, context)</code>. It may return a <code>DocumentFragment</code> or nothing.</td></tr>
   </tbody></table>
   <div class="api-subhead">Example</div>
-</section>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'user-card'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> emit <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
   <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
     &lt;button onclick="</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token function">emit</span><span class="token punctuation">(</span><span class="token string">'select'</span><span class="token punctuation">)</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">">
@@ -676,6 +665,7 @@
     &lt;/button>
   </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
 <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+</section>
 <section class="api-entry" id="meldState" data-category="core">
   <div class="api-entry-tags">
     <span class="api-tag-pill" style="background:var(--c-core-soft); color:var(--c-core);">reactivity</span>
@@ -691,9 +681,9 @@
     <tr><td class="pname">initialObject</td><td class="ptype">object</td><td class="pdesc">Initial state object to wrap.</td></tr>
   </tbody></table>
   <div class="api-subhead">Example</div>
-</section>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> state <span class="token operator">=</span> <span class="token function">meldState</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">count</span><span class="token operator">:</span> <span class="token number">0</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 state<span class="token punctuation">.</span>count <span class="token operator">+=</span> <span class="token number">1</span><span class="token punctuation">;</span></code></pre>
+</section>
 <section class="api-entry" id="computed" data-category="core">
   <div class="api-entry-tags">
     <span class="api-tag-pill" style="background:var(--c-core-soft); color:var(--c-core);">reactivity</span>
@@ -709,9 +699,9 @@ state<span class="token punctuation">.</span>count <span class="token operator">
     <tr><td class="pname">getterFn</td><td class="ptype">Function</td><td class="pdesc">Function that reads reactive state and returns the derived value.</td></tr>
   </tbody></table>
   <div class="api-subhead">Example</div>
-</section>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> fullName <span class="token operator">=</span> <span class="token function">computed</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>state<span class="token punctuation">.</span>first<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string"> </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>state<span class="token punctuation">.</span>last<span class="token interpolation-punctuation punctuation">}</span></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
 console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token function">fullName</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+</section>
 <section class="api-entry" id="meldHtml" data-category="dom">
   <div class="api-entry-tags">
     <span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">dom</span>
@@ -739,11 +729,11 @@ console<span class="token punctuation">.</span><span class="token function">log<
   })}"&gt;Content&lt;/div&gt;
 `;</code></pre>
   <div class="api-subhead">Example</div>
-</section>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">
   &lt;span></span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> state<span class="token punctuation">.</span>count<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">&lt;/span>
   &lt;button onclick="</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> state<span class="token punctuation">.</span>count<span class="token operator">++</span><span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">">+&lt;/button>
 </span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span></code></pre>
+</section>
 <section class="api-entry" id="onMount" data-category="lifecycle">
   <div class="api-entry-tags">
     <span class="api-tag-pill" style="background:var(--c-lifecycle-soft); color:var(--c-lifecycle);">lifecycle</span>
@@ -758,6 +748,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
   <table class="api-params"><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
     <tr><td class="pname">fn</td><td class="ptype">Function</td><td class="pdesc">Callback to run on connection.</td></tr>
   </tbody></table>
+  <div class="api-subhead">Example</div>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">onMount</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token string">'Component is now in the DOM'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 </section>
 <section class="api-entry" id="onDestroy" data-category="lifecycle">
   <div class="api-entry-tags">
@@ -773,6 +767,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
   <table class="api-params"><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
     <tr><td class="pname">fn</td><td class="ptype">Function</td><td class="pdesc">Cleanup callback for timers, listeners, or external resources.</td></tr>
   </tbody></table>
+  <div class="api-subhead">Example</div>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">onDestroy</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token function">clearInterval</span><span class="token punctuation">(</span>timerId<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 </section>
 <section class="api-entry" id="provide" data-category="context">
   <div class="api-entry-tags">
@@ -789,6 +787,8 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <tr><td class="pname">key</td><td class="ptype">string</td><td class="pdesc">Context identifier.</td></tr>
     <tr><td class="pname">value</td><td class="ptype">any</td><td class="pdesc">Value to provide.</td></tr>
   </tbody></table>
+  <div class="api-subhead">Example</div>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">provide</span><span class="token punctuation">(</span><span class="token string">'theme'</span><span class="token punctuation">,</span> <span class="token string">'dark'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 </section>
 <section class="api-entry" id="inject" data-category="context">
   <div class="api-entry-tags">
@@ -805,8 +805,10 @@ console<span class="token punctuation">.</span><span class="token function">log<
     <tr><td class="pname">key</td><td class="ptype">string</td><td class="pdesc">Context identifier to resolve.</td></tr>
     <tr><td class="pname">defaultValue<span class="api-optional-flag">?</span></td><td class="ptype">any</td><td class="pdesc">Fallback if no provider is found.</td></tr>
   </tbody></table>
+  <div class="api-subhead">Example</div>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">const</span> theme <span class="token operator">=</span> <span class="token function">inject</span><span class="token punctuation">(</span><span class="token string">'theme'</span><span class="token punctuation">,</span> <span class="token string">'light'</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
 </section>
-<section class="api-entry" id="use" data-category="dom">
+<section class="api-entry" id="use" data-category="plugin">
   <div class="api-entry-tags">
     <span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">plugin</span>
     <span class="api-since">since v1.0.0</span>
@@ -823,7 +825,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
   </tbody></table>
 </section>
 <section class="api-entry" id="meldTheme" data-category="dom">
-  <div class="api-entry-tags"><span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">dom</span><span class="api-since">since v1.3.0</span></div>
+  <div class="api-entry-tags"><span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">dom</span><span class="api-since">since v1.2.0</span></div>
   <div class="api-signature" style="border-left: 4px solid var(--c-dom);"><div class="api-signature-call"><span class="fn-name" style="color:var(--c-dom);">meld.theme</span><span class="fn-punct">(</span><span class="fn-param">cssString</span><span class="fn-punct">)</span></div><div class="api-return-pill"><span class="arrow">-></span>void</div></div>
   <p class="api-entry-desc">Creates a constructable stylesheet and adopts it into Meld component shadow roots.</p>
 </section>
@@ -850,7 +852,7 @@ console<span class="token punctuation">.</span><span class="token function">log<
 <section class="api-entry" id="meldFlush" data-category="dom">
   <div class="api-entry-tags"><span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">dom</span><span class="api-since">since v1.4.0</span></div>
   <div class="api-signature" style="border-left: 4px solid var(--c-dom);"><div class="api-signature-call"><span class="fn-name" style="color:var(--c-dom);">meld.flush</span><span class="fn-punct">(</span><span class="fn-punct">)</span></div><div class="api-return-pill"><span class="arrow">-></span>void</div></div>
-  <p class="api-entry-desc">Synchronously flushes any pending batched reactive updates to the DOM immediately.</p>
+  <p class="api-entry-desc">Synchronously flushes all pending batched reactive updates to the DOM.</p>
 </section>
 
 
@@ -866,11 +868,6 @@ console<span class="token punctuation">.</span><span class="token function">log<
         <strong>Releases and Changelog</strong>
       </a>
     
-    
-      <a href="/release-audit/" class="doc-pager-link doc-pager-link--next" rel="next">
-        <span>Next →</span>
-        <strong>Release Audit</strong>
-      </a>
     
   </nav>
 

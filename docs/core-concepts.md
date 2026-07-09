@@ -15,10 +15,8 @@ Meld does not use `setState()` (React) or a compiler (Svelte). It uses **JavaScr
 
 * **Tracking:** When you access `state.count` inside `meldHtml`, the engine records a dependency.
 * **Updating:** When you write `state.count++`, the engine is notified. Multiple synchronous updates are automatically coalesced.
-* **Asynchronous Microtask Batching**: DOM updates are queued and flushed on the next microtask tick (using `Promise.resolve()`). This avoids synchronous DOM thrashing and layout bottlenecks. If you need to force updates to flush synchronously (e.g. during testing or before reading side-effects), you can call `meld.flush()`.
+* **Asynchronous Microtask Batching**: DOM updates are queued and flushed on the next microtask tick (using `Promise.resolve()`). This avoids synchronous DOM thrashing and layout bottlenecks. If you need to force updates to flush synchronously (e.g. during testing or before reading side-effects), you can call `meld.flush()` (accessed as a method on the `meld` namespace, not a standalone import).
 * **Surgical Update:** When flushing, the engine goes directly to the DOM Text Node associated with that dependency and updates `.data`. It does **not** re-render the component.
-
-
 
 ## 2. Components as Native Elements
 Every Meld component is a standard **HTML Custom Element**.
@@ -39,3 +37,13 @@ Meld files are just JavaScript (`.js`).
 * No `.jsx` or `.vue` extensions.
 * No transpilation needed.
 * **Benefit:** Browser DevTools show your actual code, line-for-line. Debugging is trivial.
+
+---
+
+## Next Steps
+
+Now that you understand the core concepts, dig deeper:
+
+- **[Installation & Scaffolding](/getting-started/installation/)** — set up your first Meld project in under a minute.
+- **[API Reference](/api-reference/)** — canonical reference for every exported function.
+- **[Architecture Deep Dive](/architecture/architecture-deep-dive/)** — how the reactivity engine, Shadow DOM model, and template engine work under the hood.

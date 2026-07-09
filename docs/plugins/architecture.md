@@ -16,7 +16,7 @@ Tools for structuring Single Page Applications (SPAs) and managing global applic
 
 ### Usage
 ```javascript
-import { MeldRouter } from '../src/plugins/meld-router.js';
+import { MeldRouter } from '@meldjs/meld/plugins/meld-router';
 
 use(MeldRouter, {
   routes: [
@@ -24,7 +24,7 @@ use(MeldRouter, {
     { path: '/users/:id', component: 'user-detail' } // Supports params in v1.3+
   ]
 });
-````
+```
 
 ### Components
 
@@ -51,7 +51,7 @@ defineMeld('user-detail', (el, { inject }) => {
 Create a store file (`store.js`):
 
 ```javascript
-import { meldState } from '../src/meld.core.js';
+import { meldState } from '@meldjs/meld';
 
 export const store = meldState({
   user: null,

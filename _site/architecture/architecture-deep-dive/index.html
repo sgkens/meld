@@ -188,16 +188,6 @@
             <span>Strict API Reference</span>
           </a>
         
-          <a
-            href="/release-audit/"
-            
-            data-excerpt=""
-            data-tags=""
-          >
-            <i data-lucide="file-text"></i>
-            <span>Release Audit</span>
-          </a>
-        
       </section>
     
       <section class="nav-category" aria-labelledby="nav-cat-getting-started" >
@@ -648,27 +638,288 @@
           </a>
         </div>
 
-        <h1><strong>Architectural Deep Dive</strong></h1>
-<p>Meld is built on three fundamental pillars of modern web engineering.</p>
-<h2><strong>1. Proxy-Based Reactivity</strong></h2>
-<p>Unlike frameworks that rely on &quot;Dirty Checking&quot; or &quot;Signals,&quot; Meld uses a deep-proxy engine.</p>
+        <h1>Architectural Deep Dive</h1>
+<p>Meld is a 2kb browser runtime built on four interlocking subsystems: a <strong>Proxy-based reactivity engine</strong>, a <strong>Shadow DOM component model</strong>, a <strong>tagged-template engine</strong>, and a <strong>plugin system</strong>. This page walks through each in detail, using actual source code from <code>src/meld.core.js</code>.</p>
+<hr>
+<h2>1. Proxy-Based Reactivity Engine</h2>
+<p>Meld uses a Proxy-based dependency tracking approach similar in intent to fine-grained signals, but without a compiler step. Everything is pure JavaScript evaluated at runtime in the browser.</p>
+<h3>Global tracking variables</h3>
+<p>Three module-level variables coordinate the entire reactivity system:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">let</span> activeEffect <span class="token operator">=</span> <span class="token keyword">null</span><span class="token punctuation">;</span>    <span class="token comment">// The currently executing effect (if any)</span>
+<span class="token keyword">const</span> effectStack <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>     <span class="token comment">// Stack to handle nested effects</span>
+<span class="token keyword">const</span> effectQueue <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Set</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// Effects pending flush this microtask</span>
+<span class="token keyword">let</span> pendingTick <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>    <span class="token comment">// Whether a Promise.resolve flush is already queued</span></code></pre>
+<h3><code>meldState()</code> — creating a reactive proxy</h3>
+<p><code>meldState(initialObj)</code> wraps any plain object in a <code>Proxy</code>. The proxy intercepts both reads (<code>get</code>) and writes (<code>set</code>):</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">meldState</span><span class="token punctuation">(</span><span class="token parameter">initialObj</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> deps <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">Map</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>           <span class="token comment">// prop -> Set&lt;Effect></span>
+
+  <span class="token keyword">return</span> <span class="token keyword">new</span> <span class="token class-name">Proxy</span><span class="token punctuation">(</span>initialObj<span class="token punctuation">,</span> <span class="token punctuation">{</span>
+    <span class="token function">get</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> prop<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>activeEffect<span class="token punctuation">)</span> <span class="token punctuation">{</span>           <span class="token comment">// only track during an active effect</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>deps<span class="token punctuation">.</span><span class="token function">has</span><span class="token punctuation">(</span>prop<span class="token punctuation">)</span><span class="token punctuation">)</span> deps<span class="token punctuation">.</span><span class="token function">set</span><span class="token punctuation">(</span>prop<span class="token punctuation">,</span> <span class="token keyword">new</span> <span class="token class-name">Set</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token keyword">const</span> depSet <span class="token operator">=</span> deps<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>prop<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        depSet<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>activeEffect<span class="token punctuation">)</span><span class="token punctuation">;</span>
+        activeEffect<span class="token punctuation">.</span>deps<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>depSet<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// bidirectional link for cleanup</span>
+      <span class="token punctuation">}</span>
+      <span class="token keyword">return</span> target<span class="token punctuation">[</span>prop<span class="token punctuation">]</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token function">set</span><span class="token punctuation">(</span>target<span class="token punctuation">,</span> prop<span class="token punctuation">,</span> value<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span>target<span class="token punctuation">[</span>prop<span class="token punctuation">]</span> <span class="token operator">!==</span> value<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+        target<span class="token punctuation">[</span>prop<span class="token punctuation">]</span> <span class="token operator">=</span> value<span class="token punctuation">;</span>
+        <span class="token keyword">if</span> <span class="token punctuation">(</span>deps<span class="token punctuation">.</span><span class="token function">has</span><span class="token punctuation">(</span>prop<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+          <span class="token punctuation">[</span><span class="token operator">...</span>deps<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>prop<span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token parameter">effect</span> <span class="token operator">=></span> <span class="token function">queueEffect</span><span class="token punctuation">(</span>effect<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        <span class="token punctuation">}</span>
+      <span class="token punctuation">}</span>
+      <span class="token keyword">return</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>The <code>deps</code> map is <strong>per-state-object</strong> and keyed by property name. Every <code>set</code> operation triggers only the effects that previously read that specific property during their last run.</p>
+<h3><code>createEffect()</code> — subscribing to state changes</h3>
+<p>An <em>effect</em> is an object with a <code>run()</code> function and a <code>deps</code> set tracking which dependency sets it belongs to. Effects automatically re-subscribe on every run (after cleanup), which means conditional access patterns are handled correctly.</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">createEffect</span><span class="token punctuation">(</span><span class="token parameter">fn</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> effect <span class="token operator">=</span> <span class="token punctuation">{</span>
+    <span class="token literal-property property">active</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span>
+    <span class="token function-variable function">run</span><span class="token operator">:</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+      <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>effect<span class="token punctuation">.</span>active<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span>
+      <span class="token function">cleanupEffect</span><span class="token punctuation">(</span>effect<span class="token punctuation">)</span><span class="token punctuation">;</span>   <span class="token comment">// clear stale subscriptions</span>
+      effectStack<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>effect<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      activeEffect <span class="token operator">=</span> effect<span class="token punctuation">;</span>   <span class="token comment">// set global tracker</span>
+      <span class="token keyword">try</span> <span class="token punctuation">{</span>
+        <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                  <span class="token comment">// run: any state.prop reads are tracked</span>
+      <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+        effectStack<span class="token punctuation">.</span><span class="token function">pop</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+        activeEffect <span class="token operator">=</span> effectStack<span class="token punctuation">[</span>effectStack<span class="token punctuation">.</span>length <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token keyword">null</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span>
+    <span class="token punctuation">}</span><span class="token punctuation">,</span>
+    <span class="token literal-property property">deps</span><span class="token operator">:</span> <span class="token keyword">new</span> <span class="token class-name">Set</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  effect<span class="token punctuation">.</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>                <span class="token comment">// run immediately for initial setup</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>currentComponent<span class="token punctuation">)</span> currentComponent<span class="token punctuation">.</span>effects<span class="token punctuation">.</span><span class="token function">push</span><span class="token punctuation">(</span>effect<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>The <code>effectStack</code> is an array (not a single variable) so nested effects (e.g. a computed inside a template) work correctly — <code>activeEffect</code> is always the innermost one.</p>
+<h3>Microtask batching and <code>meld.flush()</code></h3>
+<p>When a state property changes, <code>queueEffect</code> is called. It adds the effect to a <code>Set</code> (automatically deduplicating if the same effect is queued multiple times in one synchronous block) and schedules a microtask flush <strong>once</strong>:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">queueEffect</span><span class="token punctuation">(</span><span class="token parameter">effect</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  effectQueue<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>effect<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span>pendingTick<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    pendingTick <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+    Promise<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span>flushEffects<span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// schedule one flush</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p><code>flushEffects()</code> runs all queued effects synchronously:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">function</span> <span class="token function">flushEffects</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  pendingTick <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> queue <span class="token operator">=</span> Array<span class="token punctuation">.</span><span class="token function">from</span><span class="token punctuation">(</span>effectQueue<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  effectQueue<span class="token punctuation">.</span><span class="token function">clear</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  queue<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token parameter">effect</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>effect<span class="token punctuation">.</span>active<span class="token punctuation">)</span> effect<span class="token punctuation">.</span><span class="token function">run</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p><strong>Multiple synchronous state writes coalesce into a single DOM update.</strong> If you write <code>state.a = 1; state.b = 2</code> in the same function call, the DOM only updates once on the next microtask tick.</p>
+<p><code>meld.flush()</code> lets you force that flush synchronously, which is essential in tests or before reading layout-dependent side effects:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// In tests, after mutating state:</span>
+state<span class="token punctuation">.</span>count <span class="token operator">=</span> <span class="token number">5</span><span class="token punctuation">;</span>
+meld<span class="token punctuation">.</span><span class="token function">flush</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// DOM is now up to date</span>
+<span class="token function">assert</span><span class="token punctuation">(</span>el<span class="token punctuation">.</span>shadowRoot<span class="token punctuation">.</span>textContent<span class="token punctuation">.</span><span class="token function">includes</span><span class="token punctuation">(</span><span class="token string">'5'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<hr>
+<h2>2. Shadow DOM Component Model</h2>
+<h3><code>defineMeld()</code> — registering native Custom Elements</h3>
+<p><code>defineMeld(tagName, setupFn, options?)</code> registers a native Custom Element via <code>customElements.define</code>. The class it creates extends <code>HTMLElement</code> directly.</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token parameter">tagName<span class="token punctuation">,</span> setupFn<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>customElements<span class="token punctuation">.</span><span class="token function">get</span><span class="token punctuation">(</span>tagName<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// idempotent</span>
+  customElements<span class="token punctuation">.</span><span class="token function">define</span><span class="token punctuation">(</span>tagName<span class="token punctuation">,</span> <span class="token keyword">class</span> <span class="token class-name">extends</span> HTMLElement <span class="token punctuation">{</span>
+    <span class="token comment">// ...</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<p>Guard against double-registration ensures that hot-reloading or multiple imports of the same module don't throw <code>NotSupportedError</code>.</p>
+<h3>Constructor — Shadow root attachment</h3>
+<p>In the constructor, a Shadow Root is attached in <code>open</code> mode, and reactive attribute/property proxy objects are created:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">constructor</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">super</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>shadowRoot<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>_isHydrating <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span> <span class="token comment">// Declarative Shadow DOM already present</span>
+  <span class="token punctuation">}</span> <span class="token keyword">else</span> <span class="token punctuation">{</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span><span class="token function">attachShadow</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">mode</span><span class="token operator">:</span> <span class="token string">'open'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>mountHooks  <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>destroyHooks <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>effects     <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>_initialized <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+
+  <span class="token comment">// Attributes become a reactive state object</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>_meldAttrs <span class="token operator">=</span> <span class="token function">meldState</span><span class="token punctuation">(</span>attrsObj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// Declared properties become a reactive state object</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>_meldProps <span class="token operator">=</span> <span class="token function">meldState</span><span class="token punctuation">(</span>propsObj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<h3><code>connectedCallback</code> — component lifecycle entry point</h3>
+<p><code>connectedCallback</code> is where Meld runs the developer-authored <code>setupFn</code>. The critical step is saving and restoring <code>currentComponent</code> so lifecycle hooks (<code><a href="/api-reference/#onMount">onMount</a></code>, <code><a href="/api-reference/#onDestroy">onDestroy</a></code>, <code><a href="/api-reference/#provide">provide</a></code>) know which component they belong to:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">connectedCallback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>globalStyles<span class="token punctuation">.</span>length <span class="token operator">></span> <span class="token number">0</span><span class="token punctuation">)</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>shadowRoot<span class="token punctuation">.</span>adoptedStyleSheets <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token operator">...</span>globalStyles<span class="token punctuation">]</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">.</span>_initialized<span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// v1.4: guard against DOM move re-runs</span>
+  <span class="token keyword">this</span><span class="token punctuation">.</span>_initialized <span class="token operator">=</span> <span class="token boolean">true</span><span class="token punctuation">;</span>
+
+  <span class="token keyword">const</span> previousComponent <span class="token operator">=</span> currentComponent<span class="token punctuation">;</span>
+  currentComponent <span class="token operator">=</span> <span class="token keyword">this</span><span class="token punctuation">;</span>           <span class="token comment">// set context for lifecycle hooks</span>
+
+  <span class="token keyword">try</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> template <span class="token operator">=</span> <span class="token function">setupFn</span><span class="token punctuation">(</span><span class="token keyword">this</span><span class="token punctuation">,</span> <span class="token punctuation">{</span>
+      emit<span class="token punctuation">,</span>
+      <span class="token literal-property property">attrs</span><span class="token operator">:</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_meldAttrs<span class="token punctuation">,</span>
+      <span class="token literal-property property">props</span><span class="token operator">:</span> <span class="token keyword">this</span><span class="token punctuation">.</span>_meldProps<span class="token punctuation">,</span>
+      <span class="token operator">...</span>extensionContext             <span class="token comment">// merged plugin helpers</span>
+    <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span>template <span class="token operator">&amp;&amp;</span> <span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>_isHydrating<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>shadowRoot<span class="token punctuation">.</span>innerHTML <span class="token operator">=</span> <span class="token string">''</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>shadowRoot<span class="token punctuation">.</span><span class="token function">appendChild</span><span class="token punctuation">(</span>template<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+    <span class="token keyword">this</span><span class="token punctuation">.</span>mountHooks<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token parameter">fn</span> <span class="token operator">=></span> <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span> <span class="token comment">// fire onMount callbacks</span>
+  <span class="token punctuation">}</span> <span class="token keyword">finally</span> <span class="token punctuation">{</span>
+    currentComponent <span class="token operator">=</span> previousComponent<span class="token punctuation">;</span> <span class="token comment">// always restore</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span></code></pre>
+<p>The v1.4 <code>_initialized</code> guard is specifically to prevent a double-setup when a component is moved in the DOM (the browser fires <code>connectedCallback</code> again after a move).</p>
+<h3><code>disconnectedCallback</code> — teardown via microtask</h3>
+<p>Teardown is deferred by one microtask. This handles the DOM-move case: a component moved via <code>appendChild</code> fires <code>disconnectedCallback</code> and immediately <code>connectedCallback</code>. The microtask delay lets Meld check <code>this.isConnected</code> and skip teardown if the element reattached:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">disconnectedCallback</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  Promise<span class="token punctuation">.</span><span class="token function">resolve</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span><span class="token function">then</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    <span class="token keyword">if</span> <span class="token punctuation">(</span><span class="token operator">!</span><span class="token keyword">this</span><span class="token punctuation">.</span>isConnected<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>effects<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token parameter">effect</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+        effect<span class="token punctuation">.</span>active <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+        <span class="token function">cleanupEffect</span><span class="token punctuation">(</span>effect<span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>destroyHooks<span class="token punctuation">.</span><span class="token function">forEach</span><span class="token punctuation">(</span><span class="token parameter">fn</span> <span class="token operator">=></span> <span class="token function">fn</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">this</span><span class="token punctuation">.</span>_initialized <span class="token operator">=</span> <span class="token boolean">false</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<hr>
+<h2>3. Template Engine (<code><a href="/api-reference/#meldHtml">meldHtml</a></code>)</h2>
+<p><code><a href="/api-reference/#meldHtml">meldHtml</a></code> is a tagged template literal function. It produces a <code>DocumentFragment</code> with reactive bindings wired to <code>createEffect</code>.</p>
+<h3>Marker injection</h3>
+<p>Values in the template string are replaced with unique sentinel strings (<code>__meld_0__</code>, <code>__meld_1__</code>, etc.) before parsing:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">meldHtml</span><span class="token punctuation">(</span><span class="token parameter">strings<span class="token punctuation">,</span> <span class="token operator">...</span>values</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">const</span> markers <span class="token operator">=</span> values<span class="token punctuation">.</span><span class="token function">map</span><span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token parameter">_<span class="token punctuation">,</span> i</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">__meld_</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>i<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">__</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> htmlString <span class="token operator">=</span> strings<span class="token punctuation">.</span><span class="token function">reduce</span><span class="token punctuation">(</span>
+    <span class="token punctuation">(</span><span class="token parameter">acc<span class="token punctuation">,</span> str<span class="token punctuation">,</span> i</span><span class="token punctuation">)</span> <span class="token operator">=></span> acc <span class="token operator">+</span> str <span class="token operator">+</span> <span class="token punctuation">(</span>markers<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">||</span> <span class="token string">''</span><span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token string">''</span>
+  <span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">const</span> template <span class="token operator">=</span> document<span class="token punctuation">.</span><span class="token function">createElement</span><span class="token punctuation">(</span><span class="token string">'template'</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  template<span class="token punctuation">.</span>innerHTML <span class="token operator">=</span> htmlString<span class="token punctuation">;</span> <span class="token comment">// parsed once by the browser</span>
+  <span class="token keyword">const</span> fragment <span class="token operator">=</span> template<span class="token punctuation">.</span>content<span class="token punctuation">.</span><span class="token function">cloneNode</span><span class="token punctuation">(</span><span class="token boolean">true</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token comment">// ...</span>
+<span class="token punctuation">}</span></code></pre>
+<p>This approach means HTML is parsed exactly once by the browser's native parser, producing a real DOM tree. Meld then walks this tree to resolve each marker.</p>
+<h3>The <code>walk()</code> resolver</h3>
+<p>A recursive <code>walk(node)</code> function visits every node in the fragment. For <strong>element attributes</strong> it checks for marker values and handles them by type:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align:left">Attribute pattern</th>
+<th style="text-align:left">Behaviour</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left"><code>ref=&quot;__meld_N__&quot;</code></td>
+<td style="text-align:left">Calls the value as <code>value(node)</code> to give ref access</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>.propName=&quot;__meld_N__&quot;</code></td>
+<td style="text-align:left">Sets a DOM property; wraps in <code>createEffect</code> if a function</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>on*=&quot;__meld_N__&quot;</code></td>
+<td style="text-align:left">Adds an event listener directly</td>
+</tr>
+<tr>
+<td style="text-align:left"><code>style=&quot;__meld_N__&quot;</code></td>
+<td style="text-align:left">Reactive style object diff or string; wraps in <code>createEffect</code></td>
+</tr>
+<tr>
+<td style="text-align:left">any other <code>attr=&quot;__meld_N__&quot;</code></td>
+<td style="text-align:left">Reactive attribute set/remove; wraps in <code>createEffect</code></td>
+</tr>
+</tbody>
+</table>
+<p>For <strong>text nodes</strong> containing a marker, the value determines the update strategy:</p>
 <ul>
-<li><strong>The Trap:</strong> Every <code><a href="/api-reference/#meldState">meldState</a></code> object is wrapped in a Proxy that intercepts <code>set</code> operations.</li>
-<li><strong>The Dependency Map:</strong> Meld tracks which &quot;Effect&quot; (template binding) accessed which property during the render phase.</li>
-<li><strong>The Surgical Update:</strong> When a property changes, only the effects that depend on that specific property are re-run.</li>
+<li><strong>Reactive function</strong> (<code>typeof value === 'function'</code>): Two sentinel text nodes bracket the dynamic region. A <code>createEffect</code> is used to clear and re-insert content on every state change.</li>
+<li><strong>Node or DocumentFragment</strong>: Inserted directly.</li>
+<li><strong><code>{ __raw: string }</code></strong>: Parsed as HTML via <code>&lt;template&gt;</code> and inserted.</li>
+<li><strong>Primitive</strong>: Set as <code>node.nodeValue</code> once.</li>
 </ul>
-<h2><strong>2. Shadow DOM &amp; Scoped Slots</strong></h2>
-<p>Meld treats the <strong>Shadow DOM</strong> as a first-class citizen, not a fallback.</p>
-<ul>
-<li><strong>True Encapsulation:</strong> CSS defined inside a component cannot leak, and global CSS cannot break the component (unless variables are explicitly shared).</li>
-<li><strong>Composition:</strong> We use native <code>&lt;slot&gt;</code> elements for high-performance content projection.</li>
-</ul>
-<h2><strong>3. No Build Philosophy</strong></h2>
-<p>Meld is &quot;Battle Tested&quot; for environments where build pipelines are restricted or unwanted (e.g., legacy CMS, high-security financial portals, or rapid prototyping).</p>
-<ul>
-<li><strong>Native ESM:</strong> Uses standard <code>import</code> statements.</li>
-<li><strong>Import Maps:</strong> Leverages <code>meld-federation</code> to share code between micro-frontends without a shared build step.</li>
-</ul>
+<h3>Reactive attribute example</h3>
+<p>When you write:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript">meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;button disabled="</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> state<span class="token punctuation">.</span>loading<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">">Submit&lt;/button></span><span class="token template-punctuation string">`</span></span></code></pre>
+<p>Meld calls <code>createEffect(() =&gt; { ... })</code> for that attribute binding. Whenever <code>state.loading</code> changes, only that one <code>setAttribute</code>/<code>removeAttribute</code> call runs — there is no virtual DOM diffing, no component re-render.</p>
+<hr>
+<h2>4. Plugin Architecture</h2>
+<h3>The <code>use(plugin, options)</code> pattern</h3>
+<p><code>use()</code> is the sole installation point for plugins. It passes the full Meld API object to <code>plugin.install</code>:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token keyword">export</span> <span class="token keyword">function</span> <span class="token function">use</span><span class="token punctuation">(</span><span class="token parameter">plugin<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>installedPlugins<span class="token punctuation">.</span><span class="token function">has</span><span class="token punctuation">(</span>plugin<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token keyword">return</span><span class="token punctuation">;</span> <span class="token comment">// idempotent</span>
+  <span class="token keyword">const</span> api <span class="token operator">=</span> <span class="token punctuation">{</span>
+    defineMeld<span class="token punctuation">,</span> meldState<span class="token punctuation">,</span> meldHtml<span class="token punctuation">,</span> computed<span class="token punctuation">,</span>
+    provide<span class="token punctuation">,</span> inject<span class="token punctuation">,</span> onMount<span class="token punctuation">,</span> onDestroy<span class="token punctuation">,</span> meld
+  <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  plugin<span class="token punctuation">.</span><span class="token function">install</span><span class="token punctuation">(</span>api<span class="token punctuation">,</span> options<span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token keyword">if</span> <span class="token punctuation">(</span>plugin<span class="token punctuation">.</span>setupHelpers<span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    Object<span class="token punctuation">.</span><span class="token function">assign</span><span class="token punctuation">(</span>extensionContext<span class="token punctuation">,</span> plugin<span class="token punctuation">.</span><span class="token function">setupHelpers</span><span class="token punctuation">(</span>api<span class="token punctuation">,</span> options<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+  installedPlugins<span class="token punctuation">.</span><span class="token function">add</span><span class="token punctuation">(</span>plugin<span class="token punctuation">)</span><span class="token punctuation">;</span>
+<span class="token punctuation">}</span></code></pre>
+<h3><code>plugin.install(api, options)</code> — adding global behaviour</h3>
+<p>A plugin registers global things (routes, store, head manager) using <code>api.defineMeld</code> or direct DOM/module side effects. Example minimal plugin:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// meld-logger.js</span>
+<span class="token keyword">export</span> <span class="token keyword">const</span> MeldLogger <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token function">install</span><span class="token punctuation">(</span><span class="token parameter">api<span class="token punctuation">,</span> options <span class="token operator">=</span> <span class="token punctuation">{</span><span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> prefix <span class="token operator">=</span> options<span class="token punctuation">.</span>prefix <span class="token operator">||</span> <span class="token string">'[meld]'</span><span class="token punctuation">;</span>
+    <span class="token comment">// Patch meldState to log mutations</span>
+    <span class="token keyword">const</span> originalMeldState <span class="token operator">=</span> api<span class="token punctuation">.</span>meldState<span class="token punctuation">;</span>
+    api<span class="token punctuation">.</span><span class="token function-variable function">meldState</span> <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token parameter">obj</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+      console<span class="token punctuation">.</span><span class="token function">log</span><span class="token punctuation">(</span><span class="token template-string"><span class="token template-punctuation string">`</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>prefix<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string"> meldState created</span><span class="token template-punctuation string">`</span></span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+      <span class="token keyword">return</span> <span class="token function">originalMeldState</span><span class="token punctuation">(</span>obj<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token punctuation">}</span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+<h3><code>plugin.setupHelpers(api, options)</code> — injecting per-component helpers</h3>
+<p>If a plugin returns an object from <code>setupHelpers</code>, those keys are merged into <code>extensionContext</code>, which is spread into <strong>every</strong> component setup function call:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token comment">// meld-router.js (simplified)</span>
+<span class="token keyword">export</span> <span class="token keyword">const</span> MeldRouter <span class="token operator">=</span> <span class="token punctuation">{</span>
+  <span class="token function">install</span><span class="token punctuation">(</span><span class="token parameter">api<span class="token punctuation">,</span> options</span><span class="token punctuation">)</span> <span class="token punctuation">{</span> <span class="token comment">/* register &lt;meld-view> etc */</span> <span class="token punctuation">}</span><span class="token punctuation">,</span>
+  <span class="token function">setupHelpers</span><span class="token punctuation">(</span><span class="token parameter">api<span class="token punctuation">,</span> options</span><span class="token punctuation">)</span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> router <span class="token operator">=</span> <span class="token function">createRouterInstance</span><span class="token punctuation">(</span>options<span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> <span class="token punctuation">{</span> router <span class="token punctuation">}</span><span class="token punctuation">;</span> <span class="token comment">// available as (el, { router }) in every component</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span><span class="token punctuation">;</span></code></pre>
+<p>After <code>use(MeldRouter, { routes })</code>, any component can do:</p>
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'my-page'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token parameter">el<span class="token punctuation">,</span> <span class="token punctuation">{</span> router <span class="token punctuation">}</span></span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+  <span class="token comment">// router is available here</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span></code></pre>
+<hr>
+<h2>5. No-Build Architecture</h2>
+<p>Meld's <code>src/meld.core.js</code> uses only standard ES Module <code>export</code> statements. There is no JSX, no special file extension, no transform required. Components are plain <code>.js</code> files using standard tagged template literals.</p>
+<p>In a browser with an <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap">Import Map</a>:</p>
+<pre class="language-html" tabindex="0"><code class="language-html"><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>importmap<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+<span class="token punctuation">{</span>
+  <span class="token string-property property">"imports"</span><span class="token operator">:</span> <span class="token punctuation">{</span>
+    <span class="token string-property property">"@meldjs/meld"</span><span class="token operator">:</span> <span class="token string">"https://unpkg.com/@meldjs/meld@1.4.0/dist/meld.core.esm.js"</span>
+  <span class="token punctuation">}</span>
+<span class="token punctuation">}</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span>
+
+<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>script</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation attr-equals">=</span><span class="token punctuation">"</span>module<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token script"><span class="token language-javascript">
+  <span class="token keyword">import</span> <span class="token punctuation">{</span> defineMeld<span class="token punctuation">,</span> meldState<span class="token punctuation">,</span> meldHtml <span class="token punctuation">}</span> <span class="token keyword">from</span> <span class="token string">'@meldjs/meld'</span><span class="token punctuation">;</span>
+
+  <span class="token function">defineMeld</span><span class="token punctuation">(</span><span class="token string">'hello-world'</span><span class="token punctuation">,</span> <span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> <span class="token punctuation">{</span>
+    <span class="token keyword">const</span> state <span class="token operator">=</span> <span class="token function">meldState</span><span class="token punctuation">(</span><span class="token punctuation">{</span> <span class="token literal-property property">name</span><span class="token operator">:</span> <span class="token string">'World'</span> <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+    <span class="token keyword">return</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;h1>Hello, </span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> state<span class="token punctuation">.</span>name<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">!&lt;/h1></span><span class="token template-punctuation string">`</span></span><span class="token punctuation">;</span>
+  <span class="token punctuation">}</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
+</span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>script</span><span class="token punctuation">></span></span></code></pre>
+<p>No bundler, no transpiler, no <code>node_modules</code> needed in the browser. DevTools show your exact source code because there is nothing to compile.</p>
 
 
         

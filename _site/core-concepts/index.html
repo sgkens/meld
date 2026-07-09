@@ -188,16 +188,6 @@
             <span>Strict API Reference</span>
           </a>
         
-          <a
-            href="/release-audit/"
-            
-            data-excerpt=""
-            data-tags=""
-          >
-            <i data-lucide="file-text"></i>
-            <span>Release Audit</span>
-          </a>
-        
       </section>
     
       <section class="nav-category" aria-labelledby="nav-cat-getting-started" >
@@ -650,7 +640,7 @@
 <ul>
 <li><strong>Tracking:</strong> When you access <code>state.count</code> inside <code><a href="/api-reference/#meldHtml">meldHtml</a></code>, the engine records a dependency.</li>
 <li><strong>Updating:</strong> When you write <code>state.count++</code>, the engine is notified. Multiple synchronous updates are automatically coalesced.</li>
-<li><strong>Asynchronous Microtask Batching</strong>: DOM updates are queued and flushed on the next microtask tick (using <code>Promise.resolve()</code>). This avoids synchronous DOM thrashing and layout bottlenecks. If you need to force updates to flush synchronously (e.g. during testing or before reading side-effects), you can call <code>meld.flush()</code>.</li>
+<li><strong>Asynchronous Microtask Batching</strong>: DOM updates are queued and flushed on the next microtask tick (using <code>Promise.resolve()</code>). This avoids synchronous DOM thrashing and layout bottlenecks. If you need to force updates to flush synchronously (e.g. during testing or before reading side-effects), you can call <code>meld.flush()</code> (accessed as a method on the <code>meld</code> namespace, not a standalone import).</li>
 <li><strong>Surgical Update:</strong> When flushing, the engine goes directly to the DOM Text Node associated with that dependency and updates <code>.data</code>. It does <strong>not</strong> re-render the component.</li>
 </ul>
 <h2>2. Components as Native Elements</h2>
@@ -672,6 +662,14 @@
 <li>No <code>.jsx</code> or <code>.vue</code> extensions.</li>
 <li>No transpilation needed.</li>
 <li><strong>Benefit:</strong> Browser DevTools show your actual code, line-for-line. Debugging is trivial.</li>
+</ul>
+<hr>
+<h2>Next Steps</h2>
+<p>Now that you understand the core concepts, dig deeper:</p>
+<ul>
+<li><strong><a href="/getting-started/installation/">Installation &amp; Scaffolding</a></strong> — set up your first Meld project in under a minute.</li>
+<li><strong><a href="/api-reference/">API Reference</a></strong> — canonical reference for every exported function.</li>
+<li><strong><a href="/architecture/architecture-deep-dive/">Architecture Deep Dive</a></strong> — how the reactivity engine, Shadow DOM model, and template engine work under the hood.</li>
 </ul>
 
 

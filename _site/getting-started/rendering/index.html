@@ -188,16 +188,6 @@
             <span>Strict API Reference</span>
           </a>
         
-          <a
-            href="/release-audit/"
-            
-            data-excerpt=""
-            data-tags=""
-          >
-            <i data-lucide="file-text"></i>
-            <span>Release Audit</span>
-          </a>
-        
       </section>
     
       <section class="nav-category" aria-labelledby="nav-cat-getting-started" >
@@ -695,7 +685,9 @@
   <span class="token operator">:</span> meldHtml<span class="token template-string"><span class="token template-punctuation string">`</span><span class="token string">&lt;button onclick="</span><span class="token interpolation"><span class="token interpolation-punctuation punctuation">${</span>login<span class="token interpolation-punctuation punctuation">}</span></span><span class="token string">">Login&lt;/button></span><span class="token template-punctuation string">`</span></span>
 <span class="token punctuation">}</span></code></pre>
 <h2>Loops (The <code><a href="/api-reference/#meldList">meld.list</a></code> Helper)</h2>
-<p>Important: Always use meld.list for arrays. Using .map() directly will replace DOM nodes on every update, causing input focus loss.</p>
+<blockquote>
+<p><strong>Important:</strong> Always use <code>meld.list()</code> for reactive lists. Using <code>.map()</code> directly replaces DOM nodes on every update, causing input focus loss.</p>
+</blockquote>
 <pre class="language-javascript" tabindex="0"><code class="language-javascript">$<span class="token punctuation">{</span>meld<span class="token punctuation">.</span><span class="token function">list</span><span class="token punctuation">(</span>
   state<span class="token punctuation">.</span>items<span class="token punctuation">,</span> 
   <span class="token punctuation">(</span><span class="token parameter">item</span><span class="token punctuation">)</span> <span class="token operator">=></span> item<span class="token punctuation">.</span>id<span class="token punctuation">,</span> <span class="token comment">// Unique Key (Critical!)</span>
@@ -704,7 +696,7 @@
 <h2>Styling</h2>
 <h3>Conditional Classes</h3>
 <p>Use the meld.css helper to toggle classes cleanly.</p>
-<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token operator">&lt;</span>div <span class="token keyword">class</span><span class="token operator">=</span>"$<span class="token punctuation">{</span>meld<span class="token punctuation">.</span><span class="token function">css</span><span class="token punctuation">(</span><span class="token punctuation">{</span> 
+<pre class="language-javascript" tabindex="0"><code class="language-javascript"><span class="token operator">&lt;</span>div <span class="token keyword">class</span><span class="token operator">=</span>"$<span class="token punctuation">{</span><span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token operator">=></span> meld<span class="token punctuation">.</span><span class="token function">css</span><span class="token punctuation">(</span><span class="token punctuation">{</span> 
   <span class="token string-property property">'btn'</span><span class="token operator">:</span> <span class="token boolean">true</span><span class="token punctuation">,</span> 
   <span class="token string-property property">'btn-active'</span><span class="token operator">:</span> state<span class="token punctuation">.</span>isActive<span class="token punctuation">,</span>
   <span class="token string-property property">'btn-disabled'</span><span class="token operator">:</span> <span class="token operator">!</span>state<span class="token punctuation">.</span>isEnabled 
@@ -762,7 +754,7 @@ function Counter() {
 ```
 <!-- slide -->
 ```javascript
-// --- REACT (40kb+, Virtual DOM Hooks, Needs Build Step) ---
+// --- REACT (significantly larger runtime, ~130kb+ with ReactDOM, Virtual DOM Hooks, Needs Build Step) ---
 import React, { useState } from 'react';
 
 function Counter() {
@@ -774,7 +766,7 @@ function Counter() {
   );
 }
 ```</code></pre>
-<h3>No-Bullshit Framework Guide</h3>
+<h3>Honest Framework Comparison</h3>
 <p>When deciding whether to use Meld or another framework, here is an honest assessment of the pros, cons, and appropriate use cases:</p>
 <h4>1. React vs. Meld</h4>
 <ul>

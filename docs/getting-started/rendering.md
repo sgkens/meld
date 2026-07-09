@@ -44,7 +44,7 @@ ${() => state.isLoggedIn
 
 ## Loops (The `meld.list` Helper)
 
- Important: Always use meld.list for arrays. Using .map() directly will replace DOM nodes on every update, causing input focus loss.
+> **Important:** Always use `meld.list()` for reactive lists. Using `.map()` directly replaces DOM nodes on every update, causing input focus loss.
 
 
 ```javascript
@@ -63,7 +63,7 @@ Use the meld.css helper to toggle classes cleanly.
 
 
 ```javascript
-<div class="${meld.css({ 
+<div class="${() => meld.css({ 
   'btn': true, 
   'btn-active': state.isActive,
   'btn-disabled': !state.isEnabled 
@@ -133,7 +133,7 @@ function Counter() {
 ```
 <!-- slide -->
 ```javascript
-// --- REACT (40kb+, Virtual DOM Hooks, Needs Build Step) ---
+// --- REACT (significantly larger runtime, ~130kb+ with ReactDOM, Virtual DOM Hooks, Needs Build Step) ---
 import React, { useState } from 'react';
 
 function Counter() {
@@ -147,7 +147,7 @@ function Counter() {
 ```
 ````
 
-### No-Bullshit Framework Guide
+### Honest Framework Comparison
 
 When deciding whether to use Meld or another framework, here is an honest assessment of the pros, cons, and appropriate use cases:
 

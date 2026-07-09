@@ -188,16 +188,6 @@
             <span>Strict API Reference</span>
           </a>
         
-          <a
-            href="/release-audit/"
-            
-            data-excerpt=""
-            data-tags=""
-          >
-            <i data-lucide="file-text"></i>
-            <span>Release Audit</span>
-          </a>
-        
       </section>
     
       <section class="nav-category" aria-labelledby="nav-cat-getting-started" >
@@ -651,11 +641,19 @@
         <h1>Installation and Artisan CLI</h1>
 <p>The <strong>Meld Artisan CLI</strong> is the recommended way to start any project, as it handles boilerplate, configuration, and environment setup.</p>
 <h2>1. Local Setup</h2>
-<p>Meld requires Node.js (v14+) to run the Artisan CLI.</p>
+<p>Meld requires Node.js (v18+) to run the Artisan CLI.</p>
 <h3>Basic Project Scaffolding</h3>
 <p>Scaffolds a frontend-only project with <code>index.html</code> and the required directory structure.</p>
 <pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan init my-client-widgets
 <span class="token comment"># cd my-client-widgets</span></code></pre>
+<p><strong>Verify installation</strong> — after running the command, your project directory should contain:</p>
+<pre><code>my-client-widgets/
+├── index.html
+├── src/
+│   └── components/
+├── public/
+└── package.json
+</code></pre>
 <h3>Fullstack KMEL Setup (Recommended)</h3>
 <p>Scaffolds the complete <strong>Knex, Meld, Express, Lucia</strong> stack, ready for database-driven applications.</p>
 <pre class="language-bash" tabindex="0"><code class="language-bash">npx meld-artisan init:stack my-startup</code></pre>

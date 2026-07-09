@@ -205,7 +205,7 @@ export default function eleventyConfig(config) {
   ]);
 
   config.addTransform('apiReferenceLinks', function(content) {
-    if (!this.page?.outputPath?.endsWith('.html')) {
+    if (typeof this.page?.outputPath !== 'string' || !this.page.outputPath.endsWith('.html')) {
       return content;
     }
 

@@ -35,7 +35,6 @@ This page provides the canonical technical reference for the public Meld runtime
     <tr><td class="pname">setupFn</td><td class="ptype">Function</td><td class="pdesc">Setup function receiving <code>(element, context)</code>. It may return a <code>DocumentFragment</code> or nothing.</td></tr>
   </tbody></table>
   <div class="api-subhead">Example</div>
-</section>
 
 ```javascript
 defineMeld('user-card', (el, { emit }) => {
@@ -46,6 +45,8 @@ defineMeld('user-card', (el, { emit }) => {
   `;
 });
 ```
+
+</section>
 
 <section class="api-entry" id="meldState" data-category="core">
   <div class="api-entry-tags">
@@ -62,12 +63,13 @@ defineMeld('user-card', (el, { emit }) => {
     <tr><td class="pname">initialObject</td><td class="ptype">object</td><td class="pdesc">Initial state object to wrap.</td></tr>
   </tbody></table>
   <div class="api-subhead">Example</div>
-</section>
 
 ```javascript
 const state = meldState({ count: 0 });
 state.count += 1;
 ```
+
+</section>
 
 <section class="api-entry" id="computed" data-category="core">
   <div class="api-entry-tags">
@@ -84,12 +86,13 @@ state.count += 1;
     <tr><td class="pname">getterFn</td><td class="ptype">Function</td><td class="pdesc">Function that reads reactive state and returns the derived value.</td></tr>
   </tbody></table>
   <div class="api-subhead">Example</div>
-</section>
 
 ```javascript
 const fullName = computed(() => `${state.first} ${state.last}`);
 console.log(fullName());
 ```
+
+</section>
 
 <section class="api-entry" id="meldHtml" data-category="dom">
   <div class="api-entry-tags">
@@ -119,7 +122,6 @@ console.log(fullName());
 `;</code></pre>
 
   <div class="api-subhead">Example</div>
-</section>
 
 ```javascript
 return meldHtml`
@@ -127,6 +129,8 @@ return meldHtml`
   <button onclick="${() => state.count++}">+</button>
 `;
 ```
+
+</section>
 
 <section class="api-entry" id="onMount" data-category="lifecycle">
   <div class="api-entry-tags">
@@ -142,6 +146,14 @@ return meldHtml`
   <table class="api-params"><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
     <tr><td class="pname">fn</td><td class="ptype">Function</td><td class="pdesc">Callback to run on connection.</td></tr>
   </tbody></table>
+  <div class="api-subhead">Example</div>
+
+```javascript
+onMount(() => {
+  console.log('Component is now in the DOM');
+});
+```
+
 </section>
 
 <section class="api-entry" id="onDestroy" data-category="lifecycle">
@@ -158,6 +170,14 @@ return meldHtml`
   <table class="api-params"><thead><tr><th>Name</th><th>Type</th><th>Description</th></tr></thead><tbody>
     <tr><td class="pname">fn</td><td class="ptype">Function</td><td class="pdesc">Cleanup callback for timers, listeners, or external resources.</td></tr>
   </tbody></table>
+  <div class="api-subhead">Example</div>
+
+```javascript
+onDestroy(() => {
+  clearInterval(timerId);
+});
+```
+
 </section>
 
 <section class="api-entry" id="provide" data-category="context">
@@ -175,6 +195,12 @@ return meldHtml`
     <tr><td class="pname">key</td><td class="ptype">string</td><td class="pdesc">Context identifier.</td></tr>
     <tr><td class="pname">value</td><td class="ptype">any</td><td class="pdesc">Value to provide.</td></tr>
   </tbody></table>
+  <div class="api-subhead">Example</div>
+
+```javascript
+provide('theme', 'dark');
+```
+
 </section>
 
 <section class="api-entry" id="inject" data-category="context">
@@ -192,9 +218,15 @@ return meldHtml`
     <tr><td class="pname">key</td><td class="ptype">string</td><td class="pdesc">Context identifier to resolve.</td></tr>
     <tr><td class="pname">defaultValue<span class="api-optional-flag">?</span></td><td class="ptype">any</td><td class="pdesc">Fallback if no provider is found.</td></tr>
   </tbody></table>
+  <div class="api-subhead">Example</div>
+
+```javascript
+const theme = inject('theme', 'light');
+```
+
 </section>
 
-<section class="api-entry" id="use" data-category="dom">
+<section class="api-entry" id="use" data-category="plugin">
   <div class="api-entry-tags">
     <span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">plugin</span>
     <span class="api-since">since v1.0.0</span>
@@ -212,7 +244,7 @@ return meldHtml`
 </section>
 
 <section class="api-entry" id="meldTheme" data-category="dom">
-  <div class="api-entry-tags"><span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">dom</span><span class="api-since">since v1.3.0</span></div>
+  <div class="api-entry-tags"><span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">dom</span><span class="api-since">since v1.2.0</span></div>
   <div class="api-signature" style="border-left: 4px solid var(--c-dom);"><div class="api-signature-call"><span class="fn-name" style="color:var(--c-dom);">meld.theme</span><span class="fn-punct">(</span><span class="fn-param">cssString</span><span class="fn-punct">)</span></div><div class="api-return-pill"><span class="arrow">-></span>void</div></div>
   <p class="api-entry-desc">Creates a constructable stylesheet and adopts it into Meld component shadow roots.</p>
 </section>
@@ -244,5 +276,5 @@ return meldHtml`
 <section class="api-entry" id="meldFlush" data-category="dom">
   <div class="api-entry-tags"><span class="api-tag-pill" style="background:var(--c-dom-soft); color:var(--c-dom);">dom</span><span class="api-since">since v1.4.0</span></div>
   <div class="api-signature" style="border-left: 4px solid var(--c-dom);"><div class="api-signature-call"><span class="fn-name" style="color:var(--c-dom);">meld.flush</span><span class="fn-punct">(</span><span class="fn-punct">)</span></div><div class="api-return-pill"><span class="arrow">-></span>void</div></div>
-  <p class="api-entry-desc">Synchronously flushes any pending batched reactive updates to the DOM immediately.</p>
+  <p class="api-entry-desc">Synchronously flushes all pending batched reactive updates to the DOM.</p>
 </section>
