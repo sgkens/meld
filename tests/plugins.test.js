@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { meldState, computed, defineMeld, meldHtml, onDestroy, onMount, provide, inject, meld } from '../src/meld.core.js';
+import { meldState, computed, defineMeld, meldHtml, onDestroy, onMount, provide, inject, meld, effect } from '../src/meld.core.js';
 
 // Import all plugins
 import { MeldA11y } from '../src/plugins/meld-a11y.js';
@@ -38,7 +38,7 @@ import { MeldWasm } from '../src/plugins/meld-wasm.js';
 const tick = () => new Promise(resolve => setTimeout(resolve, 0));
 
 // Complete API object mimicking what meld.use() passes
-const api = { defineMeld, meldState, meldHtml, computed, provide, inject, onMount, onDestroy, meld };
+const api = { defineMeld, meldState, meldHtml, computed, provide, inject, onMount, onDestroy, meld, effect };
 
 beforeEach(() => {
   document.body.innerHTML = '';

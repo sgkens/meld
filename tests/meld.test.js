@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, jest } from '@jest/globals';
-import { computed, defineMeld, meld, meldHtml, meldState, onDestroy, provide, inject, use } from '../src/meld.core.js';
+import { computed, defineMeld, meld, meldHtml, meldState, onDestroy, provide, inject, use, effect } from '../src/meld.core.js';
 import { MeldA11y } from '../src/plugins/meld-a11y.js';
 import { MeldAI } from '../src/plugins/meld-ai.js';
 import { MeldPortal } from '../src/plugins/meld-portal.js';
@@ -638,6 +638,45 @@ describe('Meld Core Hardening Matrix', () => {
     expect(typeof passedProvide).toBe('function');
     expect(passedInject).toBe(inject);
     expect(passedProvide).toBe(provide);
+
+    el.remove();
+  });
+
+  it('provides public effect function that runs immediately and reactively updates on state change', async () => {
+    const state = meldState({ count: 0 });
+    let runCount = 0;
+    let valueSeen = -1;
+
+    effect(() => {
+      runCount++;
+      valueSeen = state.count;
+    });
+
+    expect(runCount).toBe(1);
+    expect(valueSeen).toBe(0);
+
+    state.count = 5;
+    meld.flush();
+
+    expect(runCount).toBe(2);
+    expect(valueSeen).toBe(5);
+  });
+
+  it('passes effect in the setup function context argument', async () => {
+    const tagName = `m-effect-ctx-${Date.now()}`;
+    let passedEffect = null;
+
+    defineMeld(tagName, (el, { effect: gotEffect }) => {
+      passedEffect = gotEffect;
+      return meldHtml`<div></div>`;
+    });
+
+    const el = document.createElement(tagName);
+    document.body.appendChild(el);
+    await tick();
+
+    expect(typeof passedEffect).toBe('function');
+    expect(passedEffect).toBe(effect);
 
     el.remove();
   });

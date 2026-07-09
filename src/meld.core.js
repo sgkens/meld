@@ -96,6 +96,17 @@ function cleanupEffect(effect) {
   effectQueue.delete(effect);
 }
 
+/**
+ * Creates and registers a reactive side effect that runs immediately and re-runs
+ * whenever any accessed reactive state changes.
+ * 
+ * @param {function(): void} fn - The callback function containing reactive state reads.
+ * @returns {void}
+ */
+export function effect(fn) {
+  createEffect(fn);
+}
+
 // 2. UTILITIES & HELPERS
 // --------------------------------------------------------
 /**
@@ -218,7 +229,7 @@ export function use(plugin, options = {}) {
   if (installedPlugins.has(plugin)) return;
   const api = { 
     defineMeld, meldState, meldHtml, computed, 
-    provide, inject, onMount, onDestroy, meld 
+    provide, inject, onMount, onDestroy, meld, effect 
   };
   plugin.install(api, options);
   if (plugin.setupHelpers) {
@@ -545,7 +556,7 @@ export function defineMeld(tagName, setupFn, options = {}) {
         if (this._isHydrating) {
           this._hydrationTarget = this.shadowRoot;
         }
-        const template = setupFn(this, { emit, inject, provide, attrs: this._meldAttrs, props: this._meldProps, ...extensionContext });
+        const template = setupFn(this, { emit, inject, provide, effect, attrs: this._meldAttrs, props: this._meldProps, ...extensionContext });
         if (template && !this._isHydrating) {
           this.shadowRoot.innerHTML = '';
           this.shadowRoot.appendChild(template);
