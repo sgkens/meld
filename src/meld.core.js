@@ -11,6 +11,28 @@ let globalStyles = []; // Store for adopted stylesheets
 const installedPlugins = new Set();
 const extensionContext = {};
 
+const effectQueue = new Set();
+let pendingTick = false;
+
+function flushEffects() {
+  pendingTick = false;
+  const queue = Array.from(effectQueue);
+  effectQueue.clear();
+  queue.forEach(effect => {
+    if (effect.active) {
+      effect.run();
+    }
+  });
+}
+
+function queueEffect(effect) {
+  effectQueue.add(effect);
+  if (!pendingTick) {
+    pendingTick = true;
+    Promise.resolve().then(flushEffects);
+  }
+}
+
 // 1. REACTIVITY ENGINE
 // --------------------------------------------------------
 /**
@@ -37,7 +59,9 @@ export function meldState(initialObj) {
       if (target[prop] !== value) {
         target[prop] = value;
         if (deps.has(prop)) {
-          [...deps.get(prop)].forEach(effect => effect.run());
+          [...deps.get(prop)].forEach(effect => {
+            queueEffect(effect);
+          });
         }
       }
       return true;
@@ -47,7 +71,9 @@ export function meldState(initialObj) {
 
 function createEffect(fn) {
   const effect = {
+    active: true,
     run: () => {
+      if (!effect.active) return;
       cleanupEffect(effect);
       effectStack.push(effect);
       activeEffect = effect;
@@ -67,6 +93,7 @@ function createEffect(fn) {
 function cleanupEffect(effect) {
   effect.deps.forEach(depSet => depSet.delete(effect));
   effect.deps.clear();
+  effectQueue.delete(effect);
 }
 
 // 2. UTILITIES & HELPERS
@@ -82,7 +109,10 @@ function cleanupEffect(effect) {
 export const computed = (getterFn) => {
   const internal = meldState({ value: null });
   createEffect(() => internal.value = getterFn());
-  return () => internal.value;
+  return () => {
+    meld.flush();
+    return internal.value;
+  };
 };
 
 /**
@@ -90,6 +120,16 @@ export const computed = (getterFn) => {
  * @type {object}
  */
 export const meld = {
+  /**
+   * Synchronously flushes any pending reactive effect updates.
+   * 
+   * @returns {void}
+   */
+  flush: () => {
+    if (pendingTick) {
+      flushEffects();
+    }
+  },
   /**
    * Registers a global CSS style sheet to be adopted by all subsequently connected Meld components.
    * 
@@ -521,7 +561,10 @@ export function defineMeld(tagName, setupFn, options = {}) {
     disconnectedCallback() {
       Promise.resolve().then(() => {
         if (!this.isConnected) {
-          this.effects.forEach(effect => cleanupEffect(effect));
+          this.effects.forEach(effect => {
+            effect.active = false;
+            cleanupEffect(effect);
+          });
           this.effects = [];
           this.destroyHooks.forEach(fn => fn());
           this._initialized = false;

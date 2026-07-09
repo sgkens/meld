@@ -48,10 +48,12 @@ describe('Meld Core Rendering', () => {
     expect(document.body.querySelector('span').textContent).toBe('B');
 
     state.left = '<i>C</i>';
+    meld.flush();
     expect(document.body.querySelector('i').textContent).toBe('C');
     expect(document.body.querySelector('span').textContent).toBe('B');
 
     state.right = 'D';
+    meld.flush();
     expect(document.body.querySelector('i').textContent).toBe('C');
     expect(document.body.querySelector('span').textContent).toBe('D');
   });
@@ -66,6 +68,7 @@ describe('Meld Core Rendering', () => {
     expect(document.body.querySelector('section').children[2].tagName).toBe('EM');
 
     state.tag = 'small';
+    meld.flush();
     expect(document.body.querySelector('section').children[0].tagName).toBe('EM');
     expect(document.body.querySelector('section').children[1].tagName).toBe('SMALL');
     expect(document.body.querySelector('section').children[2].tagName).toBe('EM');
@@ -585,5 +588,34 @@ describe('Meld Core Hardening Matrix', () => {
 
     const staticElement = document.body.querySelectorAll('m-test-dot-binding')[1];
     expect(staticElement.val).toBe('world');
+  });
+
+  it('batches reactive updates in microtasks and supports manual flushing', async () => {
+    const state = meldState({ count: 0 });
+    let triggerCount = 0;
+
+    const double = computed(() => {
+      triggerCount++;
+      return state.count * 2;
+    });
+
+    expect(double()).toBe(0);
+    expect(triggerCount).toBe(1);
+
+    state.count = 1;
+    state.count = 2;
+    state.count = 3;
+
+    expect(triggerCount).toBe(1);
+
+    meld.flush();
+    expect(triggerCount).toBe(2);
+
+    state.count = 4;
+    state.count = 5;
+    expect(triggerCount).toBe(2);
+
+    await tick();
+    expect(triggerCount).toBe(3);
   });
 });

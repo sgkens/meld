@@ -14,8 +14,9 @@ To master Meld, you need to understand how it differs from React or Vue.
 Meld does not use `setState()` (React) or a compiler (Svelte). It uses **JavaScript Proxies**.
 
 * **Tracking:** When you access `state.count` inside `meldHtml`, the engine records a dependency.
-* **Updating:** When you write `state.count++`, the engine is notified immediately.
-* **Surgical Update:** The engine goes directly to the DOM Text Node associated with that dependency and updates `.data`. It does **not** re-render the component.
+* **Updating:** When you write `state.count++`, the engine is notified. Multiple synchronous updates are automatically coalesced.
+* **Asynchronous Microtask Batching**: DOM updates are queued and flushed on the next microtask tick (using `Promise.resolve()`). This avoids synchronous DOM thrashing and layout bottlenecks. If you need to force updates to flush synchronously (e.g. during testing or before reading side-effects), you can call `meld.flush()`.
+* **Surgical Update:** When flushing, the engine goes directly to the DOM Text Node associated with that dependency and updates `.data`. It does **not** re-render the component.
 
 
 

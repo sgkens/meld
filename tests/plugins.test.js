@@ -101,6 +101,7 @@ describe('MeldPersist Plugin', () => {
     expect(state.active).toBe(true);
 
     state.age = 31;
+    meld.flush();
     expect(JSON.parse(localStorage.getItem('my-key'))).toEqual({ name: 'Alice', age: 31, active: true });
   });
 });

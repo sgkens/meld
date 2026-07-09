@@ -649,8 +649,9 @@
 <p>Meld does not use <code>setState()</code> (React) or a compiler (Svelte). It uses <strong>JavaScript Proxies</strong>.</p>
 <ul>
 <li><strong>Tracking:</strong> When you access <code>state.count</code> inside <code><a href="/api-reference/#meldHtml">meldHtml</a></code>, the engine records a dependency.</li>
-<li><strong>Updating:</strong> When you write <code>state.count++</code>, the engine is notified immediately.</li>
-<li><strong>Surgical Update:</strong> The engine goes directly to the DOM Text Node associated with that dependency and updates <code>.data</code>. It does <strong>not</strong> re-render the component.</li>
+<li><strong>Updating:</strong> When you write <code>state.count++</code>, the engine is notified. Multiple synchronous updates are automatically coalesced.</li>
+<li><strong>Asynchronous Microtask Batching</strong>: DOM updates are queued and flushed on the next microtask tick (using <code>Promise.resolve()</code>). This avoids synchronous DOM thrashing and layout bottlenecks. If you need to force updates to flush synchronously (e.g. during testing or before reading side-effects), you can call <code>meld.flush()</code>.</li>
+<li><strong>Surgical Update:</strong> When flushing, the engine goes directly to the DOM Text Node associated with that dependency and updates <code>.data</code>. It does <strong>not</strong> re-render the component.</li>
 </ul>
 <h2>2. Components as Native Elements</h2>
 <p>Every Meld component is a standard <strong>HTML Custom Element</strong>.</p>
